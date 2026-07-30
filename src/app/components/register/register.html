@@ -1,0 +1,214 @@
+<div class="register-page">
+
+
+    <div class="glass-card">
+
+
+        <div class="logo-section">
+
+            <h1>
+                DIGI SHOP
+            </h1>
+
+            <p>
+                Create your account and start shopping
+            </p>
+
+        </div>
+
+
+
+        <form [formGroup]="registerForm" (ngSubmit)="registerUser()">
+
+
+            <div class="input-group">
+
+                <input type="text" formControlName="userName" placeholder=" ">
+
+                <label>
+                    Username
+                </label>
+
+            </div>
+
+            @if(
+            registerForm.controls.userName.touched &&
+            registerForm.controls.userName.invalid
+            )
+            {
+            <div class="error-message">
+
+                @if(registerForm.controls.userName.errors?.['required'])
+                {
+                <span>
+                    Username is required
+                </span>
+                }
+
+
+                @if(registerForm.controls.userName.errors?.['minlength'])
+                {
+                <span>
+                    Username must be minimum 4 characters
+                </span>
+                }
+
+            </div>
+            }
+
+
+
+
+            <div class="input-group">
+
+                <input type="email" formControlName="email" placeholder=" ">
+
+                <label>
+                    Email Address
+                </label>
+
+            </div>
+
+            @if(
+            registerForm.controls.email.touched &&
+            registerForm.controls.email.invalid
+            )
+            {
+            <div class="error-message">
+
+                @if(registerForm.controls.email.errors?.['required'])
+                {
+                <span>
+                    Email is required
+                </span>
+                }
+
+                @if(registerForm.controls.email.errors?.['pattern'])
+                {
+                <span>
+                    Please enter a valid email address
+                </span>
+                }
+
+            </div>
+            }
+
+
+
+
+            <div class="input-group">
+
+                <input type="password" formControlName="password" placeholder=" ">
+
+                <label>
+                    Password
+                </label>
+
+            </div>
+
+            @if(
+            registerForm.controls.password.touched &&
+            registerForm.controls.password.invalid
+            )
+            {
+            <div class="error-message">
+
+                @if(registerForm.controls.password.errors?.['required'])
+                {
+                <span>
+                    Password is required
+                </span>
+                }
+
+                @if(registerForm.controls.password.errors?.['minlength'])
+                {
+                <span>
+                    Password must be at least 8 characters
+                </span>
+                }
+
+                @if(registerForm.controls.password.errors?.['passwordStrength'])
+                {
+                <span>
+                    Password must contain at least one uppercase letter, one lowercase letter, one number, and one
+                    special character.
+                </span>
+                }
+
+            </div>
+            }
+
+
+
+
+            <div class="input-group">
+
+                <input type="password" formControlName="confirmPassword" placeholder=" ">
+
+                <label>
+                    Confirm Password
+                </label>
+
+            </div>
+
+
+            @if(
+            registerForm.controls.confirmPassword.touched &&
+            registerForm.controls.confirmPassword.invalid
+            )
+            {
+            <div class="error-message">
+
+                @if(registerForm.controls.confirmPassword.errors?.['required'])
+                {
+                <span>
+                    Confirm Password is required
+                </span>
+                }
+
+            </div>
+            }
+
+            @if(
+            registerForm.controls.confirmPassword.touched &&
+            registerForm.controls.confirmPassword.value &&
+            registerForm.errors?.['passwordMismatch']
+            )
+            {
+            <div class="error-message">
+
+                <span>
+                    Passwords do not match
+                </span>
+
+            </div>
+            }
+
+
+
+
+            <button type="submit" class="register-btn" [disabled]="registerForm.invalid">
+
+                Create Account
+
+            </button>
+
+
+
+        </form>
+
+
+
+        <div class="login-text">
+
+            Already have an account?
+            <a style="cursor: pointer; font-weight: bold;" (click)="goToLogin()">Login</a>
+        </div>
+
+
+
+    </div>
+
+
+
+</div>

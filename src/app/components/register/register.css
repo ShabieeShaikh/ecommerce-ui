@@ -1,0 +1,521 @@
+* {
+
+    box-sizing: border-box;
+
+    font-family: 'Poppins', sans-serif;
+
+}
+
+
+
+/* ===========================
+   MAIN PAGE
+=========================== */
+
+
+.register-page {
+
+    min-height: 100vh;
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+
+
+    background:
+        linear-gradient(135deg,
+            #7C1C77,
+            #B0295C);
+
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+
+/* ===========================
+   BACKGROUND BLUR EFFECT
+=========================== */
+
+
+.register-page::before,
+.register-page::after {
+
+
+    content: "";
+
+    position: absolute;
+
+    width: 280px;
+
+    height: 280px;
+
+    border-radius: 50%;
+
+
+    background:
+        rgba(255, 255, 255, 0.18);
+
+
+    filter: blur(60px);
+
+
+}
+
+
+
+.register-page::before {
+
+    top: -80px;
+
+    left: -80px;
+
+}
+
+
+
+
+.register-page::after {
+
+    bottom: -80px;
+
+    right: -80px;
+
+}
+
+
+
+
+
+/* ===========================
+   GLASS CARD
+=========================== */
+
+
+.glass-card {
+
+
+    width: 60%;
+
+    padding: 32px;
+
+
+    border-radius: 22px;
+
+
+    background:
+        rgba(255, 255, 255, 0.15);
+
+
+    backdrop-filter: blur(20px);
+
+    -webkit-backdrop-filter: blur(20px);
+
+
+    border:
+
+        1px solid rgba(255, 255, 255, 0.25);
+
+
+
+    box-shadow:
+
+        0 20px 45px rgba(0, 0, 0, 0.25);
+
+
+
+    color: white;
+
+
+    z-index: 1;
+
+
+}
+
+
+
+
+
+/* ===========================
+   LOGO / HEADER
+=========================== */
+
+
+.logo-section {
+
+    text-align: center;
+
+    margin-bottom: 28px;
+
+}
+
+
+
+
+.logo-section h1 {
+
+
+    font-size: 28px;
+
+    font-weight: 600;
+
+    margin: 0 0 8px;
+
+
+}
+
+
+
+
+.logo-section p {
+
+
+    font-size: 14px;
+
+    color: #f5d9e8;
+
+    margin: 0;
+
+
+}
+
+
+
+
+/* ===========================
+   INPUT GROUP
+=========================== */
+
+
+.input-group {
+
+
+    position: relative;
+
+    margin-bottom: 22px;
+
+    width: 100%;
+
+
+}
+
+
+
+
+.input-group input {
+
+
+    width: 100%;
+
+
+    padding:
+
+        14px 15px;
+
+
+
+    border-radius: 12px;
+
+
+    border:
+
+        1px solid rgba(255, 255, 255, 0.35);
+
+
+
+    background:
+
+        rgba(255, 255, 255, 0.12);
+
+
+
+    outline: none;
+
+
+    color: white;
+
+
+    font-size: 14px;
+
+
+
+    transition: .3s;
+
+
+}
+
+
+
+
+
+.input-group input::placeholder {
+
+    color: transparent;
+
+}
+
+
+
+
+
+.input-group input:focus {
+
+
+    border-color: white;
+
+
+    background:
+
+        rgba(255, 255, 255, 0.2);
+
+
+}
+
+
+
+
+
+
+
+/* Floating Label */
+
+
+.input-group label {
+
+
+    position: absolute;
+
+
+    left: 15px;
+
+
+    top: 14px;
+
+
+    color: #eeeeee;
+
+
+    font-size: 14px;
+
+
+    pointer-events: none;
+
+
+    transition: .3s;
+
+
+}
+
+
+
+
+
+
+.input-group input:focus~label,
+.input-group input:not(:placeholder-shown)~label {
+
+
+    top: -10px;
+
+
+    left: 12px;
+
+
+    font-size: 12px;
+
+
+
+    background: #7C1C77;
+
+
+    padding:
+
+        2px 8px;
+
+
+    border-radius: 6px;
+
+
+}
+
+
+
+
+
+
+/* ===========================
+   BUTTON
+=========================== */
+
+
+.register-btn {
+
+
+    width: 100%;
+
+
+    padding: 13px;
+
+
+    margin-top: 5px;
+
+
+    border: none;
+
+
+    border-radius: 30px;
+
+
+
+    background: white;
+
+
+
+    color: #7C1C77;
+
+
+    font-size: 15px;
+
+
+    font-weight: 600;
+
+
+
+    cursor: pointer;
+
+
+    transition: .3s;
+
+
+}
+
+
+
+
+
+.register-btn:hover:not(:disabled) {
+
+    background: #B0295C;
+
+    color: white;
+
+    transform: translateY(-3px);
+
+}
+
+.register-btn:disabled {
+
+    opacity: 0.5;
+
+    cursor: not-allowed;
+
+}
+
+
+
+
+
+
+
+/* ===========================
+   LOGIN TEXT
+=========================== */
+
+
+.login-text {
+
+
+    text-align: center;
+
+
+    margin-top: 22px;
+
+
+    font-size: 14px;
+
+
+    color: #f5d9e8;
+
+
+}
+
+
+
+
+
+.login-text span {
+
+
+    color: white;
+
+
+    font-weight: 600;
+
+
+    cursor: pointer;
+
+
+}
+
+
+.error-message {
+
+    color: rgba(162, 18, 18, 0.995);
+
+    font-size: 12px;
+
+    margin-top: -18px;
+
+    margin-bottom: 18px;
+
+    padding-left: 5px;
+
+    line-height: 1.5;
+
+}
+
+
+
+
+/* ===========================
+   MOBILE RESPONSIVE
+=========================== */
+
+
+@media(max-width:450px) {
+
+
+
+    .glass-card {
+
+
+        width: 100%;
+
+
+        padding: 25px;
+
+
+    }
+
+
+
+
+    .logo-section h1 {
+
+
+        font-size: 24px;
+
+
+    }
+
+
+}
