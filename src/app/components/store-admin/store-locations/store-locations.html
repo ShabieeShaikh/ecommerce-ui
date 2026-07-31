@@ -1,0 +1,334 @@
+<div class="locations-page">
+
+  <!-- ── CARD GRID VIEW ── -->
+  @if (!selectedStoreId()) {
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Store Locations</h1>
+        <p class="page-desc">Select a store to manage its location, delivery zones, and history.</p>
+      </div>
+    </div>
+
+    <div class="store-location-grid">
+      @for (store of storeService.stores(); track store.id) {
+        <div class="location-card" (click)="selectStore(store.id)">
+          <!-- Card accent bar -->
+          <div class="location-card-accent" [style.background]="store.accentColor"></div>
+
+          <div class="location-card-body">
+            <!-- Store avatar + name -->
+            <div class="location-card-header">
+              <div class="store-avatar" [style.background]="store.accentColor">
+                {{ store.name.charAt(0) }}
+              </div>
+              <div class="store-title-block">
+                <h3 class="store-card-name">{{ store.name }}</h3>
+                <span class="store-card-cat">{{ store.category }}</span>
+              </div>
+              <span class="loc-status-badge" [class]="getStatusClass(store.status)">
+                {{ store.status | titlecase }}
+              </span>
+            </div>
+
+            <!-- Location info -->
+            <div class="location-card-info">
+              <div class="loc-info-row">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>{{ store.address ?? store.city }}, {{ store.country }}</span>
+              </div>
+              <div class="loc-info-row">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Owner: {{ store.owner }}</span>
+              </div>
+              <div class="loc-info-row">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>Since {{ store.createdAt }}</span>
+              </div>
+            </div>
+
+            <!-- Delivery zone count badge -->
+            <div class="location-card-zones">
+              <span class="zones-badge">4 Delivery Zones</span>
+            </div>
+          </div>
+
+          <div class="location-card-footer">
+            <button class="view-location-btn" (click)="selectStore(store.id); $event.stopPropagation()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              View Location
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── DETAIL VIEW ── -->
+  @if (selectedStoreId() && selectedStore()) {
+    <div class="detail-view">
+
+      <!-- Header -->
+      <div class="detail-header">
+        <button class="back-btn" (click)="goBack()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All Stores
+        </button>
+        <div class="detail-title-block">
+          <div class="detail-store-avatar" [style.background]="selectedStore()!.accentColor">
+            {{ selectedStore()!.name.charAt(0) }}
+          </div>
+          <div>
+            <h1 class="detail-store-name">{{ selectedStore()!.name }}</h1>
+            <span class="detail-store-cat">{{ selectedStore()!.category }}</span>
+          </div>
+          <span class="loc-status-badge" [class]="getStatusClass(selectedStore()!.status)">
+            {{ selectedStore()!.status | titlecase }}
+          </span>
+        </div>
+        <div class="detail-header-actions">
+          <button class="btn-outline" (click)="onShareLocation()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Share Location
+          </button>
+          <button class="btn-primary" (click)="onUpdateLocation()" [disabled]="isUpdating()">
+            @if (isUpdating()) { <span class="spinner"></span> Saving... }
+            @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Update Location
+            }
+          </button>
+        </div>
+      </div>
+
+      <!-- Map Visualization -->
+      <div class="map-card">
+        <div class="map-visual">
+          <div class="map-grid"></div>
+          <div class="map-rings">
+            <div class="map-ring ring-3"></div>
+            <div class="map-ring ring-2"></div>
+            <div class="map-ring ring-1"></div>
+          </div>
+          <div class="map-pin" [style.background]="selectedStore()!.accentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="map-coords-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ selectedStore()!.latitude ?? '40.7128' }}, {{ selectedStore()!.longitude ?? '-74.0060' }}
+          </div>
+        </div>
+        <div class="map-footer">
+          <div>
+            <span class="map-store-name">{{ selectedStore()!.name }}</span>
+            <span class="map-store-addr">{{ selectedStore()!.address ?? selectedStore()!.city + ', ' + selectedStore()!.country }}</span>
+          </div>
+          <div class="map-footer-btns">
+            <button class="btn-outline-sm" (click)="onViewOnMaps()">View on Google Maps</button>
+            <button class="btn-outline-sm" (click)="onShareLocation()">Share Location</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="detail-tabs">
+        <button class="detail-tab" [class.active]="activeTab() === 'info'" (click)="setTab('info')">Location Info</button>
+        <button class="detail-tab" [class.active]="activeTab() === 'zones'" (click)="setTab('zones')">
+          Delivery Zones
+          <span class="tab-badge">{{ deliveryZones().length }}</span>
+        </button>
+        <button class="detail-tab" [class.active]="activeTab() === 'history'" (click)="setTab('history')">History</button>
+      </div>
+
+      <!-- Tab: Location Info -->
+      @if (activeTab() === 'info') {
+        <div class="info-grid">
+          <div class="info-card">
+            <h3 class="info-card-title">Address Details</h3>
+            <div class="info-row">
+              <span class="info-label">Street Address</span>
+              <span class="info-val">{{ selectedStore()!.address ?? '—' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">City</span>
+              <span class="info-val">{{ selectedStore()!.city }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">State / Region</span>
+              <span class="info-val">{{ selectedStore()!.state ?? '—' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Country</span>
+              <span class="info-val">{{ selectedStore()!.country }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Postal Code</span>
+              <span class="info-val">{{ selectedStore()!.postalCode ?? '—' }}</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <h3 class="info-card-title">GPS Coordinates</h3>
+            <div class="info-row">
+              <span class="info-label">Latitude</span>
+              <span class="info-val mono">{{ selectedStore()!.latitude ?? '40.7128' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Longitude</span>
+              <span class="info-val mono">{{ selectedStore()!.longitude ?? '-74.0060' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Coverage Radius</span>
+              <span class="info-val">25 km</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Status</span>
+              <span class="loc-status-badge" [class]="getStatusClass(selectedStore()!.status)">
+                {{ selectedStore()!.status | titlecase }}
+              </span>
+            </div>
+          </div>
+          <div class="info-card">
+            <h3 class="info-card-title">Contact & Owner</h3>
+            <div class="info-row">
+              <span class="info-label">Owner</span>
+              <span class="info-val">{{ selectedStore()!.owner }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Email</span>
+              <span class="info-val">{{ selectedStore()!.email }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Phone</span>
+              <span class="info-val">{{ selectedStore()!.phone }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Since</span>
+              <span class="info-val">{{ selectedStore()!.createdAt }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Tab: Delivery Zones -->
+      @if (activeTab() === 'zones') {
+        <div class="zones-section">
+          <div class="zones-toolbar">
+            <h3 class="zones-title">Delivery Zones</h3>
+            <button class="btn-primary" (click)="showAddZoneModal.set(true)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Zone
+            </button>
+          </div>
+          <div class="zones-grid">
+            @for (zone of deliveryZones(); track zone.id) {
+              <div class="zone-card" [class.disabled]="!zone.isActive">
+                <div class="zone-header">
+                  <div class="zone-name-row">
+                    <div class="zone-dot" [class.active]="zone.isActive"></div>
+                    <span class="zone-name">{{ zone.name }}</span>
+                  </div>
+                  <div class="zone-actions">
+                    <button class="zone-action-btn" (click)="onEditZone(zone)" title="Edit zone">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="zone-action-btn danger" (click)="onDeleteZone(zone)" title="Remove zone">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </button>
+                    <button class="zone-toggle-btn" [class.on]="zone.isActive" (click)="onToggleZone(zone)">
+                      {{ zone.isActive ? 'Active' : 'Disabled' }}
+                    </button>
+                  </div>
+                </div>
+                <div class="zone-stats">
+                  <div class="zone-stat">
+                    <span class="zone-stat-val">{{ zone.radius }} {{ zone.unit }}</span>
+                    <span class="zone-stat-lbl">Radius</span>
+                  </div>
+                  <div class="zone-divider"></div>
+                  <div class="zone-stat">
+                    <span class="zone-stat-val">${{ zone.deliveryFee }}</span>
+                    <span class="zone-stat-lbl">Delivery Fee</span>
+                  </div>
+                  <div class="zone-divider"></div>
+                  <div class="zone-stat">
+                    <span class="zone-stat-val">{{ zone.estimatedTime }}</span>
+                    <span class="zone-stat-lbl">Est. Time</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Tab: History -->
+      @if (activeTab() === 'history') {
+        <div class="history-section">
+          <h3 class="history-title">Location History</h3>
+          <div class="history-timeline">
+            @for (item of locationHistory(); track item.id) {
+              <div class="history-item">
+                <div class="history-line"></div>
+                <div class="history-dot" [class]="'dot--' + item.type"></div>
+                <div class="history-body">
+                  <div class="history-row">
+                    <span class="history-action">{{ item.action }}</span>
+                    <span class="history-time">{{ item.timestamp }}</span>
+                  </div>
+                  <span class="history-details">{{ item.details }}</span>
+                  <span class="history-by">by {{ item.performedBy }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+  }
+
+  <!-- Add Zone Modal -->
+  @if (showAddZoneModal()) {
+    <div class="modal-backdrop" (click)="showAddZoneModal.set(false)">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Add Delivery Zone</h3>
+          <button class="modal-close" (click)="showAddZoneModal.set(false)">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <label>Zone Name</label>
+            <input type="text" [(ngModel)]="newZone.name" placeholder="e.g. Downtown Zone" class="form-input">
+          </div>
+          <div class="form-row-2">
+            <div class="form-row">
+              <label>Radius</label>
+              <input type="number" [(ngModel)]="newZone.radius" class="form-input">
+            </div>
+            <div class="form-row">
+              <label>Unit</label>
+              <select [(ngModel)]="newZone.unit" class="form-input">
+                <option value="km">km</option>
+                <option value="mi">mi</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-row">
+              <label>Delivery Fee ($)</label>
+              <input type="number" [(ngModel)]="newZone.deliveryFee" class="form-input">
+            </div>
+            <div class="form-row">
+              <label>Estimated Time</label>
+              <input type="text" [(ngModel)]="newZone.estimatedTime" placeholder="e.g. 1–2 hrs" class="form-input">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-outline" (click)="showAddZoneModal.set(false)">Cancel</button>
+          <button class="btn-primary" (click)="onAddZone()" [disabled]="!newZone.name">Add Zone</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

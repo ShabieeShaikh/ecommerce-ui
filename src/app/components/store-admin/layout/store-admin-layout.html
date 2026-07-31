@@ -1,0 +1,418 @@
+<div class="admin-shell" [class.collapsed]="sidebarCollapsed()">
+
+  <!-- ═══════════════════════════════════════
+       SIDEBAR
+  ═══════════════════════════════════════ -->
+  <aside class="sidebar" role="complementary" aria-label="Main navigation">
+
+    <!-- Brand / Logo -->
+    <div class="sidebar-brand">
+      <div class="brand-logo-wrap">
+        <div class="brand-logo">
+          <img src="dts-logo-white.png" width="50" height="22" viewBox="0 0 30 30"
+               fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">DigiShop</span>
+          <span class="brand-sub">Admin Portal</span>
+        </div>
+      </div>
+      <button class="sidebar-collapse-btn" (click)="toggleSidebar()"
+              [attr.aria-label]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+             [class.rotated]="sidebarCollapsed()">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav" aria-label="Store admin navigation">
+
+      <!-- MAIN group -->
+      <div class="nav-group">
+        <span class="nav-group-label">Main</span>
+        <a class="nav-item" routerLink="/store-admin/dashboard" routerLinkActive="nav-active"
+           [routerLinkActiveOptions]="{exact: true}" title="Dashboard">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+      </div>
+
+      <!-- STORE group -->
+      <div class="nav-group">
+        <span class="nav-group-label">Store</span>
+
+        <a class="nav-item" routerLink="/store-admin/stores" routerLinkActive="nav-active"
+           [routerLinkActiveOptions]="{exact: true}" title="Store Management">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </span>
+          <span class="nav-label">Store Management</span>
+        </a>
+
+        <a class="nav-item" routerLink="/store-admin/analytics" routerLinkActive="nav-active" title="Store Analytics">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+            </svg>
+          </span>
+          <span class="nav-label">Store Analytics</span>
+        </a>
+
+        <!-- <a class="nav-item" routerLink="/store-admin/stores" routerLinkActive="nav-active"
+           [routerLinkActiveOptions]="{exact: true}" title="Store Listings">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+              <line x1="8" y1="18" x2="21" y2="18"/>
+              <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
+              <line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+          </span>
+          <span class="nav-label">Store Listings</span>
+        </a> -->
+
+        <a class="nav-item" routerLink="/store-admin/locations" routerLinkActive="nav-active" title="Store Locations">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </span>
+          <span class="nav-label">Store Locations</span>
+        </a>
+
+        <a class="nav-item" routerLink="/store-admin/products" routerLinkActive="nav-active" title="Product Management">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+          </span>
+          <span class="nav-label">Product Management</span>
+        </a>
+      </div>
+
+      <!-- ACCOUNT group -->
+      <div class="nav-group">
+        <span class="nav-group-label">Account</span>
+
+        <a class="nav-item" routerLink="/store-admin/settings" routerLinkActive="nav-active" title="Settings">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="nav-label">Settings</span>
+        </a>
+
+        <a class="nav-item" routerLink="/store-admin/profile" routerLinkActive="nav-active" title="Profile">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </span>
+          <span class="nav-label">Profile</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">JD</div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name">John Doe</span>
+          <span class="sidebar-user-role">Store Admin</span>
+        </div>
+        <button class="sidebar-logout-btn" title="Logout" aria-label="Logout" (click)="logout()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════════════════════════════
+       MAIN CONTENT AREA
+  ═══════════════════════════════════════ -->
+  <div class="admin-main">
+
+    <!-- TOP BAR -->
+    <header class="topbar" role="banner">
+
+      <div class="topbar-start">
+        <!-- Mobile hamburger -->
+        <button class="mobile-nav-btn" (click)="toggleSidebar()" aria-label="Toggle navigation">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a routerLink="/store-admin/dashboard" class="breadcrumb-home">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            </svg>
+            DigiShop
+          </a>
+          <svg class="breadcrumb-sep" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span class="breadcrumb-current">Store Admin</span>
+        </nav>
+      </div>
+
+      <div class="topbar-center">
+        <!-- Search with results dropdown -->
+        <div class="topbar-search-wrap" (click)="$event.stopPropagation()">
+          <div class="topbar-search" role="search">
+            <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input id="topbar-search-input" type="search" class="search-input"
+                   [value]="searchQuery()"
+                   (input)="onSearchInput($event)"
+                   placeholder="Search stores, orders, analytics..." autocomplete="off">
+            @if (searchQuery()) {
+              <button class="search-clear-btn" (click)="clearSearch()" aria-label="Clear search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            } @else {
+              <kbd class="search-shortcut">⌘K</kbd>
+            }
+          </div>
+          <!-- Search Results Dropdown -->
+          @if (showSearchResults() && searchResults().length > 0) {
+            <div class="search-results-dropdown">
+              <div class="search-results-header">Stores matching "{{ searchQuery() }}"</div>
+              @for (store of searchResults(); track store.id) {
+                <div class="search-result-item" (click)="navigateToStore(store.id)">
+                  <div class="search-result-avatar" [style.background]="store.accentColor">
+                    {{ store.name.charAt(0) }}
+                  </div>
+                  <div class="search-result-info">
+                    <span class="search-result-name">{{ store.name }}</span>
+                    <span class="search-result-meta">{{ store.category }} · {{ store.city }}</span>
+                  </div>
+                  <span class="search-result-status" [class]="'status-badge status--' + store.status">
+                    {{ store.status }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
+          @if (showSearchResults() && searchResults().length === 0 && searchQuery().length >= 2) {
+            <div class="search-results-dropdown">
+              <div class="search-no-results">No stores found for "{{ searchQuery() }}"</div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="topbar-end">
+
+        <!-- Current Store Chip / Dropdown -->
+        <div class="store-chip-wrap" (click)="toggleStoreDropdown($event)">
+          <div class="store-chip" [class.active]="showStoreDropdown()">
+            <span class="store-chip-dot"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            </svg>
+            <span>{{ selectedStore().name }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                 [class.rotated]="showStoreDropdown()">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+          <!-- Store Switcher Dropdown -->
+          @if (showStoreDropdown()) {
+            <div class="store-dropdown" (click)="$event.stopPropagation()">
+              <div class="dropdown-header">Switch Active Store</div>
+              @for (store of storeService.stores(); track store.id) {
+                <div class="store-dropdown-item"
+                     [class.selected]="store.id === selectedStoreId()"
+                     (click)="selectStore(store.id)">
+                  <div class="store-dd-avatar" [style.background]="store.accentColor">{{ store.name.charAt(0) }}</div>
+                  <div class="store-dd-info">
+                    <span class="store-dd-name">{{ store.name }}</span>
+                    <span class="store-dd-cat">{{ store.category }}</span>
+                  </div>
+                  <span class="store-dd-status" [class]="'status-dot--' + store.status"></span>
+                  @if (store.id === selectedStoreId()) {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Notification Bell -->
+        <div class="notif-wrap" (click)="toggleNotifPanel($event)">
+          <button class="topbar-icon-btn" id="notif-bell-btn" aria-label="Notifications"
+                  [class.active]="showNotifPanel()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            @if (unreadCount() > 0) {
+              <span class="notif-badge">{{ unreadCount() }}</span>
+            }
+          </button>
+          <!-- Notification Panel -->
+          @if (showNotifPanel()) {
+            <div class="notif-panel" (click)="$event.stopPropagation()">
+              <div class="notif-panel-header">
+                <span>Notifications</span>
+                <button class="notif-mark-read" (click)="markAllRead()">Mark all read</button>
+              </div>
+              <div class="notif-list">
+                @for (notif of notifications; track notif.id) {
+                  <div class="notif-item" [class.unread]="notif.unread">
+                    <div class="notif-item-icon" [class]="'notif-icon--' + notif.icon">
+                      @if (notif.icon === 'order') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                      } @else if (notif.icon === 'success') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      } @else if (notif.icon === 'warning') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      } @else {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      }
+                    </div>
+                    <div class="notif-item-body">
+                      <span class="notif-item-title">{{ notif.title }}</span>
+                      <span class="notif-item-msg">{{ notif.message }}</span>
+                      <span class="notif-item-time">{{ notif.time }}</span>
+                    </div>
+                    @if (notif.unread) { <span class="notif-unread-dot"></span> }
+                  </div>
+                }
+              </div>
+              <div class="notif-panel-footer">
+                <a routerLink="/store-admin/dashboard" (click)="showNotifPanel.set(false)">View all activity</a>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Role Badge -->
+        <div class="role-badge">
+          <span class="role-dot"></span>
+          Store Admin
+        </div>
+
+        <!-- User Menu -->
+        <div class="user-menu-wrap" (click)="toggleUserMenu($event)">
+          <button class="user-menu" id="user-menu-btn" aria-label="User account menu"
+                  [class.active]="showUserMenu()">
+            <div class="user-avatar-topbar">JD</div>
+            <div class="user-meta">
+              <span class="user-fullname">John Doe</span>
+              <span class="user-email-sm">john&#64;example.com</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                 [class.rotated]="showUserMenu()">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <!-- User Dropdown Panel -->
+          @if (showUserMenu()) {
+            <div class="user-dropdown" (click)="$event.stopPropagation()">
+              <div class="user-dropdown-header">
+                <div class="user-dd-avatar">JD</div>
+                <div class="user-dd-info">
+                  <span class="user-dd-name">John Doe</span>
+                  <span class="user-dd-email">john&#64;example.com</span>
+                  <span class="user-dd-role-badge">Store Admin</span>
+                </div>
+              </div>
+              <div class="user-dropdown-sep"></div>
+              <button class="user-dd-item" (click)="goToProfile()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                My Profile
+              </button>
+              <button class="user-dd-item" (click)="goToSettings()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Settings
+              </button>
+              <div class="user-dropdown-sep"></div>
+              <button class="user-dd-item danger" (click)="logout()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign Out
+              </button>
+            </div>
+          }
+        </div>
+
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content" role="main">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+  <!-- Global Toast Notifications Overlay -->
+  <div class="toast-container" aria-live="polite" aria-atomic="true">
+    @for (toast of storeService.toasts(); track toast.id) {
+      <div class="toast-card" [class]="'toast-card toast--' + toast.type" (click)="removeToast(toast.id)">
+        <div class="toast-icon">
+          @if (toast.type === 'success') {
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          } @else if (toast.type === 'danger') {
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          } @else if (toast.type === 'warning') {
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          }
+        </div>
+        <span class="toast-msg">{{ toast.message }}</span>
+        <button class="toast-close" (click)="removeToast(toast.id); $event.stopPropagation()">&times;</button>
+      </div>
+    }
+  </div>
+
+</div>

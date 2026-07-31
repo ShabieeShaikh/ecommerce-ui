@@ -1,0 +1,245 @@
+<!-- =====================================================================
+     ANALYTICS PAGE  |  API: GET /analytics?period=30d
+===================================================================== -->
+<div class="analytics-page">
+
+  <!-- Page Header -->
+  <header class="page-header anim-fade">
+    <div>
+      <h1 class="page-title">Store Analytics</h1>
+      <p class="page-sub">Monitor performance, revenue, and customer trends across all stores.</p>
+    </div>
+    <div class="header-controls">
+      <div class="period-tabs" role="group" aria-label="Analytics period">
+        @for (p of ['7d','30d','90d','1y']; track p) {
+          <button class="period-tab" [class.period-tab--active]="selectedPeriod() === p"
+                  (click)="setPeriod(p)" [id]="'period-' + p">
+            {{ p === '7d' ? 'Last 7 Days' : p === '30d' ? 'Last 30 Days' : p === '90d' ? 'Last 90 Days' : 'This Year' }}
+          </button>
+        }
+      </div>
+      <button class="btn btn-outline" id="export-analytics-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════
+       KPI SUMMARY ROW
+  ══════════════════════ -->
+  @if (isLoadingKpi()) {
+    <div class="analytics-kpi-grid">
+      @for (_ of [1,2,3,4,5,6]; track $index) {
+        <div class="an-kpi-skel skeleton"></div>
+      }
+    </div>
+  } @else if (hasError()) {
+    <div class="an-error-banner" role="alert">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Unable to load analytics data.
+      <button class="text-btn" id="retry-analytics-btn">Retry</button>
+    </div>
+  } @else {
+    <div class="analytics-kpi-grid">
+      @for (kpi of kpis; track kpi.id) {
+        <div class="an-kpi-card" [class]="'an-kpi-card an-kpi--' + kpi.colorVar">
+          <div class="an-kpi-top">
+            <span class="an-kpi-label">{{ kpi.label }}</span>
+            <span class="an-kpi-trend" [class]="'an-kpi-trend an-trend--' + kpi.trend">
+              {{ kpi.change > 0 ? '▲' : kpi.change < 0 ? '▼' : '–' }} {{ kpi.change > 0 ? '+' : '' }}{{ kpi.change }}%
+            </span>
+          </div>
+          <div class="an-kpi-value">{{ kpi.value }}</div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ══════════════════════
+       CHARTS ROW
+  ══════════════════════ -->
+  <div class="charts-row">
+
+    <!-- Revenue Chart -->
+    <div class="chart-card chart-card--wide">
+      <div class="chart-hd">
+        <div>
+          <h2 class="chart-title">Revenue Overview</h2>
+          <p class="chart-sub">Monthly revenue trend across all stores</p>
+        </div>
+        <select class="chart-select" id="revenue-chart-store" aria-label="Filter by store">
+          <option>All Stores</option>
+          <option>Fashion Hub</option>
+          <option>TechZone</option>
+          <option>Sports Arena</option>
+        </select>
+      </div>
+
+      @if (isLoadingCharts()) {
+        <div class="chart-skel skeleton"></div>
+      } @else {
+        <!-- SVG Area Chart Placeholder -->
+        <div class="chart-body" aria-label="Revenue area chart (placeholder)">
+          <svg class="chart-svg" viewBox="0 0 700 200" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="#7C3AED" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Area fill -->
+            <path d="M 0 160 L 58 140 L 116 145 L 175 115 L 233 120 L 291 90 L 350 95 L 408 70 L 467 55 L 525 60 L 583 40 L 700 20 L 700 200 L 0 200 Z" fill="url(#revGrad)"/>
+            <!-- Line -->
+            <path d="M 0 160 L 58 140 L 116 145 L 175 115 L 233 120 L 291 90 L 350 95 L 408 70 L 467 55 L 525 60 L 583 40 L 700 20" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- X-axis labels -->
+            <text x="0"   y="198" class="chart-axis-lbl">Jan</text>
+            <text x="116" y="198" class="chart-axis-lbl">Mar</text>
+            <text x="233" y="198" class="chart-axis-lbl">May</text>
+            <text x="350" y="198" class="chart-axis-lbl">Jul</text>
+            <text x="467" y="198" class="chart-axis-lbl">Sep</text>
+            <text x="583" y="198" class="chart-axis-lbl">Nov</text>
+          </svg>
+          <div class="chart-x-labels">
+            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+            <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Orders Chart -->
+    <div class="chart-card">
+      <div class="chart-hd">
+        <div>
+          <h2 class="chart-title">Orders by Status</h2>
+          <p class="chart-sub">Order distribution this period</p>
+        </div>
+      </div>
+      @if (isLoadingCharts()) {
+        <div class="chart-skel skeleton"></div>
+      } @else {
+        <div class="donut-placeholder" aria-label="Orders donut chart placeholder">
+          <svg viewBox="0 0 120 120" class="donut-svg">
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#E5E7EB" stroke-width="16"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#7C3AED" stroke-width="16" stroke-dasharray="145 145" stroke-dashoffset="36" stroke-linecap="round"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#2563EB" stroke-width="16" stroke-dasharray="58 232"  stroke-dashoffset="-109" stroke-linecap="round"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#10B981" stroke-width="16" stroke-dasharray="36 254"  stroke-dashoffset="-167" stroke-linecap="round"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#EF4444" stroke-width="16" stroke-dasharray="20 270"  stroke-dashoffset="-203" stroke-linecap="round"/>
+            <text x="60" y="58"  text-anchor="middle" class="donut-center-val">4,821</text>
+            <text x="60" y="72"  text-anchor="middle" class="donut-center-lbl">Orders</text>
+          </svg>
+          <ul class="donut-legend">
+            <li><span class="legend-dot" style="background:#7C3AED"></span> Completed <strong>50%</strong></li>
+            <li><span class="legend-dot" style="background:#2563EB"></span> Processing <strong>20%</strong></li>
+            <li><span class="legend-dot" style="background:#10B981"></span> Pending <strong>13%</strong></li>
+            <li><span class="legend-dot" style="background:#EF4444"></span> Cancelled <strong>7%</strong></li>
+          </ul>
+        </div>
+      }
+    </div>
+
+  </div><!-- end charts-row -->
+
+  <!-- ══════════════════════
+       BOTTOM ROW
+  ══════════════════════ -->
+  <div class="bottom-row">
+
+    <!-- Recent Orders -->
+    <div class="an-card an-card--wide">
+      <div class="an-card-hd">
+        <h2 class="an-card-title">Recent Orders</h2>
+        <button class="view-all-link" id="view-all-orders-btn">View all →</button>
+      </div>
+
+      @if (isLoadingOrders()) {
+        <div class="table-skel">
+          @for (_ of [1,2,3,4,5]; track $index) { <div class="table-skel-row skeleton"></div> }
+        </div>
+      } @else if (recentOrders().length === 0) {
+        <div class="an-empty"><p>No orders found for this period.</p></div>
+      } @else {
+        <div class="orders-table-wrap">
+          <table class="an-table" aria-label="Recent orders">
+            <thead>
+              <tr>
+                <th>Order ID</th><th>Store</th><th>Customer</th>
+                <th>Amount</th><th>Status</th><th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of recentOrders(); track order.id) {
+                <tr>
+                  <td class="ord-id">{{ order.orderId }}</td>
+                  <td class="ord-store">{{ order.store }}</td>
+                  <td class="ord-cust">{{ order.customer }}</td>
+                  <td class="ord-amt">${{ order.amount.toFixed(2) }}</td>
+                  <td><span class="ord-status" [class]="'ord-status ord-status--' + order.status">{{ capitalize(order.status) }}</span></td>
+                  <td class="ord-date">{{ order.date }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Right Column -->
+    <div class="an-right-col">
+
+      <!-- Top Products -->
+      <div class="an-card">
+        <div class="an-card-hd">
+          <h2 class="an-card-title">Top Products</h2>
+          <span class="an-card-badge">This Period</span>
+        </div>
+
+        @if (isLoadingProducts()) {
+          <div class="table-skel">
+            @for (_ of [1,2,3,4,5]; track $index) { <div class="table-skel-row skeleton"></div> }
+          </div>
+        } @else {
+          <ol class="top-products-list">
+            @for (product of topProducts(); track product.rank) {
+              <li class="tp-item">
+                <span class="tp-rank">#{{ product.rank }}</span>
+                <div class="tp-info">
+                  <span class="tp-name">{{ product.name }}</span>
+                  <span class="tp-store">{{ product.store }}</span>
+                </div>
+                <div class="tp-metrics">
+                  <span class="tp-sold">{{ product.sold }} sold</span>
+                  <span class="tp-trend" [class]="'tp-trend tp-trend--' + product.trend">
+                    {{ product.trend === 'up' ? '▲' : '▼' }}
+                  </span>
+                </div>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="an-card">
+        <div class="an-card-hd">
+          <h2 class="an-card-title">Recent Activity</h2>
+          <span class="live-badge">● Live</span>
+        </div>
+        <ul class="activity-list">
+          @for (item of activityFeed(); track item.id) {
+            <li class="activity-item">
+              <div class="activity-dot" [class]="'activity-dot activity-dot--' + item.colorVar"></div>
+              <div class="activity-content">
+                <p class="activity-msg">{{ item.message }}</p>
+                <span class="activity-time">{{ item.timestamp }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+
+    </div>
+  </div><!-- end bottom-row -->
+
+</div>

@@ -1,0 +1,142 @@
+<div class="profile-page">
+
+  <!-- Profile Header Card -->
+  <div class="profile-header-card">
+    <div class="profile-cover"></div>
+    <div class="profile-header-body">
+      <div class="avatar-wrap">
+        <div class="profile-avatar">
+          {{ profile.fullName.charAt(0) }}
+        </div>
+        <button class="avatar-edit-btn" (click)="uploadAvatar()" title="Change Avatar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
+      </div>
+
+      <div class="profile-main-meta">
+        <div class="name-role-block">
+          <h1 class="profile-name">{{ profile.fullName }}</h1>
+          <span class="role-badge">{{ profile.role }}</span>
+        </div>
+        <p class="profile-username">&#64;{{ profile.username }} · {{ profile.company }}</p>
+      </div>
+
+      <div class="profile-header-actions">
+        <button class="btn-primary" (click)="saveProfile()" [disabled]="isSaving()">
+          @if (isSaving()) { Saving... } @else { Save Changes }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="profile-tabs">
+    <button class="profile-tab" [class.active]="activeTab() === 'personal'" (click)="setTab('personal')">Personal Information</button>
+    <button class="profile-tab" [class.active]="activeTab() === 'business'" (click)="setTab('business')">Business & Contact</button>
+    <button class="profile-tab" [class.active]="activeTab() === 'activity'" (click)="setTab('activity')">Recent Activity</button>
+  </div>
+
+  <!-- Tab Contents -->
+  <div class="profile-content">
+    
+    <!-- PERSONAL TAB -->
+    @if (activeTab() === 'personal') {
+      <div class="profile-card">
+        <h2 class="card-title">Personal Details</h2>
+        <div class="form-row-2col">
+          <div class="form-row">
+            <label class="form-label">Full Name</label>
+            <input type="text" [(ngModel)]="profile.fullName" class="form-input">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Username</label>
+            <input type="text" [(ngModel)]="profile.username" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-row-2col">
+          <div class="form-row">
+            <label class="form-label">Email Address</label>
+            <input type="email" [(ngModel)]="profile.email" class="form-input">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Phone Number</label>
+            <input type="text" [(ngModel)]="profile.phone" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Bio / Overview</label>
+          <textarea [(ngModel)]="profile.bio" class="form-input textarea" rows="4"></textarea>
+        </div>
+      </div>
+    }
+
+    <!-- BUSINESS TAB -->
+    @if (activeTab() === 'business') {
+      <div class="profile-card">
+        <h2 class="card-title">Business Information</h2>
+        <div class="form-row-2col">
+          <div class="form-row">
+            <label class="form-label">Company Name</label>
+            <input type="text" [(ngModel)]="profile.company" class="form-input">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Tax ID / VAT Number</label>
+            <input type="text" [(ngModel)]="profile.taxId" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Street Address</label>
+          <input type="text" [(ngModel)]="profile.address" class="form-input">
+        </div>
+
+        <div class="form-row-2col">
+          <div class="form-row">
+            <label class="form-label">City</label>
+            <input type="text" [(ngModel)]="profile.city" class="form-input">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Country</label>
+            <input type="text" [(ngModel)]="profile.country" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-row-2col">
+          <div class="form-row">
+            <label class="form-label">Website</label>
+            <input type="text" [(ngModel)]="profile.website" class="form-input">
+          </div>
+          <div class="form-row">
+            <label class="form-label">LinkedIn</label>
+            <input type="text" [(ngModel)]="profile.linkedin" class="form-input">
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ACTIVITY TAB -->
+    @if (activeTab() === 'activity') {
+      <div class="profile-card">
+        <h2 class="card-title">Activity Log</h2>
+        <div class="activity-list">
+          @for (act of activities; track act.id) {
+            <div class="activity-item">
+              <div class="act-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="act-details">
+                <span class="act-action">{{ act.action }}</span>
+                <span class="act-target">{{ act.target }}</span>
+              </div>
+              <span class="act-time">{{ act.timestamp }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+
+</div>

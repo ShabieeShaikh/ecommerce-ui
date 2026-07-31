@@ -1,0 +1,268 @@
+<div class="products-page">
+
+  <!-- Header & Filters -->
+  <div class="products-header">
+    <div>
+      <h1 class="page-title">Product Management</h1>
+      <p class="page-desc">Manage products across all your active stores and inventory.</p>
+    </div>
+    
+    <div class="header-controls">
+      <!-- Search -->
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)" placeholder="Search products, SKU..." class="search-input">
+      </div>
+
+      <!-- Store Filter -->
+      <select class="store-filter-select" (change)="onFilterStoreChange($event)">
+        <option value="all">All Stores</option>
+        @for (store of storeService.stores(); track store.id) {
+          <option [value]="store.id">{{ store.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Store Groups Accordion/Sections -->
+  <div class="store-groups-container">
+    @for (group of storeProductGroups(); track group.store.id) {
+      <div class="store-section-card">
+        
+        <!-- Store Header Banner -->
+        <div class="store-banner">
+          <div class="store-banner-info">
+            <div class="store-avatar" [style.background]="group.store.accentColor">
+              {{ group.store.name.charAt(0) }}
+            </div>
+            <div>
+              <h2 class="store-name">{{ group.store.name }}</h2>
+              <span class="store-meta">{{ group.store.category }} · {{ group.products.length }} Products</span>
+            </div>
+          </div>
+
+          <button class="add-product-btn" (click)="openAddProductModal(group.store.id)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Product
+          </button>
+        </div>
+
+        <!-- Products Medium Cards Grid -->
+        @if (group.products.length > 0) {
+          <div class="products-grid">
+            @for (product of group.products; track product.id) {
+              <div class="product-card" (click)="openProductDetail(product)">
+                <div class="product-img-wrap">
+                  <img [src]="product.imageUrl" [alt]="product.name" class="product-img">
+                  <span class="stock-badge" [class.low-stock]="product.stock < 15">
+                    {{ product.stock }} in stock
+                  </span>
+                </div>
+                
+                <div class="product-card-body">
+                  <span class="product-category">{{ product.category }}</span>
+                  <h3 class="product-title">{{ product.name }}</h3>
+                  <span class="product-sku">SKU: {{ product.sku }}</span>
+                  
+                  <div class="product-card-footer">
+                    <div class="product-price">
+                      <span class="current-price">${{ product.price }}</span>
+                      @if (product.comparePrice) {
+                        <span class="compare-price">${{ product.comparePrice }}</span>
+                      }
+                    </div>
+                    
+                    <span class="rating-badge">★ {{ product.rating }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-products">
+            <p>No products found for this store.</p>
+          </div>
+        }
+
+      </div>
+    }
+  </div>
+
+  <!-- Right-Side Slide-Over Product Detail Panel -->
+  @if (selectedProduct(); as prod) {
+    <div class="slideover-backdrop" (click)="closeProductDetail()">
+      <div class="slideover-panel" (click)="$event.stopPropagation()">
+        
+        <!-- Slideover Header -->
+        <div class="slideover-header">
+          <h2>Product Details</h2>
+          <div class="slideover-actions">
+            <button class="icon-btn danger" (click)="deleteCurrentProduct()" title="Delete Product">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+            <button class="icon-btn" (click)="toggleEditDetail()" title="Edit Product">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="close-btn" (click)="closeProductDetail()">&times;</button>
+          </div>
+        </div>
+
+        <div class="slideover-body">
+          <div class="detail-img-box">
+            <img [src]="prod.imageUrl" [alt]="prod.name" class="detail-img">
+          </div>
+
+          @if (!isEditingDetail()) {
+            <!-- Read-only View -->
+            <div class="detail-info-block">
+              <span class="detail-cat-tag">{{ prod.category }}</span>
+              <h3 class="detail-name">{{ prod.name }}</h3>
+              <p class="detail-sku">SKU: {{ prod.sku }}</p>
+
+              <div class="detail-price-row">
+                <span class="price-large">${{ prod.price }}</span>
+                @if (prod.comparePrice) {
+                  <span class="compare-large">${{ prod.comparePrice }}</span>
+                }
+              </div>
+
+              <div class="detail-grid-stats">
+                <div class="stat-box">
+                  <span class="stat-lbl">Stock</span>
+                  <span class="stat-val">{{ prod.stock }} units</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-lbl">Status</span>
+                  <span class="stat-val capitalize">{{ prod.status }}</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-lbl">Rating</span>
+                  <span class="stat-val">★ {{ prod.rating }}</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-lbl">Sales</span>
+                  <span class="stat-val">{{ prod.salesCount }}</span>
+                </div>
+              </div>
+
+              <div class="detail-desc-box">
+                <h4>Description</h4>
+                <p>{{ prod.description }}</p>
+              </div>
+
+              <div class="tags-container">
+                @for (tag of prod.tags; track tag) {
+                  <span class="tag-badge">#{{ tag }}</span>
+                }
+              </div>
+            </div>
+          } @else {
+            <!-- Edit Form -->
+            <div class="edit-form-block">
+              <div class="form-row">
+                <label>Product Name</label>
+                <input type="text" [(ngModel)]="prod.name" class="form-input">
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-row">
+                  <label>Price ($)</label>
+                  <input type="number" [(ngModel)]="prod.price" class="form-input">
+                </div>
+                <div class="form-row">
+                  <label>Compare Price ($)</label>
+                  <input type="number" [(ngModel)]="prod.comparePrice" class="form-input">
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-row">
+                  <label>Stock</label>
+                  <input type="number" [(ngModel)]="prod.stock" class="form-input">
+                </div>
+                <div class="form-row">
+                  <label>Category</label>
+                  <input type="text" [(ngModel)]="prod.category" class="form-input">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label>Description</label>
+                <textarea [(ngModel)]="prod.description" rows="3" class="form-input"></textarea>
+              </div>
+
+              <button class="btn-primary full-btn" (click)="saveProductDetail()">Save Changes</button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Add Product Modal -->
+  @if (showAddModal()) {
+    <div class="modal-backdrop" (click)="closeAddModal()">
+      <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Add New Product</h3>
+          <button class="modal-close" (click)="closeAddModal()">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="form-row-2">
+            <div class="form-row">
+              <label>Product Name</label>
+              <input type="text" [(ngModel)]="newProduct.name" placeholder="e.g. Wireless Mouse" class="form-input">
+            </div>
+            <div class="form-row">
+              <label>SKU</label>
+              <input type="text" [(ngModel)]="newProduct.sku" class="form-input">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-row">
+              <label>Category</label>
+              <input type="text" [(ngModel)]="newProduct.category" class="form-input">
+            </div>
+            <div class="form-row">
+              <label>Status</label>
+              <select [(ngModel)]="newProduct.status" class="form-input">
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-row">
+              <label>Price ($)</label>
+              <input type="number" [(ngModel)]="newProduct.price" class="form-input">
+            </div>
+            <div class="form-row">
+              <label>Stock Quantity</label>
+              <input type="number" [(ngModel)]="newProduct.stock" class="form-input">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Image URL</label>
+            <input type="text" [(ngModel)]="newProduct.imageUrl" class="form-input">
+          </div>
+
+          <div class="form-row">
+            <label>Description</label>
+            <textarea [(ngModel)]="newProduct.description" rows="3" class="form-input" placeholder="Full product details..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-outline" (click)="closeAddModal()">Cancel</button>
+          <button class="btn-primary" (click)="saveNewProduct()">Create Product</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

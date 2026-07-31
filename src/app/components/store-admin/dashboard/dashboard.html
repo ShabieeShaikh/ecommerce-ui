@@ -1,0 +1,286 @@
+<!-- =====================================================================
+     DASHBOARD PAGE  |  API: GET /dashboard/analytics  GET /stores
+===================================================================== -->
+<div class="dash-page">
+
+  <!-- ── Page Header ── -->
+  <header class="page-header anim-fade">
+    <div class="greeting-block">
+      <p class="greeting-date">{{ today }}</p>
+      <h1 class="greeting-title">{{ greeting }}, John 👋</h1>
+      <p class="greeting-sub">Manage your ecommerce stores and track performance from one place.</p>
+    </div>
+    <div class="header-ctas">
+      <button class="btn btn-outline" id="export-report-btn" aria-label="Export analytics report">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export Report
+      </button>
+      <a class="btn btn-primary" routerLink="/store-admin/stores/create" id="create-store-cta-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create Store
+      </a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════
+       KPI CARDS  |  GET /dashboard/analytics
+  ══════════════════════════════════════ -->
+  <section class="dash-section" aria-labelledby="kpi-heading">
+    <div class="section-hd">
+      <div>
+        <h2 class="section-title" id="kpi-heading">Key Metrics</h2>
+        <p class="section-sub">Performance overview for the last 30 days</p>
+      </div>
+      <span class="period-badge">Last 30 days</span>
+    </div>
+
+    @if (isLoadingKpi()) {
+      <div class="kpi-grid" aria-busy="true" aria-label="Loading metrics">
+        @for (_ of [1,2,3,4,5,6,7,8]; track $index) {
+          <div class="kpi-skel skeleton" aria-hidden="true"></div>
+        }
+      </div>
+    } @else if (hasKpiError()) {
+      <div class="inline-error" role="alert">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p>Unable to load metrics. <button class="text-btn" id="retry-kpi-btn">Retry</button></p>
+      </div>
+    } @else {
+      <div class="kpi-grid">
+        @for (card of kpiCards(); track card.id) {
+          <article class="kpi-card" [class]="'kpi-card kpi--' + card.colorVar" [attr.aria-label]="card.label + ': ' + card.value">
+            <div class="kpi-top-row">
+              <div class="kpi-icon" [class]="'kpi-icon kpi-icon--' + card.colorVar">
+                @if (card.iconType === 'store') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                }
+                @if (card.iconType === 'check') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                }
+                @if (card.iconType === 'ban') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                }
+                @if (card.iconType === 'clock') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                }
+                @if (card.iconType === 'dollar') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                }
+                @if (card.iconType === 'package') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                }
+                @if (card.iconType === 'users') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                }
+                @if (card.iconType === 'star') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                }
+              </div>
+              <div class="kpi-trend" [class]="'kpi-trend kpi-trend--' + card.trend">
+                @if (card.trend === 'up') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                }
+                @if (card.trend === 'down') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                }
+                <span>{{ card.change > 0 ? '+' : '' }}{{ card.change }}%</span>
+              </div>
+            </div>
+            <div class="kpi-value">{{ card.value }}</div>
+            <div class="kpi-label">{{ card.label }}</div>
+            <div class="kpi-sparkline" aria-hidden="true">
+              <svg viewBox="0 0 80 26" preserveAspectRatio="none" width="100%" height="26">
+                <defs>
+                  <linearGradient [id]="'sgrad-' + card.id" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="currentColor" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path [attr.d]="getSparklinePath(card.sparkline) + ' L 80 26 L 0 26 Z'" [attr.fill]="'url(#sgrad-' + card.id + ')'" stroke="none"/>
+                <path [attr.d]="getSparklinePath(card.sparkline)" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- ══════════════════════════════════
+       QUICK ACTIONS
+  ══════════════════════════════════ -->
+  <section class="dash-section" aria-labelledby="actions-heading">
+    <div class="section-hd">
+      <h2 class="section-title" id="actions-heading">Quick Actions</h2>
+    </div>
+    <div class="quick-grid">
+      @for (action of quickActions; track action.id) {
+        <a class="action-card" [routerLink]="action.route" [id]="'qa-' + action.id" role="button"
+           [attr.aria-label]="action.title">
+          <div class="action-icon-box" [style.background]="action.gradient">
+            @if (action.iconType === 'plus') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            }
+            @if (action.iconType === 'grid') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            }
+            @if (action.iconType === 'map') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            }
+            @if (action.iconType === 'chart') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+            }
+            @if (action.iconType === 'settings') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            }
+          </div>
+          <div class="action-body">
+            <h3 class="action-title">{{ action.title }}</h3>
+            <p class="action-desc">{{ action.description }}</p>
+          </div>
+          <svg class="action-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       STORE CARDS  |  GET /stores
+  ══════════════════════════════════ -->
+  <section class="dash-section" aria-labelledby="stores-heading">
+    <div class="section-hd">
+      <div>
+        <h2 class="section-title" id="stores-heading">Recent Stores</h2>
+        <p class="section-sub">Your most recently updated stores</p>
+      </div>
+      <a class="view-all-link" routerLink="/store-admin/stores">
+        View all stores
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <!-- Loading Skeleton -->
+    @if (isLoadingStores()) {
+      <div class="stores-grid" aria-busy="true">
+        @for (_ of [1,2,3,4,5,6]; track $index) {
+          <div class="store-skel" aria-hidden="true">
+            <div class="skel-banner skeleton"></div>
+            <div class="skel-body">
+              <div class="skel-circle skeleton"></div>
+              <div class="skel-line skeleton" style="width:65%;height:14px;margin:16px 0 6px"></div>
+              <div class="skel-line skeleton" style="width:42%;height:11px;margin-bottom:20px"></div>
+              <div class="skel-stats skeleton" style="height:44px;margin-bottom:14px"></div>
+              <div class="skel-line skeleton" style="height:34px"></div>
+            </div>
+          </div>
+        }
+      </div>
+
+    <!-- Error State -->
+    } @else if (hasStoreError()) {
+      <div class="empty-state" role="alert">
+        <div class="es-icon es-icon--error">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h3 class="es-title">Unable to load stores</h3>
+        <p class="es-desc">A network error occurred. Please check your connection and try again.</p>
+        <button class="btn btn-outline" id="retry-stores-btn">Retry</button>
+      </div>
+
+    <!-- Empty State -->
+    } @else if (stores().length === 0) {
+      <div class="empty-state">
+        <div class="es-icon es-icon--empty">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <h3 class="es-title">No stores yet</h3>
+        <p class="es-desc">Get started by creating your first ecommerce store.</p>
+        <a class="btn btn-primary" routerLink="/store-admin/stores/create" id="empty-create-store-btn">Create Your First Store</a>
+      </div>
+
+    <!-- Data Grid -->
+    } @else {
+      <div class="stores-grid">
+        @for (store of stores(); track store.id) {
+          <article class="store-card" [attr.data-store-id]="store.id" [attr.data-status]="store.status">
+
+            <!-- Banner -->
+            <div class="sc-banner" [style.background]="'linear-gradient(135deg,' + store.accentColor + 'D0 0%,' + store.accentColor + '70 100%)'">
+              <div class="sc-status-badge" [class]="'sc-status-badge sc-status--' + store.status">
+                {{ capitalize(store.status) }}
+              </div>
+              <button class="sc-menu" [id]="'store-menu-' + store.id" aria-label="Store options" aria-haspopup="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="5" r="1" fill="white"/><circle cx="12" cy="12" r="1" fill="white"/><circle cx="12" cy="19" r="1" fill="white"/></svg>
+              </button>
+            </div>
+
+            <!-- Logo -->
+            <div class="sc-logo-wrap">
+              <div class="sc-logo" [style.background]="store.accentColor">{{ store.name.charAt(0) }}</div>
+            </div>
+
+            <!-- Body -->
+            <div class="sc-body">
+              <div class="sc-identity">
+                <h3 class="sc-name">{{ store.name }}</h3>
+                <span class="sc-category">{{ store.category }}</span>
+                <div class="sc-meta">
+                  <span class="sc-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    {{ store.owner }}
+                  </span>
+                  <span class="sc-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {{ store.city }}, {{ store.country }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Rating + date -->
+              <div class="sc-rating-row">
+                <div class="sc-rating">
+                  <span class="sc-stars">★</span>
+                  <span class="sc-rating-val">{{ store.rating }}</span>
+                </div>
+                <span class="sc-date">Since {{ store.createdAt }}</span>
+              </div>
+
+              <!-- Stats -->
+              <div class="sc-stats">
+                <div class="sc-stat">
+                  <span class="sc-stat-val">{{ formatRevenue(store.revenue) }}</span>
+                  <span class="sc-stat-lbl">Revenue</span>
+                </div>
+                <div class="sc-stat-sep"></div>
+                <div class="sc-stat">
+                  <span class="sc-stat-val">{{ formatNum(store.orders) }}</span>
+                  <span class="sc-stat-lbl">Orders</span>
+                </div>
+                <div class="sc-stat-sep"></div>
+                <div class="sc-stat">
+                  <span class="sc-stat-val">{{ formatNum(store.visitors) }}</span>
+                  <span class="sc-stat-lbl">Visitors</span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="sc-actions">
+                <button class="sca-btn sca-view"     [id]="'view-'     + store.id" (click)="onViewStore(store.id)">View</button>
+                <button class="sca-btn sca-edit"     [id]="'edit-'     + store.id" (click)="onEditStore(store.id)">Edit</button>
+                <button class="sca-btn sca-analytics"[id]="'analytics-'+ store.id" (click)="onAnalytics(store.id)">Analytics</button>
+                <button class="sca-btn sca-location" [id]="'location-' + store.id" (click)="onLocation(store.id)">Location</button>
+                <button class="sca-btn sca-disable"  [id]="'disable-'  + store.id" (click)="onToggleStatus(store.id, $event)">
+                  {{ store.status === 'active' ? 'Disable' : 'Enable' }}
+                </button>
+                <button class="sca-btn sca-delete"   [id]="'delete-'   + store.id" (click)="onDeleteStore(store.id, store.name, $event)">Delete</button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+</div>

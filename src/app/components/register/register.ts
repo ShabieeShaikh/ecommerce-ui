@@ -133,7 +133,7 @@ export class Register {
 
             icon: 'success',
 
-            confirmButtonColor: '#7C1C77'
+            confirmButtonColor: '#7C3AED'
 
           });
 
@@ -169,7 +169,7 @@ export class Register {
 
             icon: 'error',
 
-            confirmButtonColor: '#7C1C77'
+            confirmButtonColor: '#7C3AED'
 
           });
 

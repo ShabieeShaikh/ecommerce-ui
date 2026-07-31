@@ -1,10 +1,124 @@
-/* You can add global styles to this file, and also import other style files */
-html,
-body,
-app-root,
-app-register {
-    width:100%;
-    height:100%;
-    margin:0;
-    padding:0;
+/* ============================================================
+   GLOBAL STYLES — DigiShop Admin Design System
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ── CSS Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: 'Inter', system-ui, sans-serif; }
+a { text-decoration: none; color: inherit; }
+button { border: none; cursor: pointer; background: none; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+img { max-width: 100%; display: block; }
+ul, ol { list-style: none; }
+
+html, body, app-root { width: 100%; height: 100%; }
+
+/* ── Admin Theme Tokens ── */
+:root {
+  /* Brand */
+  --clr-primary:       #7C3AED;
+  --clr-primary-dark:  #6D28D9;
+  --clr-indigo:        #4F46E5;
+  --clr-blue:          #2563EB;
+  --clr-blue-light:    #3B82F6;
+  --grad-brand:        linear-gradient(135deg, #7C3AED 0%, #4F46E5 55%, #2563EB 100%);
+  --grad-brand-soft:   linear-gradient(135deg, rgba(124,58,237,.12), rgba(79,70,229,.12));
+
+  /* Neutrals */
+  --clr-bg:            #F3F4F8;
+  --clr-surface:       #FFFFFF;
+  --clr-border:        #E5E7EB;
+  --clr-border-soft:   rgba(0,0,0,.06);
+
+  /* Sidebar */
+  --clr-sidebar-bg:    #0D0B1F;
+  --clr-sidebar-text:  rgba(255,255,255,.55);
+  --clr-sidebar-hover: rgba(255,255,255,.06);
+  --clr-sidebar-sep:   rgba(255,255,255,.07);
+
+  /* Text */
+  --clr-text-primary:  #111827;
+  --clr-text-secondary:#4B5563;
+  --clr-text-muted:    #9CA3AF;
+
+  /* Status */
+  --clr-success:       #10B981;
+  --clr-success-bg:    rgba(16,185,129,.1);
+  --clr-warning:       #F59E0B;
+  --clr-warning-bg:    rgba(245,158,11,.1);
+  --clr-danger:        #EF4444;
+  --clr-danger-bg:     rgba(239,68,68,.1);
+  --clr-info:          #06B6D4;
+  --clr-info-bg:       rgba(6,182,212,.1);
+
+  /* Shadows */
+  --shadow-xs:   0 1px 2px rgba(0,0,0,.06);
+  --shadow-sm:   0 2px 8px rgba(0,0,0,.07);
+  --shadow-md:   0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,.10);
+  --shadow-xl:   0 16px 48px rgba(0,0,0,.12);
+  --shadow-brand:0 6px 24px rgba(124,58,237,.28);
+  --shadow-card-hover: 0 12px 40px rgba(0,0,0,.13);
+
+  /* Radius */
+  --r-xs:  4px;
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  16px;
+  --r-xl:  20px;
+  --r-2xl: 24px;
+  --r-full:9999px;
+
+  /* Layout */
+  --sidebar-w:  260px;
+  --sidebar-collapsed-w: 70px;
+  --topbar-h:   64px;
+
+  /* Transitions */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --tr-fast: 0.15s var(--ease);
+  --tr-base: 0.25s var(--ease);
+  --tr-slow: 0.35s var(--ease);
 }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+/* ── Shared Utilities ── */
+.skeleton {
+  background: linear-gradient(90deg, #F0F0F0 25%, #E8E8E8 50%, #F0F0F0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--r-sm);
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .6; transform: scale(1.4); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.anim-fade  { animation: fadeIn var(--tr-slow) both; }
+.anim-slide { animation: slideInLeft var(--tr-slow) both; }
+.anim-scale { animation: scaleIn var(--tr-base) both; }

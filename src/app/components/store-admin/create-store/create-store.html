@@ -1,0 +1,299 @@
+<!-- =====================================================================
+     CREATE STORE PAGE  |  API: POST /stores
+===================================================================== -->
+<div class="create-page">
+
+  <!-- Page Header -->
+  <header class="cp-header anim-fade">
+    <div>
+      <h1 class="page-title">Create New Store</h1>
+      <p class="page-sub">Follow the steps below to set up your ecommerce store.</p>
+    </div>
+    <a class="btn btn-ghost" routerLink="/store-admin/stores" id="cancel-create-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      Cancel
+    </a>
+  </header>
+
+  <div class="cp-layout">
+
+    <!-- ── Step Progress Sidebar ── -->
+    <aside class="cp-sidebar" aria-label="Form progress">
+      <h3 class="cp-sidebar-title">Steps</h3>
+      <ol class="step-list">
+        @for (step of steps; track step.id) {
+          <li class="step-item"
+              [class.step-active]="activeStep() === step.id"
+              [class.step-done]="isComplete(step.id)">
+            <button class="step-btn" (click)="setStep(step.id)"
+                    [id]="'step-btn-' + step.id"
+                    [attr.aria-current]="activeStep() === step.id ? 'step' : null">
+              <div class="step-num">
+                @if (isComplete(step.id)) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                } @else {
+                  {{ step.id }}
+                }
+              </div>
+              <div class="step-info">
+                <span class="step-title">{{ step.title }}</span>
+                <span class="step-desc">{{ step.description }}</span>
+              </div>
+            </button>
+            @if (step.id < steps.length) {
+              <div class="step-connector" [class.step-connector--done]="isComplete(step.id)"></div>
+            }
+          </li>
+        }
+      </ol>
+
+      <!-- Summary card -->
+      <div class="cp-sidebar-summary">
+        <p class="summary-label">Progress</p>
+        <div class="summary-bar">
+          <div class="summary-fill" [style.width]="(((activeStep() - 1) / steps.length) * 100) + '%'"></div>
+        </div>
+        <p class="summary-text">Step {{ activeStep() }} of {{ steps.length }}</p>
+      </div>
+    </aside>
+
+    <!-- ── Form Content ── -->
+    <div class="cp-form-area">
+
+      <!-- ════════════════════ STEP 1: Basic Info ════════════════════ -->
+      @if (activeStep() === 1) {
+        <section class="form-section anim-fade" aria-labelledby="step1-heading">
+          <div class="form-section-hd">
+            <div class="form-step-badge">01</div>
+            <div>
+              <h2 class="form-section-title" id="step1-heading">Basic Information</h2>
+              <p class="form-section-sub">Provide the core details of your store.</p>
+            </div>
+          </div>
+
+          <div class="form-body">
+            <div class="form-row form-row--full">
+              <div class="form-field">
+                <label class="form-label" for="store-name">Store Name <span class="required">*</span></label>
+                <input class="form-input" type="text" id="store-name" name="store-name" [(ngModel)]="formData.name" placeholder="e.g. Fashion Hub" autocomplete="off" required>
+                <span class="form-hint">This name will appear publicly on your store page.</span>
+              </div>
+            </div>
+
+            <div class="form-row form-row--full">
+              <div class="form-field">
+                <label class="form-label" for="store-description">Store Description</label>
+                <textarea class="form-textarea" id="store-description" name="store-description" [(ngModel)]="formData.description" rows="3" placeholder="Describe what your store sells and what makes it unique…"></textarea>
+              </div>
+            </div>
+
+            <div class="form-row form-row--half">
+              <div class="form-field">
+                <label class="form-label" for="store-category">Category <span class="required">*</span></label>
+                <select class="form-select" id="store-category" name="store-category" [(ngModel)]="formData.category">
+                  @for (cat of categories; track cat) {
+                    <option [value]="cat">{{ cat }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="store-status-select">Store Status</label>
+                <select class="form-select" id="store-status-select" name="store-status" [(ngModel)]="formData.status">
+                  <option value="active">Active — Open for orders</option>
+                  <option value="pending">Pending — Awaiting approval</option>
+                  <option value="disabled">Disabled — Hidden from customers</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row form-row--half">
+              <div class="form-field">
+                <label class="form-label" for="store-phone">Phone Number</label>
+                <div class="input-with-prefix">
+                  <span class="input-prefix">📞</span>
+                  <input class="form-input form-input--prefixed" type="tel" id="store-phone" name="store-phone" [(ngModel)]="formData.phone" placeholder="+1 (555) 000-0000">
+                </div>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="store-email">Store Email <span class="required">*</span></label>
+                <div class="input-with-prefix">
+                  <span class="input-prefix">✉</span>
+                  <input class="form-input form-input--prefixed" type="email" id="store-email" name="store-email" [(ngModel)]="formData.email" placeholder="store@example.com">
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      <!-- ════════════════════ STEP 2: Location ════════════════════ -->
+      } @else if (activeStep() === 2) {
+        <section class="form-section anim-fade" aria-labelledby="step2-heading">
+          <div class="form-section-hd">
+            <div class="form-step-badge">02</div>
+            <div>
+              <h2 class="form-section-title" id="step2-heading">Store Location</h2>
+              <p class="form-section-sub">Configure your store's physical address and GPS coordinates.</p>
+            </div>
+          </div>
+
+          <div class="form-body">
+            <div class="form-row form-row--full">
+              <div class="form-field">
+                <label class="form-label" for="store-address">Street Address</label>
+                <input class="form-input" type="text" id="store-address" name="store-address" [(ngModel)]="formData.address" placeholder="123 Commerce Street, Suite 400">
+              </div>
+            </div>
+
+            <div class="form-row form-row--three">
+              <div class="form-field">
+                <label class="form-label" for="store-country">Country <span class="required">*</span></label>
+                <select class="form-select" id="store-country" name="store-country" [(ngModel)]="formData.country">
+                  @for (c of countries; track c) { <option [value]="c">{{ c }}</option> }
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="store-state">State / Province</label>
+                <input class="form-input" type="text" id="store-state" name="store-state" [(ngModel)]="formData.state" placeholder="e.g. New York">
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="store-city">City <span class="required">*</span></label>
+                <input class="form-input" type="text" id="store-city" name="store-city" [(ngModel)]="formData.city" placeholder="e.g. New York City">
+              </div>
+            </div>
+
+            <div class="form-row form-row--half">
+              <div class="form-field">
+                <label class="form-label" for="store-postal">Postal Code</label>
+                <input class="form-input" type="text" id="store-postal" name="store-postal" [(ngModel)]="formData.postalCode" placeholder="10001">
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="delivery-radius">Delivery Radius (km)</label>
+                <input class="form-input" type="number" id="delivery-radius" placeholder="25" min="1" max="200">
+              </div>
+            </div>
+
+            <!-- Map Placeholder -->
+            <div class="map-card">
+              <div class="map-placeholder" aria-label="Google Maps location picker placeholder">
+                <div class="map-overlay">
+                  <div class="map-pin">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="var(--clr-primary)" stroke="white" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white" stroke="var(--clr-primary)"/></svg>
+                  </div>
+                  <p class="map-note">Interactive map location selected.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      <!-- ════════════════════ STEP 3: Media ════════════════════ -->
+      } @else if (activeStep() === 3) {
+        <section class="form-section anim-fade" aria-labelledby="step3-heading">
+          <div class="form-section-hd">
+            <div class="form-step-badge">03</div>
+            <div>
+              <h2 class="form-section-title" id="step3-heading">Store Media</h2>
+              <p class="form-section-sub">Upload your store logo and banner image.</p>
+            </div>
+          </div>
+
+          <div class="form-body">
+            <!-- Logo Upload -->
+            <div class="form-field">
+              <label class="form-label">Store Logo <span class="required">*</span></label>
+              <div class="upload-zone upload-zone--logo" id="logo-upload-zone" role="button" tabindex="0" aria-label="Upload store logo">
+                <div class="upload-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+                <p class="upload-title">Drop your logo here or <span class="upload-link">browse</span></p>
+                <p class="upload-hint">Recommended: 200×200px · PNG or SVG · Max 2MB</p>
+                <input type="file" class="upload-input" id="logo-file-input" accept="image/*" aria-label="Choose logo file">
+              </div>
+            </div>
+
+            <!-- Banner Upload -->
+            <div class="form-field">
+              <label class="form-label">Store Banner</label>
+              <div class="upload-zone upload-zone--banner" id="banner-upload-zone" role="button" tabindex="0" aria-label="Upload store banner">
+                <div class="upload-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+                <p class="upload-title">Drop your banner here or <span class="upload-link">browse</span></p>
+                <p class="upload-hint">Recommended: 1200×300px · JPG, PNG, or WebP · Max 5MB</p>
+                <input type="file" class="upload-input" id="banner-file-input" accept="image/*" aria-label="Choose banner file">
+              </div>
+            </div>
+          </div>
+        </section>
+
+      <!-- ════════════════════ STEP 4: Operations ════════════════════ -->
+      } @else if (activeStep() === 4) {
+        <section class="form-section anim-fade" aria-labelledby="step4-heading">
+          <div class="form-section-hd">
+            <div class="form-step-badge">04</div>
+            <div>
+              <h2 class="form-section-title" id="step4-heading">Operations</h2>
+              <p class="form-section-sub">Configure your business hours and delivery settings.</p>
+            </div>
+          </div>
+
+          <div class="form-body">
+            <!-- Business Hours -->
+            <div class="form-field">
+              <label class="form-label">Business Hours</label>
+              <div class="hours-table">
+                <div class="hours-head">
+                  <span>Day</span><span>Open</span><span>Opening Time</span><span>Closing Time</span>
+                </div>
+                @for (hour of businessHours; track hour.day) {
+                  <div class="hours-row" [class.hours-row--closed]="!hour.isOpen">
+                    <span class="hours-day">{{ hour.day }}</span>
+                    <label class="toggle-switch" [attr.aria-label]="'Toggle ' + hour.day">
+                      <input type="checkbox" [(ngModel)]="hour.isOpen" [name]="'toggle-' + hour.day" [id]="'toggle-' + hour.day">
+                      <span class="toggle-track"></span>
+                    </label>
+                    <input class="form-input form-input--sm" type="time" [(ngModel)]="hour.openTime" [name]="'open-' + hour.day" [id]="'open-' + hour.day" [disabled]="!hour.isOpen">
+                    <input class="form-input form-input--sm" type="time" [(ngModel)]="hour.closeTime" [name]="'close-' + hour.day" [id]="'close-' + hour.day" [disabled]="!hour.isOpen">
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- ── Step Navigation ── -->
+      <div class="form-nav">
+        @if (activeStep() > 1) {
+          <button class="btn btn-outline-dark" (click)="prevStep()" id="prev-step-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Previous
+          </button>
+        } @else {
+          <span></span>
+        }
+
+        <div class="nav-right">
+          @if (activeStep() < steps.length) {
+            <button class="btn btn-primary" (click)="nextStep()" id="next-step-btn">
+              Continue
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          } @else {
+            <button class="btn btn-primary" id="save-store-btn" (click)="saveStore()" [disabled]="isSaving()">
+              @if (isSaving()) {
+                <span class="btn-spinner"></span>
+                Saving…
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Store
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+    </div><!-- end form-area -->
+  </div><!-- end layout -->
+
+</div>
