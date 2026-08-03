@@ -22,12 +22,9 @@ export class StoreAdminLayout {
   showSearchResults  = signal(false);
 
   // Current selected store (default = first store)
-  selectedStoreId = signal<string>('store-001');
+  selectedStoreId = this.storeService.selectedStoreId;
 
-  selectedStore = computed(() =>
-    this.storeService.stores().find(s => s.id === this.selectedStoreId())
-    ?? this.storeService.stores()[0]
-  );
+  selectedStore = this.storeService.selectedStore;
 
   // Search results computed from query
   searchResults = computed(() => {
@@ -75,10 +72,9 @@ export class StoreAdminLayout {
   }
 
   selectStore(id: string) {
-    this.selectedStoreId.set(id);
+     this.storeService.changeSelectedStore(id);
+
     this.showStoreDropdown.set(false);
-    const store = this.storeService.stores().find(s => s.id === id);
-    if (store) this.storeService.showToast(`Switched to ${store.name}`, 'info');
   }
 
   onSearchInput(event: Event) {

@@ -65,6 +65,29 @@ export class StoreService {
   readonly stores = this.storesSignal.asReadonly();
   readonly toasts = this.toastsSignal.asReadonly();
 
+  // Currently selected store across the whole admin portal
+private selectedStoreIdSignal = signal<string>('store-001');
+
+readonly selectedStoreId = this.selectedStoreIdSignal.asReadonly();
+
+readonly selectedStore = computed(() => {
+
+  const stores = this.storesSignal();
+
+  return stores.find(
+    store => store.id === this.selectedStoreIdSignal()
+  ) || stores[0];
+
+});
+
+// readonly selectedStore = computed(() =>
+//   this.storesSignal().find(
+//     store => store.id === this.selectedStoreIdSignal()
+//   ) ?? this.storesSignal()[0]
+// );
+
+
+
   readonly totalStoresCount = computed(() => this.storesSignal().length);
   readonly activeStoresCount = computed(() => this.storesSignal().filter(s => s.status === 'active').length);
   readonly disabledStoresCount = computed(() => this.storesSignal().filter(s => s.status === 'disabled').length);
@@ -156,6 +179,27 @@ export class StoreService {
       this.showToast(`Store "${store.name}" deleted.`, 'danger');
     }
   }
+
+
+  changeSelectedStore(id:string):void{
+
+  const store = this.storesSignal()
+    .find(s => s.id === id);
+
+  if(store){
+
+    this.selectedStoreIdSignal.set(id);
+
+    this.showToast(
+      `Switched to ${store.name}`,
+      'info'
+    );
+
+  }
+
+}
+
+
 
   showToast(message: string, type: ToastNotification['type'] = 'info'): void {
     const id = `toast-${Date.now()}`;
