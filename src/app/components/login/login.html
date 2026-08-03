@@ -155,8 +155,7 @@
                         <strong>{{ loginForm.value.email }}</strong>. Enter it below to sign in.
                     </p>
 
-                    <form (ngSubmit)="verifyOtp()">
-
+                    <form (ngSubmit)="verifyOtp()" >
                         <div class="otp-inputs-wrapper">
 
                             <input #otp1 type="text" maxlength="1" class="otp-input" inputmode="numeric"
@@ -185,8 +184,15 @@
 
                         </div>
 
-                        <button type="submit" class="primary-btn" [disabled]="!isOtpComplete() || isLoading" onclick="console.log('Native HTML click')">
 
+                        <button type="button"
+                         class="primary-btn"
+                         (click)="verifyOtp()"
+                         [disabled]="loginForm.invalid || isLoading"
+                          
+                         >
+
+                            
                             @if (isLoading) {
                             <span class="btn-spinner"></span>
                             <span>Verifying...</span>

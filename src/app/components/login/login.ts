@@ -52,6 +52,32 @@ export class Login implements OnDestroy {
 
     }
 
+    const email = this.loginForm.value.email || "";
+
+
+const user = this.auth.checkUser(email);
+
+
+if(!user){
+
+
+ Swal.fire({
+
+   title:"User Not Found",
+
+   text:"This email is not registered.",
+
+   icon:"error",
+
+   confirmButtonColor:"#7C1C77"
+
+ });
+
+
+ return;
+
+}
+
 
     // TEST MODE (No API call)
     if (this.testMode) {
@@ -166,28 +192,41 @@ export class Login implements OnDestroy {
    */
 
 
-  testVerifyClick() {
-    console.log('Verify button clicked');
-  }
+
   verifyOtp() {
 
 
-    console.log("verifyOtp() called");
+
+    console.log("VERIFY FUNCTION STARTED");
+
+
 
     if (!this.isOtpComplete()) {
+
+      console.log("OTP COMPLETE");
+
       return;
     }
+
+    console.log("OTP COMPLETE");
+
 
 
     // TEST OTP MODE
     if (this.testMode) {
 
 
+      console.log("ENTERED TEST MODE");
+
       const enteredOtp = this.otpValues.join('');
+
+      console.log("ENTERED OTP:", enteredOtp);
 
 
       if (enteredOtp !== "123456") {
 
+
+        console.log("WRONG OTP");
 
         Swal.fire({
 
@@ -203,11 +242,17 @@ export class Login implements OnDestroy {
 
       }
 
+      console.log("correct OTP");
 
+
+
+      console.log("BEFORE MOCK LOGIN");
 
       const user = this.auth.mockLogin(
         this.loginForm.value.email || ''
       );
+
+      console.log("AFTER MOCK LOGIN", user);
 
 
       Swal.fire({
@@ -369,6 +414,9 @@ export class Login implements OnDestroy {
 
 
   }
+
+
+
 
   /**
    * Resend OTP sequence

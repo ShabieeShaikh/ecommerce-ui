@@ -14,7 +14,7 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
 
   constructor(
-    private http: HttpClient,private storage: LocalStorageService
+    private http: HttpClient, private storage: LocalStorageService
   ) {
 
   }
@@ -22,67 +22,131 @@ export class AuthService {
 
 
   // mock storage start
+  checkUser(email: string) {
+
+    const users = [
+      {
+        id: 1,
+        name: "Muhammad",
+        email: "shabiee@digisofttrsol.com",
+        role: "StoreAdmin",
+
+        stores: [
+          {
+            id: 101,
+            name: "Digital Store"
+          }
+        ]
+      }
+    ];
+
+
+    const user = users.find(
+      x => x.email === email
+    );
+
+
+    return user || null;
+
+  }
+
+
+  // mockLogin(email: string) {
+
+
+  //   const users = [
+  //     {
+  //       id: 1,
+  //       name: "Muhammad",
+  //       email: "shabiee@digisofttrsol.com",
+  //       role: "StoreAdmin",
+
+  //       stores: [
+  //         {
+  //           id: 101,
+  //           name: "Digital Store"
+  //         }
+  //       ]
+  //     }
+  //   ];
+
+
+  //   const user = users.find(
+  //     x => x.email === email
+  //   );
+
+
+
+  //   if (!user) {
+
+  //     return null;
+
+  //   }
+
+
+
+  //   this.storage.setItem(
+  //     "currentUser",
+  //     user
+  //   );
+
+
+  //   return user;
+
+  // }
 
   mockLogin(email:string){
 
-
- const user = {
-
-   id:1,
-   name:"Muhammad",
-   email:email,
-   role:"StoreAdmin",
-
-   stores:[
-     {
-       id:101,
-       name:"Digital Store"
-     }
-   ]
-
- };
+  const user = this.checkUser(email);
 
 
- this.storage.setItem(
-   "currentUser",
-   user
- );
+  if(!user){
+
+    return null;
+
+  }
 
 
- return user;
+  this.storage.setItem(
+    "currentUser",
+    user
+  );
+
+
+  return user;
 
 }
 
 
 
 
-getCurrentUser(){
+  getCurrentUser() {
 
- return this.storage.getItem(
-   "currentUser"
- );
+    return this.storage.getItem(
+      "currentUser"
+    );
 
-}
-
-
-
-
-logout(){
-
- this.storage.removeItem(
-   "currentUser"
- );
-
-}
+  }
 
 
 
-isLoggedIn(){
 
- return !!this.getCurrentUser();
+  logout() {
 
-}
-    //  mock storage close
+    this.storage.removeItem(
+      "currentUser"
+    );
+
+  }
+
+
+
+  isLoggedIn() {
+
+    return !!this.getCurrentUser();
+
+  }
+  //  mock storage close
 
   register(userData: any) {
 
@@ -116,14 +180,14 @@ isLoggedIn(){
   }
 
 
-  saveUser(user:any){
+  saveUser(user: any) {
 
-  this.storage.setItem(
-    "currentUser",
-    user
-  );
+    this.storage.setItem(
+      "currentUser",
+      user
+    );
 
-}
+  }
 
 
 }
