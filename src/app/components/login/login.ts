@@ -13,6 +13,7 @@ import { finalize } from 'rxjs';
 })
 export class Login implements OnDestroy {
   // Loading and flow state controls
+  testMode = true;
   isLoading = false;
   otpSent = false;
   countdown = 0;
@@ -29,7 +30,13 @@ export class Login implements OnDestroy {
     ])
   });
 
-  constructor(private router: Router, private auth: AuthService, private cdr: ChangeDetectorRef) { }
+
+
+
+  constructor(private router: Router, private auth: AuthService, private cdr: ChangeDetectorRef) {
+
+    console.log("LOGIN COMPONENT LOADED");
+  }
 
   /**
    * Mock Send OTP sequence
@@ -45,6 +52,33 @@ export class Login implements OnDestroy {
 
     }
 
+
+    // TEST MODE (No API call)
+    if (this.testMode) {
+
+
+      this.otpSent = true;
+
+      this.startTimer();
+
+
+      Swal.fire({
+
+        title: 'Test OTP Sent!',
+        text: 'Use OTP: 123456',
+        icon: 'success',
+        confirmButtonColor: '#7C3AED'
+
+      });
+
+
+      return;
+
+    }
+
+
+
+    // real api
 
     this.isLoading = true;
 
@@ -130,6 +164,11 @@ export class Login implements OnDestroy {
   /**
    * Mock Verify OTP sequence
    */
+
+
+  testVerifyClick() {
+    console.log('Verify button clicked');
+  }
   verifyOtp() {
 
 
@@ -139,6 +178,63 @@ export class Login implements OnDestroy {
       return;
     }
 
+
+    // TEST OTP MODE
+    if (this.testMode) {
+
+
+      const enteredOtp = this.otpValues.join('');
+
+
+      if (enteredOtp !== "123456") {
+
+
+        Swal.fire({
+
+          title: 'Invalid OTP',
+          text: 'For testing use OTP: 123456',
+          icon: 'error',
+          confirmButtonColor: '#7C1C77'
+
+        });
+
+
+        return;
+
+      }
+
+
+
+      const user = this.auth.mockLogin(
+        this.loginForm.value.email || ''
+      );
+
+
+      Swal.fire({
+
+        title: 'Login Success!',
+        text: 'Redirecting to dashboard...',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+
+      }).then(() => {
+
+
+        this.router.navigate([
+          '/store-admin/dashboard'
+        ]);
+
+
+      });
+
+
+      return;
+
+    }
+
+
+    // real api
 
     this.isLoading = true;
 
@@ -184,9 +280,13 @@ export class Login implements OnDestroy {
 
 
             // Store user information
-            sessionStorage.setItem(
-              "user",
-              JSON.stringify(response.data)
+            // sessionStorage.setItem(
+            //   "user",
+            //   JSON.stringify(response.data)
+            // );
+
+            this.auth.saveUser(
+              response.data
             );
 
 
@@ -209,7 +309,7 @@ export class Login implements OnDestroy {
             }).then(() => {
 
 
-              this.router.navigate(['/home']);
+              this.router.navigate(['/store-admin/dashboard']);
 
 
             });
@@ -371,6 +471,8 @@ export class Login implements OnDestroy {
     } else {
       this.otpValues[index - 1] = '';
     }
+
+    console.log("OTP ARRAY:", this.otpValues);
   }
 
   /**

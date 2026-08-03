@@ -22,7 +22,7 @@ export class AuthService {
 
 
   // mock storage start
-  
+
   mockLogin(email:string){
 
 
@@ -114,6 +114,16 @@ isLoggedIn(){
     );
 
   }
+
+
+  saveUser(user:any){
+
+  this.storage.setItem(
+    "currentUser",
+    user
+  );
+
+}
 
 
 }

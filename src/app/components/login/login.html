@@ -9,7 +9,7 @@
         <!-- Left Column: Branding / Visual Aspect -->
         <section class="login-visual-side">
             <div class="visual-image-wrapper">
-                <img src="login-image.jpg" alt="DIGI SHOP Illustration" class="visual-image">
+                <img src="login-image.webp" alt="DIGI SHOP Illustration" class="visual-image" fetchpriority="high">
                 <div class="visual-gradient-overlay"></div>
             </div>
 
@@ -185,7 +185,7 @@
 
                         </div>
 
-                        <button type="submit" class="primary-btn" [disabled]="!isOtpComplete() || isLoading">
+                        <button type="submit" class="primary-btn" [disabled]="!isOtpComplete() || isLoading" onclick="console.log('Native HTML click')">
 
                             @if (isLoading) {
                             <span class="btn-spinner"></span>
