@@ -1,7 +1,48 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StoreService } from '../../../services/store.service';
 import { ProductService, Product } from '../../../services/product.service';
+
+type ProductPanelMode = 'details' | 'edit' | 'create';
+type ProductStockFilter = 'all' | 'active' | 'low' | 'out' | 'draft' | 'archived';
+
+interface ProductFormData {
+  name: string;
+  sku: string;
+  category: string;
+  brand: string;
+  barcode: string;
+  price: number;
+  comparePrice?: number;
+  stock: number;
+  status: Product['status'];
+  imageUrl: string;
+  imageFileName: string;
+  description: string;
+  tagsString: string;
+  weight: number;
+  dimensions: string;
+}
+
+const EMPTY_PRODUCT_FORM: ProductFormData = {
+  name: '',
+  sku: '',
+  category: 'Mobiles',
+  brand: '',
+  barcode: '',
+  price: 0,
+  comparePrice: undefined,
+  stock: 0,
+  status: 'active',
+  imageUrl: '',
+  imageFileName: '',
+  description: '',
+  tagsString: '',
+  weight: 0,
+  dimensions: ''
+};
+
+const CATEGORIES = ['Mobiles', 'Laptops', 'Wearables', 'Audio', 'TV & Video', 'Cameras', 'Tablets', 'Accessories'];
 
 @Component({
   selector: 'app-products',
@@ -13,131 +54,267 @@ export class Products {
   readonly storeService = inject(StoreService);
   readonly productService = inject(ProductService);
 
-  searchQuery = signal('');
-  selectedStoreFilter = signal('all');
-  selectedProduct = signal<Product | null>(null);
-  
-  // Modals & Panels
-  showAddModal = signal(false);
-  activeModalStoreId = signal<string>('store-001');
-  isEditingDetail = signal(false);
+  readonly selectedStore = this.storeService.selectedStore;
+  readonly searchQuery = signal('');
+  readonly selectedCategory = signal('all');
+  readonly selectedStatus = signal<ProductStockFilter>('all');
+  readonly panelMode = signal<ProductPanelMode | null>(null);
+  readonly selectedProductId = signal<string | null>(null);
+  readonly activeDetailTab = signal<'overview' | 'activity'>('overview');
+  readonly categories = CATEGORIES;
 
-  // Form State for Adding Product
-  newProduct = {
-    name: '',
-    sku: '',
-    category: 'Apparel',
-    price: 49.99,
-    comparePrice: 69.99,
-    stock: 50,
-    status: 'active' as 'active' | 'draft' | 'archived',
-    imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60',
-    description: '',
-    tagsString: 'new, featured',
-    weight: 0.5,
-    dimensions: '20x15x5 cm'
-  };
+  formData: ProductFormData = { ...EMPTY_PRODUCT_FORM };
 
-  // Group products by Store
-  storeProductGroups = computed(() => {
-    const query = this.searchQuery().toLowerCase().trim();
-    const filterStore = this.selectedStoreFilter();
-
-    let stores = this.storeService.stores();
-    if (filterStore !== 'all') {
-      stores = stores.filter(s => s.id === filterStore);
-    }
-
-    return stores.map(store => {
-      let prods = this.productService.getProductsByStore(store.id);
-      if (query) {
-        prods = prods.filter(p =>
-          p.name.toLowerCase().includes(query) ||
-          p.sku.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query)
-        );
-      }
-      return { store, products: prods };
-    });
+  readonly storeProducts = computed(() => this.productService.products().filter(product => product.storeId === this.selectedStore().id));
+  readonly selectedProduct = computed(() => {
+    const id = this.selectedProductId();
+    return id ? this.productService.getProductById(id) : undefined;
   });
 
-  openProductDetail(product: Product) {
-    this.selectedProduct.set({ ...product });
-    this.isEditingDetail.set(false);
+  readonly filteredProducts = computed(() => {
+    let products = [...this.storeProducts()];
+    const query = this.searchQuery().trim().toLowerCase();
+
+    if (query) {
+      products = products.filter(product =>
+        product.name.toLowerCase().includes(query) ||
+        product.sku.toLowerCase().includes(query) ||
+        product.category.toLowerCase().includes(query)
+      );
+    }
+
+    if (this.selectedCategory() !== 'all') {
+      products = products.filter(product => product.category === this.selectedCategory());
+    }
+
+    const status = this.selectedStatus();
+    if (status === 'low') {
+      products = products.filter(product => product.stock > 0 && product.stock <= 15);
+    } else if (status === 'out') {
+      products = products.filter(product => product.stock === 0);
+    } else if (status !== 'all') {
+      products = products.filter(product => product.status === status);
+    }
+
+    return products;
+  });
+  readonly emptyMessage = computed(() => {
+    if (this.storeProducts().length === 0) {
+      return `${this.selectedStore().name} has no products yet.`;
+    }
+
+    return 'No products match the selected filters.';
+  });
+
+  readonly stats = computed(() => {
+    const products = this.storeProducts();
+    const total = products.length;
+    const inStock = products.filter(product => product.stock > 15 && product.status === 'active').length;
+    const sold = products.reduce((sum, product) => sum + product.salesCount, 0);
+    const low = products.filter(product => product.stock > 0 && product.stock <= 15).length;
+
+    return [
+      { label: 'Total Products', value: total.toLocaleString('en-US'), helper: 'All products in store', tone: 'purple', icon: 'box' },
+      { label: 'In Stock', value: inStock.toLocaleString('en-US'), helper: `${this.percent(inStock, total)}% of total`, tone: 'green', icon: 'stock' },
+      { label: 'Sold', value: sold.toLocaleString('en-US'), helper: 'Total units sold', tone: 'orange', icon: 'sold' },
+      { label: 'Low Stock', value: low.toLocaleString('en-US'), helper: 'Need attention', tone: 'blue', icon: 'low' }
+    ];
+  });
+
+  constructor() {
+    effect(() => {
+      this.selectedStore();
+      this.panelMode.set(null);
+      this.selectedProductId.set(null);
+      this.searchQuery.set('');
+      this.selectedCategory.set('all');
+      this.selectedStatus.set('all');
+    });
   }
 
-  closeProductDetail() {
-    this.selectedProduct.set(null);
-    this.isEditingDetail.set(false);
+  onSearchInput(event: Event): void {
+    this.searchQuery.set((event.target as HTMLInputElement).value);
   }
 
-  openAddProductModal(storeId: string) {
-    this.activeModalStoreId.set(storeId);
-    this.newProduct = {
-      name: '',
-      sku: `SKU-${Math.floor(1000 + Math.random() * 9000)}`,
-      category: 'Apparel',
-      price: 49.99,
-      comparePrice: 69.99,
-      stock: 50,
-      status: 'active',
-      imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60',
-      description: '',
-      tagsString: 'new, featured',
-      weight: 0.5,
-      dimensions: '20x15x5 cm'
+  onCategoryChange(event: Event): void {
+    this.selectedCategory.set((event.target as HTMLSelectElement).value);
+  }
+
+  onStatusChange(event: Event): void {
+    this.selectedStatus.set((event.target as HTMLSelectElement).value as ProductStockFilter);
+  }
+
+  openDetails(product: Product): void {
+    this.selectedProductId.set(product.id);
+    this.activeDetailTab.set('overview');
+    this.panelMode.set('details');
+  }
+
+  openEdit(product: Product): void {
+    this.selectedProductId.set(product.id);
+    this.formData = this.toFormData(product);
+    this.panelMode.set('edit');
+  }
+
+  openCreate(): void {
+    this.formData = {
+      ...EMPTY_PRODUCT_FORM,
+      sku: `${this.selectedStore().name.replace(/[^A-Z0-9]/gi, '').slice(0, 3).toUpperCase() || 'SKU'}-${Math.floor(1000 + Math.random() * 9000)}`,
+      tagsString: 'new, featured'
     };
-    this.showAddModal.set(true);
+    this.selectedProductId.set(null);
+    this.panelMode.set('create');
   }
 
-  closeAddModal() {
-    this.showAddModal.set(false);
-  }
+  onProductImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
 
-  saveNewProduct() {
-    if (!this.newProduct.name.trim()) {
-      this.storeService.showToast('Product name is required!', 'warning');
+    if (!file) {
       return;
     }
 
-    const tags = this.newProduct.tagsString.split(',').map(t => t.trim()).filter(Boolean);
+    if (!file.type.startsWith('image/')) {
+      this.storeService.showToast('Please select a valid product image.', 'warning');
+      return;
+    }
 
-    this.productService.addProduct({
-      ...this.newProduct,
-      storeId: this.activeModalStoreId(),
-      tags
-    });
+    if (file.size > 3 * 1024 * 1024) {
+      this.storeService.showToast('Please select an image smaller than 3 MB.', 'warning');
+      return;
+    }
 
-    this.storeService.showToast(`Product "${this.newProduct.name}" added successfully!`, 'success');
-    this.closeAddModal();
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageUrl = typeof reader.result === 'string' ? reader.result : '';
+      if (!imageUrl) {
+        this.storeService.showToast('Unable to read the selected product image.', 'danger');
+        return;
+      }
+
+      this.formData.imageUrl = imageUrl;
+      this.formData.imageFileName = file.name;
+      this.storeService.showToast('Product image preview updated.', 'success');
+    };
+    reader.onerror = () => this.storeService.showToast('Unable to read the selected product image.', 'danger');
+    reader.readAsDataURL(file);
   }
 
-  toggleEditDetail() {
-    this.isEditingDetail.update(v => !v);
+  closePanel(): void {
+    this.panelMode.set(null);
+    this.selectedProductId.set(null);
   }
 
-  saveProductDetail() {
-    const prod = this.selectedProduct();
-    if (!prod) return;
+  saveCreate(): void {
+    if (!this.formData.name.trim()) {
+      this.storeService.showToast('Product name is required.', 'warning');
+      return;
+    }
 
-    this.productService.updateProduct(prod.id, prod);
-    this.storeService.showToast(`Product "${prod.name}" updated successfully!`, 'success');
-    this.isEditingDetail.set(false);
+    if (!this.formData.imageUrl) {
+      this.storeService.showToast('Please upload a product image.', 'warning');
+      return;
+    }
+
+    const product = this.productService.addProduct(this.toProductPayload());
+    this.storeService.showToast(`Product "${product.name}" added successfully.`, 'success');
+    this.closePanel();
   }
 
-  deleteCurrentProduct() {
-    const prod = this.selectedProduct();
-    if (!prod) return;
+  saveEdit(): void {
+    const product = this.selectedProduct();
+    if (!product) {
+      return;
+    }
 
-    if (confirm(`Are you sure you want to delete "${prod.name}"?`)) {
-      this.productService.deleteProduct(prod.id);
-      this.storeService.showToast(`Product "${prod.name}" deleted`, 'danger');
-      this.closeProductDetail();
+    this.productService.updateProduct(product.id, this.toProductPayload());
+    this.storeService.showToast(`Product "${this.formData.name}" updated successfully.`, 'success');
+    this.panelMode.set('details');
+  }
+
+  deleteProduct(product?: Product): void {
+    const target = product ?? this.selectedProduct();
+    if (!target) {
+      return;
+    }
+
+    if (confirm(`Are you sure you want to delete "${target.name}"?`)) {
+      this.productService.deleteProduct(target.id);
+      this.storeService.showToast(`Product "${target.name}" deleted.`, 'danger');
+      this.closePanel();
     }
   }
 
-  onFilterStoreChange(event: Event) {
-    const val = (event.target as HTMLSelectElement).value;
-    this.selectedStoreFilter.set(val);
+  stockLabel(product: Product): string {
+    if (product.stock === 0 || product.status === 'archived') return 'Out of Stock';
+    if (product.stock <= 15) return 'Low Stock';
+    if (product.status === 'draft') return 'Draft';
+    return 'In Stock';
+  }
+
+  stockTone(product: Product): string {
+    if (product.stock === 0 || product.status === 'archived') return 'out';
+    if (product.stock <= 15) return 'low';
+    if (product.status === 'draft') return 'draft';
+    return 'stock';
+  }
+
+  brand(product: Product): string {
+    return product.tags[0] ? this.titleCase(product.tags[0]) : 'DigiShop';
+  }
+
+  barcode(product: Product): string {
+    return `${product.sku.replace(/[^0-9]/g, '').padEnd(12, '0').slice(0, 12)}`;
+  }
+
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+  }
+
+  private toFormData(product: Product): ProductFormData {
+    return {
+      name: product.name,
+      sku: product.sku,
+      category: product.category,
+      brand: this.brand(product),
+      barcode: this.barcode(product),
+      price: product.price,
+      comparePrice: product.comparePrice,
+      stock: product.stock,
+      status: product.status,
+      imageUrl: product.imageUrl,
+      imageFileName: '',
+      description: product.description,
+      tagsString: product.tags.join(', '),
+      weight: product.weight ?? 0,
+      dimensions: product.dimensions ?? ''
+    };
+  }
+
+  private toProductPayload(): Partial<Product> {
+    return {
+      storeId: this.selectedStore().id,
+      name: this.formData.name.trim() || 'New Product',
+      sku: this.formData.sku.trim() || `SKU-${Date.now().toString().slice(-4)}`,
+      category: this.formData.category,
+      price: Number(this.formData.price) || 0,
+      comparePrice: this.formData.comparePrice ? Number(this.formData.comparePrice) : undefined,
+      stock: Number(this.formData.stock) || 0,
+      status: this.formData.status,
+      imageUrl: this.formData.imageUrl.trim(),
+      description: this.formData.description.trim() || 'Product description.',
+      tags: this.formData.tagsString.split(',').map(tag => tag.trim()).filter(Boolean),
+      weight: Number(this.formData.weight) || 0,
+      dimensions: this.formData.dimensions.trim()
+    };
+  }
+
+  private percent(value: number, total: number): number {
+    return total ? Number(((value / total) * 100).toFixed(2)) : 0;
+  }
+
+  private titleCase(value: string): string {
+    return value.charAt(0).toUpperCase() + value.slice(1);
   }
 }

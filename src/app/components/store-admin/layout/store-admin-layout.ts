@@ -1,6 +1,20 @@
-import { Component, signal, inject, HostListener, computed } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Component, HostListener, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../../services/auth';
 import { StoreService } from '../../../services/store.service';
+import { Store } from '../../../models/admin.models';
+
+interface NavigationItem {
+  label: string;
+  route: string;
+  icon: 'dashboard' | 'store' | 'products' | 'analytics' | 'location' | 'settings' | 'profile';
+  exact?: boolean;
+}
+
+interface NavigationGroup {
+  label: string;
+  items: NavigationItem[];
+}
 
 @Component({
   selector: 'app-store-admin-layout',
@@ -10,106 +24,188 @@ import { StoreService } from '../../../services/store.service';
 })
 export class StoreAdminLayout {
   readonly storeService = inject(StoreService);
-  readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  sidebarCollapsed = signal(false);
+  readonly sidebarCollapsed = signal(false);
+  readonly mobileDrawerOpen = signal(false);
+  readonly showUserMenu = signal(false);
+  readonly showStoreDropdown = signal(false);
+  readonly showNotifPanel = signal(false);
+  readonly searchQuery = signal('');
+  readonly searchFocused = signal(false);
 
-  // Topbar dropdown state
-  showUserMenu       = signal(false);
-  showStoreDropdown  = signal(false);
-  showNotifPanel     = signal(false);
-  searchQuery        = signal('');
-  showSearchResults  = signal(false);
+  readonly currentUser = computed(() => this.authService.getCurrentUser());
+  readonly selectedStoreId = this.storeService.selectedStoreId;
+  readonly selectedStore = this.storeService.selectedStore;
+  readonly stores = this.storeService.stores;
+  readonly notifications = this.storeService.notifications;
+  readonly unreadCount = this.storeService.unreadNotificationsCount;
+  readonly toasts = this.storeService.toasts;
 
-  // Current selected store (default = first store)
-  selectedStoreId = this.storeService.selectedStoreId;
-
-  selectedStore = this.storeService.selectedStore;
-
-  // Search results computed from query
-  searchResults = computed(() => {
-    const q = this.searchQuery().toLowerCase().trim();
-    if (!q || q.length < 2) return [];
-    return this.storeService.stores().filter(s =>
-      s.name.toLowerCase().includes(q) ||
-      s.category.toLowerCase().includes(q) ||
-      s.owner.toLowerCase().includes(q) ||
-      s.city.toLowerCase().includes(q)
-    ).slice(0, 6);
-  });
-
-  // Mock notifications
-  notifications = [
-    { id: 'n1', title: 'New Order Received', message: 'Fashion Hub received a $420 order', time: '2 min ago', unread: true,  icon: 'order'  },
-    { id: 'n2', title: 'Store Approved',     message: 'TechZone is now Active',           time: '1 hr ago',  unread: true,  icon: 'success' },
-    { id: 'n3', title: 'Low Stock Alert',    message: 'Beauty Vault has 3 items below 10 units', time: '3 hr ago', unread: false, icon: 'warning' },
-    { id: 'n4', title: 'Revenue Milestone',  message: 'Sports Arena crossed $30K revenue',time: 'Yesterday', unread: false, icon: 'star'   },
+  readonly navigationGroups: NavigationGroup[] = [
+    {
+      label: 'Main',
+      items: [
+        { label: 'Dashboard', route: '/store-admin/dashboard', icon: 'dashboard', exact: true }
+      ]
+    },
+    {
+      label: 'Store',
+      items: [
+        { label: 'Store Management', route: '/store-admin/stores', icon: 'store', exact: true },
+        { label: 'Products', route: '/store-admin/products', icon: 'products' },
+        { label: 'Analytics', route: '/store-admin/analytics', icon: 'analytics' },
+        { label: 'Locations', route: '/store-admin/locations', icon: 'location' }
+      ]
+    },
+    {
+      label: 'Account',
+      items: [
+        { label: 'Profile', route: '/store-admin/profile', icon: 'profile' },
+        { label: 'Settings', route: '/store-admin/settings', icon: 'settings' }
+      ]
+    }
   ];
 
-  unreadCount = computed(() => this.notifications.filter(n => n.unread).length);
+  readonly userInitials = computed(() => this.getInitials(this.currentUser()?.name ?? 'Store Admin'));
+  readonly userName = computed(() => this.currentUser()?.name ?? 'Store Admin');
+  readonly userEmail = computed(() => this.currentUser()?.email ?? 'admin@digishop.local');
+  readonly userRole = computed(() => this.formatRole(this.currentUser()?.role ?? 'StoreAdmin'));
 
-  toggleSidebar() { this.sidebarCollapsed.update(v => !v); }
+  readonly searchResults = computed<Store[]>(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (query.length < 2) {
+      return [];
+    }
 
-  toggleUserMenu(e: Event) {
-    e.stopPropagation();
-    this.showUserMenu.update(v => !v);
+    return this.stores()
+      .filter(store =>
+        store.name.toLowerCase().includes(query) ||
+        store.category.toLowerCase().includes(query) ||
+        store.owner.toLowerCase().includes(query) ||
+        store.city.toLowerCase().includes(query)
+      )
+      .slice(0, 6);
+  });
+
+  readonly showSearchResults = computed(() => this.searchFocused() && this.searchQuery().trim().length >= 2);
+
+  toggleDesktopSidebar(): void {
+    this.sidebarCollapsed.update(collapsed => !collapsed);
+  }
+
+  openMobileDrawer(event?: Event): void {
+    event?.stopPropagation();
+    this.mobileDrawerOpen.set(true);
+    this.closePanels();
+  }
+
+  closeMobileDrawer(): void {
+    this.mobileDrawerOpen.set(false);
+  }
+
+  toggleUserMenu(event: Event): void {
+    event.stopPropagation();
+    this.showUserMenu.update(open => !open);
     this.showStoreDropdown.set(false);
     this.showNotifPanel.set(false);
   }
 
-  toggleStoreDropdown(e: Event) {
-    e.stopPropagation();
-    this.showStoreDropdown.update(v => !v);
+  toggleStoreDropdown(event: Event): void {
+    event.stopPropagation();
+    this.showStoreDropdown.update(open => !open);
     this.showUserMenu.set(false);
     this.showNotifPanel.set(false);
   }
 
-  toggleNotifPanel(e: Event) {
-    e.stopPropagation();
-    this.showNotifPanel.update(v => !v);
+  toggleNotifPanel(event: Event): void {
+    event.stopPropagation();
+    this.showNotifPanel.update(open => !open);
     this.showUserMenu.set(false);
     this.showStoreDropdown.set(false);
   }
 
-  selectStore(id: string) {
-     this.storeService.changeSelectedStore(id);
-
+  selectStore(id: string): void {
+    this.storeService.changeSelectedStore(id);
     this.showStoreDropdown.set(false);
   }
 
-  onSearchInput(event: Event) {
-    const val = (event.target as HTMLInputElement).value;
-    this.searchQuery.set(val);
-    this.showSearchResults.set(val.trim().length >= 2);
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchQuery.set(value);
+    this.searchFocused.set(true);
   }
 
-  clearSearch() {
+  clearSearch(event?: Event): void {
+    event?.stopPropagation();
     this.searchQuery.set('');
-    this.showSearchResults.set(false);
+    this.searchFocused.set(false);
   }
 
-  navigateToStore(id: string) {
+  navigateToStore(id: string): void {
+    this.selectStore(id);
     this.clearSearch();
     this.router.navigate(['/store-admin/stores']);
   }
 
-  markAllRead() {
-    this.notifications.forEach(n => n.unread = false);
-    this.storeService.showToast('All notifications marked as read', 'success');
+  markAllRead(): void {
+    this.storeService.markAllNotificationsRead();
   }
 
-  goToProfile()  { this.showUserMenu.set(false); this.router.navigate(['/store-admin/profile']); }
-  goToSettings() { this.showUserMenu.set(false); this.router.navigate(['/store-admin/settings']); }
-  logout()       { this.showUserMenu.set(false); this.router.navigate(['/login']); }
+  goToProfile(): void {
+    this.showUserMenu.set(false);
+    this.router.navigate(['/store-admin/profile']);
+  }
 
-  removeToast(id: string) { this.storeService.removeToast(id); }
+  goToSettings(): void {
+    this.showUserMenu.set(false);
+    this.router.navigate(['/store-admin/settings']);
+  }
 
-  // Close all dropdowns on outside click
+  logout(): void {
+    this.closePanels();
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  removeToast(id: string): void {
+    this.storeService.removeToast(id);
+  }
+
+  onNavItemClick(): void {
+    this.closeMobileDrawer();
+  }
+
   @HostListener('document:click')
-  onDocumentClick() {
+  onDocumentClick(): void {
+    this.closePanels();
+    this.searchFocused.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closePanels();
+    this.closeMobileDrawer();
+    this.searchFocused.set(false);
+  }
+
+  private closePanels(): void {
     this.showUserMenu.set(false);
     this.showStoreDropdown.set(false);
     this.showNotifPanel.set(false);
-    this.showSearchResults.set(false);
+  }
+
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  private formatRole(role: string): string {
+    return role.replace(/([a-z])([A-Z])/g, '$1 $2');
   }
 }

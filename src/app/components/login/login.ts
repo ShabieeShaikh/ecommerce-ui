@@ -4,10 +4,11 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth';
 import { finalize } from 'rxjs';
+import { Register } from '../register/register';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, Register],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -16,6 +17,7 @@ export class Login implements OnDestroy {
   testMode = true;
   isLoading = false;
   otpSent = false;
+  isRegisterMode = false;
   countdown = 0;
   private timerInterval: any;
 
@@ -491,7 +493,11 @@ if(!user){
    * Navigate to Register component
    */
   goToRegister() {
-    this.router.navigate(['/register']);
+    this.isRegisterMode = true;
+  }
+
+  showLogin() {
+    this.isRegisterMode = false;
   }
 
   /**

@@ -1,23 +1,8 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { Product } from '../models/admin.models';
+import { LocalStorageService } from './local-storage.service';
 
-export interface Product {
-  id: string;
-  storeId: string;
-  name: string;
-  sku: string;
-  category: string;
-  price: number;
-  comparePrice?: number;
-  stock: number;
-  status: 'active' | 'draft' | 'archived';
-  imageUrl: string;
-  description: string;
-  tags: string[];
-  weight?: number;
-  dimensions?: string;
-  rating: number;
-  salesCount: number;
-}
+export type { Product } from '../models/admin.models';
 
 const INITIAL_PRODUCTS: Product[] = [
   // Fashion Hub (store-001)
@@ -70,28 +55,35 @@ const INITIAL_PRODUCTS: Product[] = [
 ];
 
 const LS_PRODS_KEY = 'digishop_products_v1';
-
-function loadProducts(): Product[] {
-  try {
-    const raw = localStorage.getItem(LS_PRODS_KEY);
-    if (raw) return JSON.parse(raw) as Product[];
-  } catch { /* ignore */ }
-  return INITIAL_PRODUCTS;
-}
-
-function saveProducts(prods: Product[]): void {
-  try { localStorage.setItem(LS_PRODS_KEY, JSON.stringify(prods)); } catch { /* ignore */ }
-}
+const GENERATED_PRODUCT_ID_SUFFIXES = [
+  'iphone-15',
+  'macbook-air',
+  'watch-6',
+  'sony-xm5',
+  'oled-tv',
+  'canon-r50',
+  'jbl-flip',
+  'ipad-air'
+];
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  private productsSignal = signal<Product[]>(loadProducts());
+  private readonly storage = inject(LocalStorageService);
+  private productsSignal = signal<Product[]>(this.loadProducts());
   readonly products = this.productsSignal.asReadonly();
+
+  getProducts(): Product[] {
+    return this.productsSignal();
+  }
 
   getProductsByStore(storeId: string): Product[] {
     return this.productsSignal().filter(p => p.storeId === storeId);
+  }
+
+  getProductById(id: string): Product | undefined {
+    return this.productsSignal().find(product => product.id === id);
   }
 
   addProduct(productData: Partial<Product>): Product {
@@ -117,7 +109,7 @@ export class ProductService {
 
     this.productsSignal.update(prods => {
       const updated = [newProduct, ...prods];
-      saveProducts(updated);
+      this.saveProducts(updated);
       return updated;
     });
 
@@ -127,7 +119,7 @@ export class ProductService {
   updateProduct(id: string, updatedFields: Partial<Product>): void {
     this.productsSignal.update(prods => {
       const updated = prods.map(p => p.id === id ? { ...p, ...updatedFields } : p);
-      saveProducts(updated);
+      this.saveProducts(updated);
       return updated;
     });
   }
@@ -135,8 +127,30 @@ export class ProductService {
   deleteProduct(id: string): void {
     this.productsSignal.update(prods => {
       const updated = prods.filter(p => p.id !== id);
-      saveProducts(updated);
+      this.saveProducts(updated);
       return updated;
     });
+  }
+
+  private loadProducts(): Product[] {
+    const storedProducts = this.storage.getItem<Product[]>(LS_PRODS_KEY);
+    if (!storedProducts) {
+      return INITIAL_PRODUCTS;
+    }
+
+    const migratedProducts = storedProducts.filter(product => !this.isGeneratedStoreProduct(product));
+    if (migratedProducts.length !== storedProducts.length) {
+      this.saveProducts(migratedProducts);
+    }
+
+    return migratedProducts;
+  }
+
+  private saveProducts(products: Product[]): void {
+    this.storage.setItem(LS_PRODS_KEY, products);
+  }
+
+  private isGeneratedStoreProduct(product: Product): boolean {
+    return GENERATED_PRODUCT_ID_SUFFIXES.some(suffix => product.id === `${product.storeId}-${suffix}`);
   }
 }

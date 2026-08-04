@@ -1,136 +1,279 @@
-import { Component, signal, computed, inject } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { StoreService, Store } from '../../../services/store.service';
 
-export interface Pagination {
-  page: number; pageSize: number; total: number; totalPages: number;
+type StorePanelMode = 'details' | 'create' | 'edit';
+
+interface StoreFormData {
+  name: string;
+  description: string;
+  logoUrl: string;
+  email: string;
+  phone: string;
+  city: string;
+  state: string;
+  country: string;
+  address: string;
+  category: string;
+  status: Store['status'];
 }
+
+const EMPTY_FORM: StoreFormData = {
+  name: '',
+  description: '',
+  logoUrl: '',
+  email: '',
+  phone: '',
+  city: '',
+  state: '',
+  country: 'United States',
+  address: '',
+  category: 'Electronics',
+  status: 'active'
+};
+
+const CATEGORIES = [
+  'Electronics',
+  'Fashion & Apparel',
+  'Home & Living',
+  'Sports & Fitness',
+  'Beauty & Cosmetics',
+  'Books & Stationery',
+  'Food & Grocery',
+  'Gaming & Toys'
+];
+
+const LOCATION_OPTIONS = [
+  'New York, USA',
+  'Los Angeles, USA',
+  'Chicago, USA',
+  'Houston, USA',
+  'Phoenix, USA',
+  'Miami, USA',
+  'Seattle, USA',
+  'Boston, USA'
+];
 
 @Component({
   selector: 'app-store-listing',
-  imports: [RouterLink],
+  imports: [FormsModule],
   templateUrl: './store-listing.html',
   styleUrl: './store-listing.css'
 })
 export class StoreListing {
   readonly storeService = inject(StoreService);
-  readonly router = inject(Router);
 
-  viewMode = signal<'table' | 'card'>('table');
-  isLoading = signal(false);
-  hasError  = signal(false);
+  readonly stores = this.storeService.stores;
+  readonly searchQuery = signal('');
+  readonly panelMode = signal<StorePanelMode | null>(null);
+  readonly selectedStoreId = signal(this.stores()[0]?.id ?? '');
+  readonly editingStoreId = signal<string | null>(null);
+  readonly activeDetailTab = signal<'overview' | 'information' | 'settings' | 'activity'>('overview');
+  readonly categories = CATEGORIES;
+  readonly locationOptions = LOCATION_OPTIONS;
 
-  // Filter signals
-  searchQuery   = signal('');
-  selectedStatus = signal('');
-  selectedCategory = signal('');
-  sortBy         = signal('created_desc');
+  formData: StoreFormData = { ...EMPTY_FORM };
 
-  // Filtered stores computed
-  filteredStores = computed(() => {
-    let list = [...this.storeService.stores()];
-
-    const query = this.searchQuery().toLowerCase().trim();
-    if (query) {
-      list = list.filter(s =>
-        s.name.toLowerCase().includes(query) ||
-        s.category.toLowerCase().includes(query) ||
-        s.owner.toLowerCase().includes(query) ||
-        s.city.toLowerCase().includes(query)
-      );
+  readonly filteredStores = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+    if (!query) {
+      return this.stores();
     }
 
-    const status = this.selectedStatus();
-    if (status) {
-      list = list.filter(s => s.status === status);
-    }
-
-    const category = this.selectedCategory();
-    if (category) {
-      list = list.filter(s => s.category === category);
-    }
-
-    const sort = this.sortBy();
-    if (sort === 'revenue_desc') {
-      list.sort((a, b) => b.revenue - a.revenue);
-    } else if (sort === 'orders_desc') {
-      list.sort((a, b) => b.orders - a.orders);
-    } else if (sort === 'rating_desc') {
-      list.sort((a, b) => b.rating - a.rating);
-    }
-
-    return list;
+    return this.stores().filter(store =>
+      store.name.toLowerCase().includes(query) ||
+      store.email.toLowerCase().includes(query) ||
+      store.owner.toLowerCase().includes(query) ||
+      store.city.toLowerCase().includes(query) ||
+      store.country.toLowerCase().includes(query)
+    );
   });
 
-  pagination = computed<Pagination>(() => ({
-    page: 1,
-    pageSize: 10,
-    total: this.filteredStores().length,
-    totalPages: Math.max(1, Math.ceil(this.filteredStores().length / 10))
-  }));
+  readonly selectedStore = computed(() => {
+    const stores = this.stores();
+    return stores.find(store => store.id === this.selectedStoreId()) ?? stores[0];
+  });
 
-  pageNumbers = computed(() => Array.from({ length: this.pagination().totalPages }, (_, i) => i + 1));
+  readonly stats = computed(() => {
+    const stores = this.stores();
+    const total = stores.length;
+    const active = stores.filter(store => store.status === 'active').length;
+    const inactive = stores.filter(store => store.status === 'disabled').length;
+    const draft = stores.filter(store => store.status === 'pending').length;
 
-  setView(mode: 'table' | 'card') { this.viewMode.set(mode); }
+    return [
+      { label: 'Total Stores', value: total, helper: 'All Locations', tone: 'purple', icon: 'store' },
+      { label: 'Active Stores', value: active, helper: `${this.percent(active, total)}% of total`, tone: 'green', icon: 'active' },
+      { label: 'Inactive Stores', value: inactive, helper: `${this.percent(inactive, total)}% of total`, tone: 'orange', icon: 'inactive' },
+      { label: 'Draft Stores', value: draft, helper: `${this.percent(draft, total)}% of total`, tone: 'violet', icon: 'draft' }
+    ];
+  });
+
+  constructor() {
+    effect(() => {
+      const stores = this.stores();
+      if (!stores.some(store => store.id === this.selectedStoreId())) {
+        this.selectedStoreId.set(stores[0]?.id ?? '');
+      }
+    });
+  }
 
   onSearchInput(event: Event): void {
-    const val = (event.target as HTMLInputElement).value;
-    this.searchQuery.set(val);
+    this.searchQuery.set((event.target as HTMLInputElement).value);
   }
 
-  onStatusFilterChange(event: Event): void {
-    const val = (event.target as HTMLSelectElement).value;
-    this.selectedStatus.set(val);
+  openCreatePanel(): void {
+    this.formData = { ...EMPTY_FORM };
+    this.editingStoreId.set(null);
+    this.panelMode.set('create');
   }
 
-  onCategoryFilterChange(event: Event): void {
-    const val = (event.target as HTMLSelectElement).value;
-    this.selectedCategory.set(val);
+  openDetails(store: Store): void {
+    this.selectedStoreId.set(store.id);
+    this.storeService.changeSelectedStore(store.id);
+    this.activeDetailTab.set('overview');
+    this.panelMode.set('details');
   }
 
-  onSortChange(event: Event): void {
-    const val = (event.target as HTMLSelectElement).value;
-    this.sortBy.set(val);
+  openEditPanel(store: Store): void {
+    this.selectedStoreId.set(store.id);
+    this.editingStoreId.set(store.id);
+    this.formData = this.toFormData(store);
+    this.panelMode.set('edit');
   }
 
-  // Action handlers
-  onToggleStatus(id: string, event: Event): void {
-    event.stopPropagation();
-    this.storeService.toggleStoreStatus(id);
+  onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.storeService.showToast('Please choose a valid image file.', 'warning');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.formData.logoUrl = String(reader.result ?? '');
+      this.storeService.showToast('Store logo preview updated.', 'success');
+    };
+    reader.onerror = () => {
+      this.storeService.showToast('Unable to read the selected logo.', 'danger');
+    };
+    reader.readAsDataURL(file);
   }
 
-  onDeleteStore(id: string, name: string, event: Event): void {
-    event.stopPropagation();
-    if (confirm(`Are you sure you want to delete "${name}"?`)) {
-      this.storeService.deleteStore(id);
+  removeLogo(): void {
+    this.formData.logoUrl = '';
+  }
+
+  closePanel(): void {
+    this.panelMode.set(null);
+    this.editingStoreId.set(null);
+  }
+
+  saveCreate(): void {
+    const store = this.storeService.addStore(this.normalizeFormData());
+    this.selectedStoreId.set(store.id);
+    this.panelMode.set(null);
+  }
+
+  saveEdit(): void {
+    const id = this.editingStoreId();
+    if (!id) {
+      return;
+    }
+
+    this.storeService.updateStore(id, this.normalizeFormData());
+    this.selectedStoreId.set(id);
+    this.panelMode.set(null);
+    this.editingStoreId.set(null);
+  }
+
+  deleteStore(store: Store, event?: Event): void {
+    event?.stopPropagation();
+    if (confirm(`Are you sure you want to delete "${store.name}"?`)) {
+      this.storeService.deleteStore(store.id);
+      this.panelMode.set(null);
     }
   }
 
-  onViewStore(id: string): void {
-    this.storeService.showToast(`Opening preview for store ID ${id}`, 'info');
+  toggleSelectedStatus(): void {
+    const store = this.selectedStore();
+    if (store) {
+      this.storeService.toggleStoreStatus(store.id);
+    }
   }
 
-  onEditStore(id: string): void {
-    this.storeService.showToast(`Edit panel opened for store ID ${id}`, 'info');
+  setLocation(value: string): void {
+    const [city, country] = value.split(',').map(part => part.trim());
+    this.formData.city = city ?? '';
+    this.formData.country = country ?? 'United States';
   }
 
-  onAnalytics(id: string): void {
-    this.router.navigate(['/store-admin/analytics']);
+  locationValue(store: Store | undefined): string {
+    return store ? `${store.city}, ${store.country === 'United States' ? 'USA' : store.country}` : '';
   }
 
-  onLocation(id: string): void {
-    this.router.navigate(['/store-admin/locations']);
+  formLocationValue(): string {
+    if (!this.formData.city) {
+      return '';
+    }
+
+    return `${this.formData.city}, ${this.formData.country === 'United States' ? 'USA' : this.formData.country}`;
   }
 
-  formatRevenue(n: number): string {
-    if (n === 0) return '–';
-    if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000)     return `$${(n / 1_000).toFixed(1)}K`;
-    return `$${n}`;
+  statusLabel(status: Store['status']): string {
+    if (status === 'disabled') return 'Inactive';
+    if (status === 'pending') return 'Draft';
+    return 'Active';
   }
-  formatNum(n: number): string {
-    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-    return `${n}`;
+
+  formatDateTime(date: string, time = '10:30 AM'): string {
+    return `${date} ${time}`;
   }
-  capitalize(s: string): string { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  private toFormData(store: Store): StoreFormData {
+    return {
+      name: store.name,
+      description: store.description ?? '',
+      logoUrl: store.logoUrl ?? '',
+      email: store.email,
+      phone: store.phone,
+      city: store.city,
+      state: store.state ?? '',
+      country: store.country,
+      address: store.address ?? '',
+      category: store.category,
+      status: store.status
+    };
+  }
+
+  private normalizeFormData(): Partial<Store> {
+    const name = this.formData.name.trim() || 'New Store';
+    const city = this.formData.city.trim() || 'New York';
+    const country = this.formData.country.trim() || 'United States';
+
+    return {
+      name,
+      description: this.formData.description.trim(),
+      logoUrl: this.formData.logoUrl,
+      email: this.formData.email.trim() || 'store@example.com',
+      phone: this.formData.phone.trim() || '+1 (555) 000-0000',
+      city,
+      country,
+      state: this.formData.state.trim(),
+      address: this.formData.address.trim(),
+      category: this.formData.category,
+      status: this.formData.status,
+      owner: 'John Doe'
+    };
+  }
+
+  private percent(value: number, total: number): number {
+    return total ? Math.round((value / total) * 100) : 0;
+  }
 }

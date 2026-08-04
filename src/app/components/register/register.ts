@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -73,6 +73,9 @@ function passwordMatchValidator(
 })
 export class Register {
 
+  readonly embedded = input(false);
+  readonly switchToLogin = output<void>();
+
 
   constructor(
     private auth: AuthService,
@@ -80,6 +83,11 @@ export class Register {
   ) { }
 
   goToLogin() {
+    if (this.embedded()) {
+      this.switchToLogin.emit();
+      return;
+    }
+
     this.router.navigate(['/login']);
   }
 

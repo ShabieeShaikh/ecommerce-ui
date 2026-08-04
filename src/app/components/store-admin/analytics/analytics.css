@@ -1,5 +1,5 @@
 /* ── Page Layout ── */
-.analytics-page { display: flex; flex-direction: column; gap: 24px; max-width: 1400px; }
+.analytics-page { display: flex; flex-direction: column; gap: 24px; max-width: 100%; }
 
 /* ── Page Header ── */
 .page-header {

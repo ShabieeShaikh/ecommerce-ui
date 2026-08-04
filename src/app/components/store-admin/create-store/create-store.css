@@ -1,5 +1,5 @@
 /* ── Page Layout ── */
-.create-page { display: flex; flex-direction: column; gap: 24px; max-width: 1200px; }
+.create-page { display: flex; flex-direction: column; gap: 24px; max-width: 100%; }
 
 .cp-header {
   display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;

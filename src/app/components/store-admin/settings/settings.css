@@ -1,6 +1,6 @@
 .settings-page {
   padding: 24px;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   color: var(--clr-text-primary, #F8FAFC);

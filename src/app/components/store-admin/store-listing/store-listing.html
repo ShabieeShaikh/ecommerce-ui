@@ -1,351 +1,322 @@
-<!-- =====================================================================
-     STORE LISTING PAGE  |  API: GET /stores?page=1&limit=10
-===================================================================== -->
-<div class="listing-page">
-
-  <!-- Page Header -->
-  <header class="page-header anim-fade">
+<div class="store-management-page">
+  <header class="store-page-header">
     <div>
-      <h1 class="page-title">Store Management</h1>
-      <p class="page-sub">Browse, filter, and manage all your ecommerce stores.</p>
+      <h1>Store Management</h1>
+      <p>Manage all your stores from one place.</p>
     </div>
-    <a class="btn btn-primary" routerLink="/store-admin/stores/create" id="listing-create-store-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      Create Store
-    </a>
+
+    <div class="page-actions">
+      <button class="filter-btn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 5h18l-7 8v5l-4 2v-7L3 5Z"></path>
+        </svg>
+        <span>Filter</span>
+      </button>
+      <button class="create-btn" type="button" (click)="openCreatePanel()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5v14M5 12h14"></path>
+        </svg>
+        <span>Create Store</span>
+      </button>
+    </div>
   </header>
 
-  <!-- ── Toolbar ── -->
-  <div class="toolbar">
-    <!-- Search -->
-    <div class="toolbar-search">
-      <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-      <input id="store-search-input" type="search" class="search-input"
-        placeholder="Search by name, category, owner, city…" (input)="onSearchInput($event)">
-    </div>
+  <section class="summary-grid" aria-label="Store summary">
+    @for (item of stats(); track item.label) {
+      <article class="summary-card">
+        <span class="summary-icon" [class]="'summary-icon summary-icon--' + item.tone">
+          @switch (item.icon) {
+            @case ('store') {
+              <svg viewBox="0 0 24 24"><path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10M9 20v-6h6v6"></path></svg>
+            }
+            @case ('active') {
+              <svg viewBox="0 0 24 24"><path d="M4 10h16M5 10l1-6h12l1 6M7 14l3 3 7-7"></path></svg>
+            }
+            @case ('inactive') {
+              <svg viewBox="0 0 24 24"><path d="M4 10h16M5 10l1-6h12l1 6M8 16h8"></path></svg>
+            }
+            @case ('draft') {
+              <svg viewBox="0 0 24 24"><path d="M4 10h16M5 10l1-6h12l1 6M8 15h8M8 18h5"></path></svg>
+            }
+          }
+        </span>
+        <span class="summary-text">
+          <span>{{ item.label }}</span>
+          <strong>{{ item.value }}</strong>
+          <small>{{ item.helper }}</small>
+        </span>
+      </article>
+    }
+  </section>
 
-    <!-- Filters -->
-    <div class="toolbar-filters">
-      <select class="filter-select" id="status-filter" aria-label="Filter by status"
-        (change)="onStatusFilterChange($event)">
-        <option value="">All Status</option>
-        <option value="active">Active</option>
-        <option value="disabled">Disabled</option>
-        <option value="pending">Pending</option>
-      </select>
-
-      <select class="filter-select" id="category-filter" aria-label="Filter by category"
-        (change)="onCategoryFilterChange($event)">
-        <option value="">All Categories</option>
-        <option>Fashion &amp; Apparel</option>
-        <option>Electronics</option>
-        <option>Home &amp; Living</option>
-        <option>Sports &amp; Fitness</option>
-        <option>Beauty &amp; Cosmetics</option>
-        <option>Food &amp; Grocery</option>
-      </select>
-
-      <select class="filter-select" id="sort-select" aria-label="Sort stores" (change)="onSortChange($event)">
-        <option value="created_desc">Newest First</option>
-        <option value="revenue_desc">Highest Revenue</option>
-        <option value="orders_desc">Most Orders</option>
-        <option value="rating_desc">Highest Rating</option>
-      </select>
-    </div>
-
-    <!-- Right Actions -->
-    <div class="toolbar-actions">
-      <button class="icon-btn" id="refresh-stores-btn" aria-label="Refresh stores list">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <polyline points="23 4 23 10 17 10" />
-          <polyline points="1 20 1 14 7 14" />
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-        </svg>
-      </button>
-      <button class="btn btn-outline" id="export-stores-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-        Export
-      </button>
-
-      <!-- View Toggle -->
-      <div class="view-toggle" role="group" aria-label="View mode">
-        <button class="view-btn" [class.view-btn--active]="viewMode() === 'table'" (click)="setView('table')"
-          id="table-view-btn" aria-label="Table view">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="8" y1="6" x2="21" y2="6" />
-            <line x1="8" y1="12" x2="21" y2="12" />
-            <line x1="8" y1="18" x2="21" y2="18" />
-            <line x1="3" y1="6" x2="3.01" y2="6" />
-            <line x1="3" y1="12" x2="3.01" y2="12" />
-            <line x1="3" y1="18" x2="3.01" y2="18" />
+  <div class="management-grid" [class.details-open]="panelMode() === 'details'">
+    <section class="stores-panel">
+      <div class="panel-header">
+        <h2>All Stores</h2>
+        <div class="stores-search">
+          <input type="search" placeholder="Search stores by name, email, or location..." [value]="searchQuery()" (input)="onSearchInput($event)" aria-label="Search stores">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
           </svg>
-        </button>
-        <button class="view-btn" [class.view-btn--active]="viewMode() === 'card'" (click)="setView('card')"
-          id="card-view-btn" aria-label="Card view">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Results meta -->
-  <div class="results-meta">
-    <span class="results-count">Showing <strong>{{ filteredStores().length }}</strong> stores</span>
-  </div>
-
-  <!-- ══════════════════════════
-       LOADING STATE
-  ══════════════════════════ -->
-  @if (isLoading()) {
-  <div class="table-container" aria-busy="true">
-    <div class="skel-table">
-      <div class="skel-thead skeleton"></div>
-      @for (_ of [1,2,3,4,5,6]; track $index) {
-      <div class="skel-row skeleton"></div>
-      }
-    </div>
-  </div>
-
-  <!-- ══════════════════════════
-       ERROR STATE
-  ══════════════════════════ -->
-  } @else if (hasError()) {
-  <div class="page-state" role="alert">
-    <div class="ps-icon ps-icon--error">
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="1.5">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-    </div>
-    <h2 class="ps-title">Unable to Load Stores</h2>
-    <p class="ps-desc">A network error occurred while fetching your stores. Please check your connection and try again.
-    </p>
-    <button class="btn btn-outline" id="retry-listing-btn">Retry</button>
-  </div>
-
-  <!-- ══════════════════════════
-       EMPTY STATE
-  ══════════════════════════ -->
-  } @else if (filteredStores().length === 0) {
-  <div class="page-state">
-    <div class="ps-icon ps-icon--empty">
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="1.5">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    </div>
-    <h2 class="ps-title">No Stores Found</h2>
-    <p class="ps-desc">No stores match your current filters. Try adjusting the search or create a new store.</p>
-    <a class="btn btn-primary" routerLink="/store-admin/stores/create">Create a Store</a>
-  </div>
-
-  <!-- ══════════════════════════
-       TABLE VIEW
-  ══════════════════════════ -->
-  } @else if (viewMode() === 'table') {
-  <div class="table-container">
-    <table class="stores-table" aria-label="Stores table">
-      <thead>
-        <tr>
-          <th scope="col"><input type="checkbox" id="select-all-stores" aria-label="Select all stores"></th>
-          <th scope="col" class="th-sort">Store</th>
-          <th scope="col">Category</th>
-          <th scope="col">Status</th>
-          <th scope="col" class="th-sort">Revenue</th>
-          <th scope="col">Orders</th>
-          <th scope="col">Rating</th>
-          <th scope="col">Owner</th>
-          <th scope="col">Location</th>
-          <th scope="col">Created</th>
-          <th scope="col">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (store of filteredStores(); track store.id) {
-        <tr class="table-row" [attr.data-store-id]="store.id">
-          <td><input type="checkbox" [id]="'sel-' + store.id" [attr.aria-label]="'Select ' + store.name"></td>
-          <td>
-            <div class="cell-store">
-              <div class="cell-logo" [style.background]="store.accentColor">{{ store.name.charAt(0) }}</div>
-              <div class="cell-store-info">
-                <span class="cell-store-name">{{ store.name }}</span>
-                <span class="cell-store-email">{{ store.email }}</span>
-              </div>
-            </div>
-          </td>
-          <td><span class="cell-category">{{ store.category }}</span></td>
-          <td>
-            <span class="status-pill" [class]="'status-pill status--' + store.status"
-              (click)="onToggleStatus(store.id, $event)" style="cursor:pointer;" title="Click to toggle status">
-              <span class="status-dot"></span>
-              {{ capitalize(store.status) }}
-            </span>
-          </td>
-          <td class="cell-num">{{ formatRevenue(store.revenue) }}</td>
-          <td class="cell-num">{{ formatNum(store.orders) }}</td>
-          <td>
-            <span class="cell-rating">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B"
-                stroke="#F59E0B" stroke-width="1">
-                <polygon
-                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-              {{ store.rating }}
-            </span>
-          </td>
-          <td class="cell-text">{{ store.owner }}</td>
-          <td class="cell-text">{{ store.city }}</td>
-          <td class="cell-text cell-date">{{ store.createdAt }}</td>
-          <td>
-            <div class="row-actions">
-              <button class="row-act-btn row-act-view" [id]="'tbl-view-'    + store.id" aria-label="View store"
-                (click)="onViewStore(store.id)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-              </button>
-              <button class="row-act-btn row-act-edit" [id]="'tbl-edit-'    + store.id" aria-label="Edit store"
-                (click)="onEditStore(store.id)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                </svg>
-              </button>
-              <button class="row-act-btn row-act-analytics" [id]="'tbl-analytics-'+store.id" aria-label="View analytics"
-                (click)="onAnalytics(store.id)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2">
-                  <line x1="18" y1="20" x2="18" y2="10" />
-                  <line x1="12" y1="20" x2="12" y2="4" />
-                  <line x1="6" y1="20" x2="6" y2="14" />
-                </svg>
-              </button>
-              <button class="row-act-btn row-act-delete" [id]="'tbl-delete-'  + store.id" aria-label="Delete store"
-                (click)="onDeleteStore(store.id, store.name, $event)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2">
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                  <path d="M10 11v6" />
-                  <path d="M14 11v6" />
-                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-
-  <!-- ══════════════════════════
-       CARD VIEW
-  ══════════════════════════ -->
-  } @else {
-  <div class="stores-card-grid">
-    @for (store of filteredStores(); track store.id) {
-    <article class="store-card" [attr.data-store-id]="store.id">
-      <div class="sc-banner"
-        [style.background]="'linear-gradient(135deg,' + store.accentColor + 'D0,' + store.accentColor + '60)'">
-        <div class="sc-status-badge" [class]="'sc-status-badge sc-status--' + store.status">{{ capitalize(store.status)
-          }}</div>
-      </div>
-      <div class="sc-logo-wrap">
-        <div class="sc-logo" [style.background]="store.accentColor">{{ store.name.charAt(0) }}</div>
-      </div>
-      <div class="sc-body">
-        <h3 class="sc-name">{{ store.name }}</h3>
-        <span class="sc-category">{{ store.category }}</span>
-        <p class="sc-owner">
-          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-          {{ store.owner }} — {{ store.city }}
-        </p>
-        <div class="sc-stats">
-          <div class="sc-stat"><span class="sc-stat-val">{{ formatRevenue(store.revenue) }}</span><span
-              class="sc-stat-lbl">Revenue</span></div>
-          <div class="sc-stat-sep"></div>
-          <div class="sc-stat"><span class="sc-stat-val">{{ formatNum(store.orders) }}</span><span
-              class="sc-stat-lbl">Orders</span></div>
-          <div class="sc-stat-sep"></div>
-          <div class="sc-stat"><span class="sc-stat-val">{{ store.rating }}★</span><span
-              class="sc-stat-lbl">Rating</span></div>
-        </div>
-        <div class="sc-actions">
-          <button class="sca-btn sca-view" [id]="'cv-view-'    + store.id" (click)="onViewStore(store.id)">View</button>
-          <button class="sca-btn sca-edit" [id]="'cv-edit-'    + store.id" (click)="onEditStore(store.id)">Edit</button>
-          <button class="sca-btn sca-analytics" [id]="'cv-analytics-'+store.id"
-            (click)="onAnalytics(store.id)">Analytics</button>
-          <button class="sca-btn sca-location" [id]="'cv-location-'+store.id"
-            (click)="onLocation(store.id)">Location</button>
-          <button class="sca-btn sca-disable" [id]="'cv-disable-' + store.id"
-            (click)="onToggleStatus(store.id, $event)">{{ store.status === 'active' ? 'Disable' : 'Enable' }}</button>
-          <button class="sca-btn sca-delete" [id]="'cv-delete-'  + store.id"
-            (click)="onDeleteStore(store.id, store.name, $event)">Delete</button>
         </div>
       </div>
-    </article>
+
+      <div class="table-wrap">
+        <table class="stores-table" aria-label="All stores">
+          <thead>
+            <tr>
+              <th>Store Name</th>
+              <th>Owner</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (store of filteredStores(); track store.id) {
+              <tr [class.selected]="panelMode() === 'details' && selectedStore().id === store.id">
+                <td>
+                  <span class="store-cell">
+                    <span class="store-logo" [style.background]="store.logoUrl ? '#fff' : store.accentColor">
+                      @if (store.logoUrl) {
+                        <img [src]="store.logoUrl" [alt]="store.name + ' logo'">
+                      } @else {
+                        {{ store.name.slice(0, 2) }}
+                      }
+                    </span>
+                    <span class="store-name">{{ store.name }}</span>
+                  </span>
+                </td>
+                <td>
+                  <span class="owner-cell">
+                    <strong>{{ store.owner }}</strong>
+                    <small>{{ store.email }}</small>
+                  </span>
+                </td>
+                <td>{{ locationValue(store) }}</td>
+                <td><span class="status-pill" [class]="'status-pill status-' + store.status">{{ statusLabel(store.status) }}</span></td>
+                <td>{{ store.createdAt }}</td>
+                <td>
+                  <span class="row-actions">
+                    <button class="icon-action" type="button" aria-label="View store" (click)="openDetails(store); $event.stopPropagation()">
+                      <svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                    <button class="icon-action" type="button" aria-label="Edit store" (click)="openEditPanel(store); $event.stopPropagation()">
+                      <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"></path></svg>
+                    </button>
+                    <button class="icon-action danger" type="button" aria-label="Delete store" (click)="deleteStore(store, $event)">
+                      <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"></path></svg>
+                    </button>
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-row">No stores match your search.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="table-footer">
+        <span>Showing 1 to {{ filteredStores().length }} of {{ stores().length }} stores</span>
+        <div class="pagination">
+          <button type="button" aria-label="Previous page" disabled>
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>
+          </button>
+          <button type="button" class="active">1</button>
+          <button type="button" aria-label="Next page" disabled>
+            <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg>
+          </button>
+        </div>
+      </footer>
+    </section>
+
+    @if (panelMode() === 'details' && selectedStore(); as store) {
+      <aside class="details-panel">
+        <div class="details-header">
+          <h2>Store Details</h2>
+          <button class="close-btn" type="button" aria-label="Close details" (click)="closePanel()">
+            <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <div class="details-identity">
+          <span class="details-logo" [style.background]="store.logoUrl ? '#fff' : store.accentColor">
+            @if (store.logoUrl) {
+              <img [src]="store.logoUrl" [alt]="store.name + ' logo'">
+            } @else {
+              {{ store.name.slice(0, 4) }}
+            }
+          </span>
+          <span>
+            <strong>{{ store.name }}</strong>
+            <small>Store ID: #{{ store.id.replace('store-', 'ST-') }}</small>
+          </span>
+          <span class="status-pill" [class]="'status-pill status-' + store.status">{{ statusLabel(store.status) }}</span>
+        </div>
+
+        <nav class="details-tabs" aria-label="Store detail tabs">
+          <button type="button" [class.active]="activeDetailTab() === 'overview'" (click)="activeDetailTab.set('overview')">Overview</button>
+          <button type="button" [class.active]="activeDetailTab() === 'information'" (click)="activeDetailTab.set('information')">Information</button>
+          <button type="button" [class.active]="activeDetailTab() === 'settings'" (click)="activeDetailTab.set('settings')">Settings</button>
+          <button type="button" [class.active]="activeDetailTab() === 'activity'" (click)="activeDetailTab.set('activity')">Activity</button>
+        </nav>
+
+        <div class="detail-list">
+          <div class="detail-row">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Owner</span>
+            <strong>{{ store.owner }}</strong>
+          </div>
+          <div class="detail-row">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"></path><path d="m22 6-10 7L2 6"></path></svg>
+            <span>Email</span>
+            <strong>{{ store.email }}</strong>
+          </div>
+          <div class="detail-row">
+            <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"></path></svg>
+            <span>Phone</span>
+            <strong>{{ store.phone }}</strong>
+          </div>
+          <div class="detail-row">
+            <svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>Location</span>
+            <strong>{{ locationValue(store) }}</strong>
+          </div>
+          <div class="detail-row">
+            <svg viewBox="0 0 24 24"><path d="M3 11h18M5 11v9h14v-9M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Address</span>
+            <strong>{{ store.address || '123 Tech Street, New York, NY 10001, USA' }}</strong>
+          </div>
+          <div class="detail-row">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"></path><path d="M8 8h8M8 12h8M8 16h5"></path></svg>
+            <span>Description</span>
+            <strong>{{ store.description || 'Leading store for electronic gadgets and accessories.' }}</strong>
+          </div>
+          <div class="detail-row">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+            <span>Created At</span>
+            <strong>{{ formatDateTime(store.createdAt) }}</strong>
+          </div>
+          <div class="detail-row">
+            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path></svg>
+            <span>Last Updated</span>
+            <strong>{{ formatDateTime(store.createdAt, '02:15 PM') }}</strong>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <button class="secondary-action" type="button" (click)="openEditPanel(store)">
+            <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"></path></svg>
+            <span>Edit Store</span>
+          </button>
+          <button class="danger-action" type="button" (click)="toggleSelectedStatus()">
+            <svg viewBox="0 0 24 24"><path d="M12 2v10"></path><path d="M18.4 6.6a9 9 0 1 1-12.8 0"></path></svg>
+            <span>{{ store.status === 'active' ? 'Deactivate Store' : 'Activate Store' }}</span>
+          </button>
+        </div>
+      </aside>
     }
   </div>
+
+  @if (panelMode() === 'edit') {
+    <section class="floating-section edit-section" aria-labelledby="edit-store-title">
+      <div class="form-header">
+        <h2 id="edit-store-title">Edit Store</h2>
+        <button class="close-btn" type="button" (click)="closePanel()" aria-label="Close edit store">
+          <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="edit-layout">
+        <div class="logo-column">
+          <label>Store Logo</label>
+          <span class="large-logo">
+            @if (formData.logoUrl) {
+              <img [src]="formData.logoUrl" alt="Selected store logo preview">
+            } @else {
+              {{ formData.name.slice(0, 8) || 'Store' }}
+            }
+          </span>
+          <input class="logo-file-input" id="edit-logo-file" type="file" accept="image/*" (change)="onLogoSelected($event)">
+          <label class="small-outline" for="edit-logo-file">Change Logo</label>
+          <button class="small-danger" type="button" (click)="removeLogo()">Remove</button>
+        </div>
+        <form class="store-form" (ngSubmit)="saveEdit()">
+          <label>Store Name<span>*</span><input name="edit-name" [(ngModel)]="formData.name" required></label>
+          <label>Description<textarea name="edit-description" [(ngModel)]="formData.description" rows="3"></textarea></label>
+          <div class="two-col">
+            <label>Email<span>*</span><input name="edit-email" [(ngModel)]="formData.email" required></label>
+            <label>Phone<span>*</span><input name="edit-phone" [(ngModel)]="formData.phone" required></label>
+          </div>
+          <label>Address<span>*</span><input name="edit-address" [(ngModel)]="formData.address" required></label>
+          <label>Status<span>*</span>
+            <select name="edit-status" [(ngModel)]="formData.status">
+              <option value="active">Active</option>
+              <option value="disabled">Inactive</option>
+              <option value="pending">Draft</option>
+            </select>
+          </label>
+          <div class="form-actions">
+            <button class="cancel-btn" type="button" (click)="closePanel()">Cancel</button>
+            <button class="submit-btn" type="submit">Update Store</button>
+          </div>
+        </form>
+      </div>
+    </section>
   }
 
-  <!-- Pagination -->
-  @if (!isLoading() && !hasError() && filteredStores().length > 0) {
-  <nav class="pagination" aria-label="Store listing pagination">
-    <button class="pg-btn pg-prev" id="prev-page-btn" aria-label="Previous page" [disabled]="pagination().page === 1">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.5">
-        <polyline points="15 18 9 12 15 6" />
-      </svg>
-      Previous
-    </button>
-    <div class="pg-numbers">
-      @for (n of pageNumbers(); track n) {
-      <button class="pg-num" [class.pg-num--active]="n === pagination().page" [id]="'page-' + n"
-        [attr.aria-label]="'Go to page ' + n" [attr.aria-current]="n === pagination().page ? 'page' : null">{{ n
-        }}</button>
-      }
-    </div>
-    <button class="pg-btn pg-next" id="next-page-btn" aria-label="Next page"
-      [disabled]="pagination().page === pagination().totalPages">
-      Next
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.5">
-        <polyline points="9 18 15 12 9 6" />
-      </svg>
-    </button>
-  </nav>
-  }
+  @if (panelMode() === 'create') {
+    <section class="floating-section create-section" aria-labelledby="create-store-title">
+      <div class="form-header">
+        <h2 id="create-store-title">Create New Store</h2>
+        <button class="close-btn" type="button" (click)="closePanel()" aria-label="Close create store">
+          <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+        </button>
+      </div>
 
+      <form class="create-form" (ngSubmit)="saveCreate()">
+        <label class="upload-box">
+          <span>Store Logo</span>
+          <strong>
+            <svg viewBox="0 0 24 24"><path d="M16 16l-4-4-4 4M12 12v9"></path><path d="M20.4 16.6A5 5 0 0 0 18 7h-1.3A8 8 0 1 0 4 15.3"></path></svg>
+            Upload Logo
+          </strong>
+          <small>PNG, JPG up to 2MB</small>
+        </label>
+
+        <div class="create-fields">
+          <label>Store Name<span>*</span><input name="create-name" [(ngModel)]="formData.name" placeholder="Enter store name" required></label>
+          <label>Description<textarea name="create-description" [(ngModel)]="formData.description" placeholder="Enter description" rows="3"></textarea></label>
+          <label>Email<span>*</span><input name="create-email" [(ngModel)]="formData.email" placeholder="Enter email" required></label>
+          <label>Phone<span>*</span><input name="create-phone" [(ngModel)]="formData.phone" placeholder="Enter phone number" required></label>
+          <label>Location<span>*</span>
+            <select name="create-location" [ngModel]="formLocationValue()" (ngModelChange)="setLocation($event)">
+              <option value="">Select location</option>
+              @for (location of locationOptions; track location) {
+                <option [value]="location">{{ location }}</option>
+              }
+            </select>
+          </label>
+          <label>Address<span>*</span><textarea name="create-address" [(ngModel)]="formData.address" placeholder="Enter store address" rows="3"></textarea></label>
+          <label>Status<span>*</span>
+            <select name="create-status" [(ngModel)]="formData.status">
+              <option value="active">Active</option>
+              <option value="disabled">Inactive</option>
+              <option value="pending">Draft</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="cancel-btn" type="button" (click)="closePanel()">Cancel</button>
+          <button class="submit-btn" type="submit">Create Store</button>
+        </div>
+      </form>
+    </section>
+  }
 </div>
