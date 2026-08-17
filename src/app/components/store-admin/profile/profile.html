@@ -83,9 +83,9 @@
       @if (editingSection() === 'personal') {
         <form class="profile-form" [formGroup]="personalForm" (ngSubmit)="savePersonal()" novalidate>
           <div class="form-grid">
-            <label class="field"><span>First name</span><input type="text" formControlName="firstName" autocomplete="given-name"></label>
+            <label class="field"><span>First name <span class="required-marker" aria-hidden="true">*</span></span><input type="text" formControlName="firstName" autocomplete="given-name"></label>
             <label class="field"><span>Last name</span><input type="text" formControlName="lastName" autocomplete="family-name"></label>
-            <label class="field"><span>Email address</span><input type="email" formControlName="email" autocomplete="email"></label>
+            <label class="field"><span>Email address <span class="required-marker" aria-hidden="true">*</span></span><input type="email" formControlName="email" autocomplete="email"></label>
             <label class="field"><span>Phone</span><input type="tel" formControlName="phone" autocomplete="tel"></label>
             <label class="field"><span>Job title</span><input type="text" formControlName="jobTitle"></label>
             <label class="field field--wide"><span>Bio</span><textarea formControlName="bio" rows="3"></textarea></label>

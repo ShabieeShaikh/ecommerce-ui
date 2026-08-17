@@ -30,7 +30,7 @@
                     @if (!otpSent) {
                         <form [formGroup]="loginForm" (ngSubmit)="sendOtp()" novalidate>
                             <div class="field-group" [class.invalid]="loginForm.controls.email.touched && loginForm.controls.email.invalid">
-                                <label for="email-field">Email address</label>
+                                <label for="email-field">Email address <span class="required-marker" aria-hidden="true">*</span></label>
                                 <div class="field-control">
                                     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <rect x="3" y="5" width="18" height="14" rx="2" />

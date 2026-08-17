@@ -1,0 +1,264 @@
+@if (category(); as currentCategory) {
+  <div class="category-page">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a routerLink="/store-admin/catalog/categories">Catalog Management</a
+      ><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg
+      ><strong>{{ currentCategory.name }}</strong>
+    </nav>
+    <header class="page-header">
+      <div>
+        <span [class]="'status ' + currentCategory.status">{{ currentCategory.status }}</span>
+        <h1>{{ currentCategory.name }}</h1>
+        <p>{{ currentCategory.description || 'No category description provided.' }}</p>
+      </div>
+      <div class="header-actions">
+        <button class="secondary-button" type="button" (click)="openEdit()">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"></path></svg
+          >Edit Category</button
+        ><a class="primary-button" href="#assigned-attributes"
+          ><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>Manage
+          Attributes</a
+        >
+      </div>
+    </header>
+
+    <section class="summary-grid">
+      <article>
+        <small>Parent Category</small><strong>{{ parent()?.name || 'Top level' }}</strong
+        ><em>Hierarchy placement</em>
+      </article>
+      <article>
+        <small>Subcategories</small><strong>{{ subcategories().length }}</strong
+        ><em>Direct child categories</em>
+      </article>
+      <article>
+        <small>Assigned Attributes</small><strong>{{ assignments().length }}</strong
+        ><em>{{ assignments().length ? 'Configured product fields' : 'No fields configured' }}</em>
+      </article>
+      <article>
+        <small>Catalog Products</small><strong>{{ productsUsingCategory().length }}</strong
+        ><em>Stored product records</em>
+      </article>
+    </section>
+
+    <section class="surface">
+      <div class="section-heading">
+        <div>
+          <h2>Subcategories</h2>
+          <p>Child categories configured under {{ currentCategory.name }}.</p>
+        </div>
+      </div>
+      @if (subcategories().length) {
+        <div class="subcategory-grid">
+          @for (subcategory of subcategories(); track subcategory.id) {
+            <a [routerLink]="['/store-admin/catalog/categories', subcategory.id]"
+              ><span>{{ subcategory.name.charAt(0) }}</span>
+              <div>
+                <strong>{{ subcategory.name }}</strong
+                ><small>{{ subcategory.status }}</small>
+              </div>
+              <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg
+            ></a>
+          }
+        </div>
+      } @else {
+        <p class="compact-empty">No subcategories are assigned to this category.</p>
+      }
+    </section>
+
+    <section id="assigned-attributes" class="surface">
+      <div class="section-heading">
+        <div>
+          <h2>Assigned Attributes</h2>
+          <p>These definitions drive Product Specifications and Product Variants automatically.</p>
+        </div>
+        <div class="assignment-add">
+          <select
+            [value]="selectedAttributeId()"
+            (change)="selectedAttributeId.set($any($event.target).value)"
+          >
+            <option value="">Select an attribute</option>
+            @for (attribute of availableAttributes(); track attribute.id) {
+              <option [value]="attribute.id">
+                {{ attribute.label }} ({{ attribute.inputType }})
+              </option>
+            }</select
+          ><button type="button" [disabled]="!selectedAttributeId()" (click)="addAssignment()">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>Assign
+          </button>
+        </div>
+      </div>
+      @if (assignments().length) {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Attribute</th>
+                <th>Input Type</th>
+                <th>Options</th>
+                <th>Unit</th>
+                <th>Required</th>
+                <th>Variant</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (assignment of assignments(); track assignment.id; let index = $index) {
+                <tr>
+                  <td>
+                    <span class="order-actions"
+                      ><button
+                        type="button"
+                        title="Move up"
+                        [disabled]="index === 0"
+                        (click)="moveAssignment(index, -1)"
+                      >
+                        <svg viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"></path></svg></button
+                      ><strong>{{ index + 1 }}</strong
+                      ><button
+                        type="button"
+                        title="Move down"
+                        [disabled]="index === assignments().length - 1"
+                        (click)="moveAssignment(index, 1)"
+                      >
+                        <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></button
+                    ></span>
+                  </td>
+                  <td>
+                    <strong>{{ attributeName(assignment) }}</strong>
+                  </td>
+                  <td>
+                    <span class="type-badge">{{ attributeType(assignment) }}</span>
+                  </td>
+                  <td>{{ attributeOptions(assignment) || '-' }}</td>
+                  <td>
+                    <input
+                      class="unit-input"
+                      type="text"
+                      [value]="assignment.unit"
+                      (change)="updateUnit(assignment, $any($event.target).value)"
+                      placeholder="None"
+                      maxlength="16"
+                    />
+                  </td>
+                  <td>
+                    <label class="toggle"
+                      ><input
+                        type="checkbox"
+                        [checked]="assignment.required"
+                        (change)="
+                          updateAssignment(assignment, 'required', $any($event.target).checked)
+                        " /><span></span
+                    ></label>
+                  </td>
+                  <td>
+                    <label class="toggle"
+                      ><input
+                        type="checkbox"
+                        [checked]="assignment.isVariantAttribute"
+                        (change)="
+                          updateAssignment(
+                            assignment,
+                            'isVariantAttribute',
+                            $any($event.target).checked
+                          )
+                        " /><span></span
+                    ></label>
+                  </td>
+                  <td>
+                    <button
+                      class="remove-button"
+                      type="button"
+                      title="Remove assignment"
+                      (click)="removeAssignment(assignment)"
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 11v6M14 11v6"></path>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <span
+            ><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"></path></svg
+          ></span>
+          <h3>No Attributes Assigned</h3>
+          <p>Select a reusable catalog attribute to begin configuring this category.</p>
+        </div>
+      }
+    </section>
+  </div>
+
+  @if (editOpen()) {
+    <div class="modal-backdrop" (click)="editOpen.set(false)">
+      <section
+        class="edit-dialog"
+        role="dialog"
+        aria-modal="true"
+        (click)="$event.stopPropagation()"
+      >
+        <header>
+          <div>
+            <h2>Edit Category</h2>
+            <p>Update hierarchy and availability without deleting product data.</p>
+          </div>
+          <button type="button" title="Close" (click)="editOpen.set(false)">
+            <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+        </header>
+        <form (ngSubmit)="saveCategory()">
+          <div class="form-grid">
+            <label
+              >Category Name <span>*</span
+              ><input
+                type="text"
+                [value]="editDraft().name"
+                (input)="updateEditDraft('name', $any($event.target).value)" /></label
+            ><label
+              >Parent Category<select
+                [value]="editDraft().parentCategoryId"
+                (change)="updateEditDraft('parentCategoryId', $any($event.target).value)"
+              >
+                <option value="">Top level category</option>
+                @for (categoryOption of categories(); track categoryOption.id) {
+                  @if (categoryOption.id !== categoryId()) {
+                    <option [value]="categoryOption.id">{{ categoryOption.name }}</option>
+                  }
+                }
+              </select></label
+            ><label class="full"
+              >Description<textarea
+                rows="4"
+                [value]="editDraft().description"
+                (input)="updateEditDraft('description', $any($event.target).value)"
+              ></textarea></label
+            ><label
+              >Status<select
+                [value]="editDraft().status"
+                (change)="updateEditDraft('status', $any($event.target).value)"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select></label
+            >
+          </div>
+          @if (editError()) {
+            <p class="form-error">{{ editError() }}</p>
+          }
+          <footer>
+            <button class="secondary-button" type="button" (click)="editOpen.set(false)">
+              Cancel</button
+            ><button class="primary-button" type="submit">Save Category</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+}

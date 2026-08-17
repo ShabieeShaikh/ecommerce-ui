@@ -1,6 +1,10 @@
+import { ProductAttributeValue, ProductVariant } from './product-catalog.models';
+
 export type StoreStatus = 'active' | 'disabled' | 'pending';
 export type ProductStatus = 'active' | 'draft' | 'archived';
-export type UserRole = 'StoreAdmin' | 'Admin';
+export type BranchStatus = 'active' | 'inactive';
+export type BranchAddressScope = 'international' | 'national' | 'regional';
+export type UserRole = 'StoreAdmin' | 'Admin' | 'User' | string;
 export type ToastType = 'success' | 'danger' | 'warning' | 'info';
 export type NotificationType = 'order' | 'success' | 'warning' | 'star';
 
@@ -15,6 +19,13 @@ export interface User {
   email: string;
   role: UserRole;
   stores: UserStoreSummary[];
+}
+
+export interface LoginOtpResponseData {
+  userId: string;
+  userName: string;
+  email: string;
+  roles: string[];
 }
 
 export interface SocialLinks {
@@ -67,6 +78,8 @@ export interface Store {
   createdAt: string;
   accentColor: string;
   logoUrl?: string;
+  bannerUrl?: string;
+  inventoryAllocationLimit: number;
 }
 
 export interface Product {
@@ -75,18 +88,80 @@ export interface Product {
   name: string;
   sku: string;
   category: string;
+  categoryId?: string;
+  brand?: string;
+  barcode?: string;
+  shortDescription?: string;
+  taxClass?: string;
   price: number;
   comparePrice?: number;
   stock: number;
   status: ProductStatus;
   imageUrl: string;
+  imageUrls?: string[];
   description: string;
   tags: string[];
+  attributes?: ProductAttributeValue[];
+  variants?: ProductVariant[];
   weight?: number;
   dimensions?: string;
   rating: number;
   salesCount: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
+
+export type ProductUpsert = Omit<Product, 'id' | 'stock' | 'rating' | 'salesCount' | 'createdAt' | 'updatedAt'>;
+
+export interface ProductInventoryAllocation {
+  id: string;
+  productId: string;
+  storeId: string;
+  branchId: string | null;
+  quantity: number;
+  reservedQuantity: number;
+  lowStockThreshold: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ProductInventoryInput = Pick<ProductInventoryAllocation, 'storeId' | 'branchId' | 'quantity' | 'lowStockThreshold'> & Partial<Pick<ProductInventoryAllocation, 'reservedQuantity'>>;
+
+export type BranchWeekday = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+
+export interface BranchTimeSlot {
+  openingTime: string;
+  closingTime: string;
+}
+
+export interface BranchOperatingDay {
+  day: BranchWeekday;
+  isOpen: boolean;
+  timeSlots: BranchTimeSlot[];
+}
+
+export interface Branch {
+  id: string;
+  storeId: string;
+  addressScope: BranchAddressScope;
+  name: string;
+  code: string;
+  description: string;
+  country: string;
+  state: string;
+  city: string;
+  address: string;
+  postalCode: string;
+  managerName: string;
+  managerEmail: string;
+  managerPhone: string;
+  operatingHours: BranchOperatingDay[];
+  status: BranchStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type BranchUpsert = Omit<Branch, 'id' | 'createdAt' | 'updatedAt'>;
 
 export interface Category {
   id: string;
@@ -228,6 +303,7 @@ export interface VerifyLoginOtpRequest extends LoginOtpRequest {
 
 export interface AuthResponse {
   success: boolean;
+  code?: string | null;
   message?: string;
-  data: User & { accessToken?: string };
+  data: LoginOtpResponseData | null;
 }

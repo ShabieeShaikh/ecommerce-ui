@@ -6,9 +6,38 @@ import { Store } from '../../../models/admin.models';
 
 interface NavigationItem {
   label: string;
-  route: string;
-  icon: 'dashboard' | 'store' | 'products' | 'analytics' | 'location' | 'settings' | 'profile';
+  route?: string;
+  icon:
+    | 'dashboard'
+    | 'store'
+    | 'branch'
+    | 'products'
+    | 'catalog'
+    | 'attributes'
+    | 'brands'
+    | 'inventory'
+    | 'warehouse'
+    | 'receive'
+    | 'stock'
+    | 'transfer'
+    | 'adjustment'
+    | 'reports'
+    | 'managers'
+    | 'staff'
+    | 'analytics'
+    | 'location'
+    | 'settings'
+    | 'profile';
   exact?: boolean;
+  children?: NavigationSubItem[];
+}
+
+interface NavigationSubItem {
+  label: string;
+  route?: string;
+  icon: NavigationItem['icon'];
+  exact?: boolean;
+  disabled?: boolean;
 }
 
 interface NavigationGroup {
@@ -20,7 +49,7 @@ interface NavigationGroup {
   selector: 'app-store-admin-layout',
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './store-admin-layout.html',
-  styleUrl: './store-admin-layout.css'
+  styleUrl: './store-admin-layout.css',
 })
 export class StoreAdminLayout {
   readonly storeService = inject(StoreService);
@@ -34,6 +63,15 @@ export class StoreAdminLayout {
   readonly showNotifPanel = signal(false);
   readonly searchQuery = signal('');
   readonly searchFocused = signal(false);
+  readonly openNavigationTree = signal<string | null>(
+    this.router.url.startsWith('/store-admin/warehouses')
+      ? 'Warehouse'
+      : this.router.url.startsWith('/store-admin/inventory')
+        ? 'Inventory'
+        : this.router.url.startsWith('/store-admin/catalog')
+          ? 'Catalog'
+          : 'Store',
+  );
 
   readonly currentUser = computed(() => this.authService.getCurrentUser());
   readonly selectedStoreId = this.storeService.selectedStoreId;
@@ -47,28 +85,161 @@ export class StoreAdminLayout {
     {
       label: 'Main',
       items: [
-        { label: 'Dashboard', route: '/store-admin/dashboard', icon: 'dashboard', exact: true }
-      ]
+        { label: 'Dashboard', route: '/store-admin/dashboard', icon: 'dashboard', exact: true },
+      ],
     },
     {
       label: 'Store',
       items: [
-        { label: 'Store Management', route: '/store-admin/stores', icon: 'store', exact: true },
-        { label: 'Products', route: '/store-admin/products', icon: 'products' },
+        {
+          label: 'Store',
+          icon: 'store',
+          children: [
+            { label: 'Stores', route: '/store-admin/stores', icon: 'store' },
+            { label: 'Branches', route: '/store-admin/branches', icon: 'branch' },
+            { label: 'Products', route: '/store-admin/products', icon: 'products' },
+            { label: 'Managers', route: '/store-admin/managers', icon: 'managers' },
+            { label: 'Staff', icon: 'staff', disabled: true },
+          ],
+        },
+        {
+          label: 'Catalog',
+          icon: 'catalog',
+          children: [
+            {
+              label: 'Categories',
+              route: '/store-admin/catalog/categories',
+              icon: 'catalog',
+              exact: false,
+            },
+            {
+              label: 'Attributes',
+              route: '/store-admin/catalog/attributes',
+              icon: 'attributes',
+              exact: true,
+            },
+            { label: 'Brands', route: '/store-admin/catalog/brands', icon: 'brands', exact: true },
+          ],
+        },
+        {
+          label: 'Inventory',
+          icon: 'inventory',
+          children: [
+            { label: 'Overview', route: '/store-admin/inventory', icon: 'inventory', exact: true },
+            {
+              label: 'Add Stock',
+              route: '/store-admin/inventory/add',
+              icon: 'receive',
+              exact: true,
+            },
+            {
+              label: 'Allocate Stock',
+              route: '/store-admin/inventory/allocate',
+              icon: 'branch',
+              exact: true,
+            },
+            {
+              label: 'Stock Transfer',
+              route: '/store-admin/inventory/transfer',
+              icon: 'transfer',
+              exact: true,
+            },
+            {
+              label: 'Adjustments',
+              route: '/store-admin/inventory/adjustments',
+              icon: 'adjustment',
+              exact: true,
+            },
+            {
+              label: 'Reports',
+              route: '/store-admin/inventory/reports',
+              icon: 'reports',
+              exact: true,
+            },
+            {
+              label: 'Warehouse Sync',
+              route: '/store-admin/inventory/warehouse-integration',
+              icon: 'warehouse',
+              exact: true,
+            },
+            {
+              label: 'Order Integration',
+              route: '/store-admin/inventory/order-integration',
+              icon: 'products',
+              exact: true,
+            },
+          ],
+        },
+        {
+          label: 'Warehouse',
+          icon: 'warehouse',
+          children: [
+            {
+              label: 'Overview',
+              route: '/store-admin/warehouses/overview',
+              icon: 'warehouse',
+              exact: true,
+            },
+            {
+              label: 'Warehouses',
+              route: '/store-admin/warehouses',
+              icon: 'warehouse',
+              exact: true,
+            },
+            {
+              label: 'Receive Stock',
+              route: '/store-admin/warehouses/receive',
+              icon: 'receive',
+              exact: true,
+            },
+            {
+              label: 'Stock Overview',
+              route: '/store-admin/warehouses/stock',
+              icon: 'stock',
+              exact: true,
+            },
+            {
+              label: 'Stock Transfer',
+              route: '/store-admin/warehouses/transfer',
+              icon: 'transfer',
+              exact: true,
+            },
+            {
+              label: 'Adjustments',
+              route: '/store-admin/warehouses/adjustments',
+              icon: 'adjustment',
+              exact: true,
+            },
+            {
+              label: 'Stock Movement',
+              route: '/store-admin/warehouses/movements',
+              icon: 'transfer',
+              exact: true,
+            },
+            {
+              label: 'Reports',
+              route: '/store-admin/warehouses/reports',
+              icon: 'reports',
+              exact: true,
+            },
+          ],
+        },
         { label: 'Analytics', route: '/store-admin/analytics', icon: 'analytics' },
-        { label: 'Locations', route: '/store-admin/locations', icon: 'location' }
-      ]
+        { label: 'Locations', route: '/store-admin/locations', icon: 'location' },
+      ],
     },
     {
       label: 'Account',
       items: [
         { label: 'Profile', route: '/store-admin/profile', icon: 'profile' },
-        { label: 'Settings', route: '/store-admin/settings', icon: 'settings' }
-      ]
-    }
+        { label: 'Settings', route: '/store-admin/settings', icon: 'settings' },
+      ],
+    },
   ];
 
-  readonly userInitials = computed(() => this.getInitials(this.currentUser()?.name ?? 'Store Admin'));
+  readonly userInitials = computed(() =>
+    this.getInitials(this.currentUser()?.name ?? 'Store Admin'),
+  );
   readonly userName = computed(() => this.currentUser()?.name ?? 'Store Admin');
   readonly userEmail = computed(() => this.currentUser()?.email ?? 'admin@digishop.local');
   readonly userRole = computed(() => this.formatRole(this.currentUser()?.role ?? 'StoreAdmin'));
@@ -80,19 +251,39 @@ export class StoreAdminLayout {
     }
 
     return this.stores()
-      .filter(store =>
-        store.name.toLowerCase().includes(query) ||
-        store.category.toLowerCase().includes(query) ||
-        store.owner.toLowerCase().includes(query) ||
-        store.city.toLowerCase().includes(query)
+      .filter(
+        (store) =>
+          store.name.toLowerCase().includes(query) ||
+          store.category.toLowerCase().includes(query) ||
+          store.owner.toLowerCase().includes(query) ||
+          store.city.toLowerCase().includes(query),
       )
       .slice(0, 6);
   });
 
-  readonly showSearchResults = computed(() => this.searchFocused() && this.searchQuery().trim().length >= 2);
+  readonly showSearchResults = computed(
+    () => this.searchFocused() && this.searchQuery().trim().length >= 2,
+  );
 
   toggleDesktopSidebar(): void {
-    this.sidebarCollapsed.update(collapsed => !collapsed);
+    this.sidebarCollapsed.update((collapsed) => !collapsed);
+  }
+
+  isNavigationTreeOpen(label: string): boolean {
+    return this.openNavigationTree() === label;
+  }
+
+  navigationTreeId(label: string): string {
+    return `${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-submenu`;
+  }
+
+  toggleNavigationTree(label: string): void {
+    if (this.sidebarCollapsed()) {
+      this.sidebarCollapsed.set(false);
+      this.openNavigationTree.set(label);
+      return;
+    }
+    this.openNavigationTree.update((openLabel) => (openLabel === label ? null : label));
   }
 
   openMobileDrawer(event?: Event): void {
@@ -107,21 +298,21 @@ export class StoreAdminLayout {
 
   toggleUserMenu(event: Event): void {
     event.stopPropagation();
-    this.showUserMenu.update(open => !open);
+    this.showUserMenu.update((open) => !open);
     this.showStoreDropdown.set(false);
     this.showNotifPanel.set(false);
   }
 
   toggleStoreDropdown(event: Event): void {
     event.stopPropagation();
-    this.showStoreDropdown.update(open => !open);
+    this.showStoreDropdown.update((open) => !open);
     this.showUserMenu.set(false);
     this.showNotifPanel.set(false);
   }
 
   toggleNotifPanel(event: Event): void {
     event.stopPropagation();
-    this.showNotifPanel.update(open => !open);
+    this.showNotifPanel.update((open) => !open);
     this.showUserMenu.set(false);
     this.showStoreDropdown.set(false);
   }
@@ -201,7 +392,7 @@ export class StoreAdminLayout {
       .split(' ')
       .filter(Boolean)
       .slice(0, 2)
-      .map(part => part.charAt(0).toUpperCase())
+      .map((part) => part.charAt(0).toUpperCase())
       .join('');
   }
 

@@ -14,7 +14,6 @@ import { Register } from '../register/register';
 })
 export class Login implements OnDestroy {
   // Loading and flow state controls
-  testMode = true;
   isLoading = false;
   otpSent = false;
   isRegisterMode = false;
@@ -54,60 +53,6 @@ export class Login implements OnDestroy {
 
     }
 
-    const email = this.loginForm.value.email || "";
-
-
-const user = this.auth.checkUser(email);
-
-
-if(!user){
-
-
- Swal.fire({
-
-   title:"User Not Found",
-
-   text:"This email is not registered.",
-
-   icon:"error",
-
-   confirmButtonColor:"#7C1C77"
-
- });
-
-
- return;
-
-}
-
-
-    // TEST MODE (No API call)
-    if (this.testMode) {
-
-
-      this.otpSent = true;
-
-      this.startTimer();
-
-
-      Swal.fire({
-
-        title: 'Test OTP Sent!',
-        text: 'Use OTP: 123456',
-        icon: 'success',
-        confirmButtonColor: '#7C3AED'
-
-      });
-
-
-      return;
-
-    }
-
-
-
-    // real api
-
     this.isLoading = true;
 
 
@@ -121,7 +66,7 @@ if(!user){
 
       platform: "web",
 
-      appVersion: "1.0.0"
+      appVersion: "string"
 
     };
 
@@ -138,6 +83,24 @@ if(!user){
       next: (response: any) => {
 
         console.log("API SUCCESS RESPONSE:", response);
+
+        if (!response.success) {
+
+          Swal.fire({
+
+            title: 'Unable to Send OTP',
+
+            text: response.message || 'Could not send OTP. Please try again.',
+
+            icon: 'error',
+
+            confirmButtonColor: '#7C3AED'
+
+          });
+
+          return;
+
+        }
 
 
 
@@ -214,75 +177,6 @@ if(!user){
 
 
 
-    // TEST OTP MODE
-    if (this.testMode) {
-
-
-      console.log("ENTERED TEST MODE");
-
-      const enteredOtp = this.otpValues.join('');
-
-      console.log("ENTERED OTP:", enteredOtp);
-
-
-      if (enteredOtp !== "123456") {
-
-
-        console.log("WRONG OTP");
-
-        Swal.fire({
-
-          title: 'Invalid OTP',
-          text: 'For testing use OTP: 123456',
-          icon: 'error',
-          confirmButtonColor: '#7C1C77'
-
-        });
-
-
-        return;
-
-      }
-
-      console.log("correct OTP");
-
-
-
-      console.log("BEFORE MOCK LOGIN");
-
-      const user = this.auth.mockLogin(
-        this.loginForm.value.email || ''
-      );
-
-      console.log("AFTER MOCK LOGIN", user);
-
-
-      Swal.fire({
-
-        title: 'Login Success!',
-        text: 'Redirecting to dashboard...',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false
-
-      }).then(() => {
-
-
-        this.router.navigate([
-          '/store-admin/dashboard'
-        ]);
-
-
-      });
-
-
-      return;
-
-    }
-
-
-    // real api
-
     this.isLoading = true;
 
 
@@ -298,7 +192,7 @@ if(!user){
 
       platform: "web",
 
-      appVersion: "1.0.0"
+      appVersion: "string"
 
     };
 
@@ -316,25 +210,15 @@ if(!user){
 
 
 
-          if (response.success) {
+          if (response.success && response.data) {
 
-
-            // Store Access Token
-            sessionStorage.setItem(
-              "accessToken",
-              response.data.accessToken
-            );
-
-
-            // Store user information
-            // sessionStorage.setItem(
-            //   "user",
-            //   JSON.stringify(response.data)
-            // );
-
-            this.auth.saveUser(
-              response.data
-            );
+            this.auth.saveUser({
+              id: response.data.userId,
+              name: response.data.userName,
+              email: response.data.email,
+              role: response.data.roles?.[0] || 'User',
+              stores: []
+            });
 
 
 

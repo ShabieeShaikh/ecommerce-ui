@@ -1,0 +1,273 @@
+<div class="branches-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <span>Store Management</span>
+    <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg>
+    <strong>Branches</strong>
+  </nav>
+
+  <header class="branches-header">
+    <div>
+      <h1>Branch Management</h1>
+    </div>
+    @if (storeBranches().length) {
+      <button class="add-branch-btn" type="button" (click)="openCreate()">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+        <span>Add Branch</span>
+      </button>
+    }
+  </header>
+
+  @if (!storeBranches().length) {
+    <section class="empty-state" aria-labelledby="empty-branches-title">
+      <span class="empty-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 21V8l8-5 8 5v13M2 21h20M8 11h2M14 11h2M8 15h2M14 15h2M10 21v-3h4v3"></path>
+        </svg>
+      </span>
+      <h2 id="empty-branches-title">No Branches Yet</h2>
+      <button class="add-branch-btn" type="button" (click)="openCreate()">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+        <span>Add First Branch</span>
+      </button>
+    </section>
+  } @else {
+    <section class="summary-grid" aria-label="Branch summary">
+      @for (item of stats(); track item.label) {
+        <article class="summary-card">
+          <span class="summary-icon" [class]="'summary-icon summary-icon--' + item.tone">
+            @switch (item.icon) {
+              @case ('active') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 10h16M5 10l1-6h12l1 6M7 14l3 3 7-7"></path>
+                </svg>
+              }
+              @case ('inactive') {
+                <svg viewBox="0 0 24 24"><path d="M4 10h16M5 10l1-6h12l1 6M8 16h8"></path></svg>
+              }
+              @case ('inventory') {
+                <svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM2 3h20v4H2zM9 11h6"></path></svg>
+              }
+              @default {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 21V8l8-5 8 5v13M2 21h20M9 21v-5h6v5"></path>
+                </svg>
+              }
+            }
+          </span>
+          <span class="summary-text"
+            ><span>{{ item.label }}</span
+            ><strong>{{ item.value }}</strong></span
+          >
+        </article>
+      }
+    </section>
+
+    <div class="branches-layout" [class.details-open]="selectedBranch()">
+      <section class="branches-panel">
+        <div class="branch-toolbar">
+          <div class="branch-search">
+            <input
+              type="search"
+              placeholder="Search branches by name, city or code..."
+              [value]="searchQuery()"
+              (input)="onSearch($event)"
+              aria-label="Search branches"
+            />
+            <svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+          </div>
+          <select
+            [value]="statusFilter()"
+            (change)="onStatusFilter($event)"
+            aria-label="Filter branches by status"
+          >
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="branches-table" aria-label="Branches">
+            <thead>
+              <tr>
+                <th>Branch Name</th>
+                <th>Code</th>
+                <th>Location</th>
+                <th>Manager</th>
+                <th>Inventory</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (branch of visibleBranches(); track branch.id) {
+                <tr [class.selected]="selectedBranchId() === branch.id">
+                  <td>
+                    <span class="branch-cell"
+                      ><span class="branch-avatar" [style.background]="branchColor(branch)">{{
+                        branchInitials(branch)
+                      }}</span
+                      ><strong>{{ branch.name }}</strong></span
+                    >
+                  </td>
+                  <td>{{ branch.code }}</td>
+                  <td>{{ location(branch) }}</td>
+                  <td>{{ branch.managerName }}</td>
+                  <td>{{ inventoryForBranch(branch).toLocaleString() }}</td>
+                  <td>
+                    <span [class]="'status-pill status-' + branch.status">{{
+                      branch.status === 'active' ? 'Active' : 'Inactive'
+                    }}</span>
+                  </td>
+                  <td>{{ formatDate(branch.createdAt) }}</td>
+                  <td>
+                    <span class="row-actions">
+                      <button
+                        class="icon-action"
+                        type="button"
+                        title="View branch"
+                        aria-label="View branch"
+                        (click)="openDetails(branch)"
+                      >
+                        <svg viewBox="0 0 24 24">
+                          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      </button>
+                      <button
+                        class="icon-action"
+                        type="button"
+                        title="Edit branch"
+                        aria-label="Edit branch"
+                        (click)="openEdit(branch)"
+                      >
+                        <svg viewBox="0 0 24 24">
+                          <path
+                            d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"
+                          ></path>
+                        </svg>
+                      </button>
+                      <button
+                        class="icon-action danger"
+                        type="button"
+                        title="Delete branch"
+                        aria-label="Delete branch"
+                        (click)="deleteBranch(branch)"
+                      >
+                        <svg viewBox="0 0 24 24">
+                          <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"></path>
+                        </svg>
+                      </button>
+                    </span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="8" class="no-results">
+                    No branches match the current search and filter.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="table-footer">
+          <span
+            >Showing {{ pageStart() }} to {{ pageEnd() }} of
+            {{ filteredBranches().length }} branches</span
+          >
+          <div class="pagination">
+            <button
+              type="button"
+              aria-label="Previous page"
+              (click)="previousPage()"
+              [disabled]="currentPage() === 1"
+            >
+              <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>
+            </button>
+            <span>{{ currentPage() }} / {{ totalPages() }}</span>
+            <button
+              type="button"
+              aria-label="Next page"
+              (click)="nextPage()"
+              [disabled]="currentPage() === totalPages()"
+            >
+              <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg>
+            </button>
+          </div>
+        </footer>
+      </section>
+
+      @if (selectedBranch(); as branch) {
+        <aside class="details-panel">
+          <div class="details-header">
+            <h2>Branch Details</h2>
+            <button
+              class="close-btn"
+              type="button"
+              aria-label="Close details"
+              (click)="closeDetails()"
+            >
+              <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+            </button>
+          </div>
+          <div class="details-identity">
+            <span class="branch-avatar large" [style.background]="branchColor(branch)">{{
+              branchInitials(branch)
+            }}</span>
+            <div>
+              <h3>{{ branch.name }}</h3>
+              <span class="branch-code">{{ branch.code }}</span>
+            </div>
+            <span [class]="'status-pill status-' + branch.status">{{ branch.status }}</span>
+          </div>
+          <dl class="detail-list">
+            <div>
+              <dt>Location</dt>
+              <dd>
+                {{ branch.address }}, {{ branch.city }}, {{ branch.state }}, {{ branch.country }}
+              </dd>
+            </div>
+            <div>
+              <dt>Manager</dt>
+              <dd>{{ branch.managerName }}</dd>
+            </div>
+            <div>
+              <dt>Email</dt>
+              <dd>{{ branch.managerEmail || 'Not provided' }}</dd>
+            </div>
+            <div>
+              <dt>Phone</dt>
+              <dd>{{ branch.managerPhone }}</dd>
+            </div>
+            <div>
+              <dt>Hours</dt>
+              <dd>{{ operatingHoursSummary(branch) }}</dd>
+            </div>
+            <div>
+              <dt>Open Days</dt>
+              <dd>{{ openDaysSummary(branch) }}</dd>
+            </div>
+            <div>
+              <dt>Inventory</dt>
+              <dd>{{ inventoryForBranch(branch).toLocaleString() }} units</dd>
+            </div>
+          </dl>
+          <div class="detail-actions">
+            <button class="secondary-action" type="button" (click)="openEdit(branch)">
+              Edit Branch
+            </button>
+            <button class="status-action" type="button" (click)="toggleStatus(branch)">
+              {{ branch.status === 'active' ? 'Deactivate' : 'Activate' }}
+            </button>
+          </div>
+        </aside>
+      }
+    </div>
+  }
+</div>

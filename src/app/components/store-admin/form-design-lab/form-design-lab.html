@@ -1,0 +1,365 @@
+<main class="form-lab-page" [style.--lab-accent]="selectedAccent()">
+  <nav class="lab-breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/store-admin/dashboard">Dashboard</a>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <span>Form design lab</span>
+  </nav>
+
+  <header class="lab-header">
+    <div class="lab-title">
+      <span class="eyebrow"><i></i> Isolated UI concept</span>
+      <h1>Create a new product</h1>
+      <span class="header-copy">A cleaner, calmer form direction for the DigiShop admin.</span>
+    </div>
+    <div class="header-actions">
+      <span class="autosave"><i></i> Design preview</span>
+      <button type="button" class="button button-ghost" (click)="saveDraft()">Save draft</button>
+      <button type="button" class="button button-primary" (click)="submit()">
+        Create product
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  @if (submitted()) {
+    <div class="success-banner" role="status">
+      <span class="success-icon"
+        ><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg
+      ></span>
+      <span><strong>Looks good.</strong> This is a UI-only test; no product data was saved.</span>
+      <button type="button" aria-label="Dismiss message" (click)="submitted.set(false)">×</button>
+    </div>
+  }
+
+  <div class="lab-layout">
+    <aside class="step-rail" aria-label="Form sections">
+      <span class="rail-label">Form sections</span>
+      <a href="#essential" class="step active">
+        <span>01</span>
+        <i></i>
+        <strong>Essentials</strong>
+      </a>
+      <a href="#pricing" class="step">
+        <span>02</span>
+        <i></i>
+        <strong>Pricing & stock</strong>
+      </a>
+      <a href="#media" class="step">
+        <span>03</span>
+        <i></i>
+        <strong>Media</strong>
+      </a>
+      <a href="#publishing" class="step">
+        <span>04</span>
+        <i></i>
+        <strong>Publishing</strong>
+      </a>
+    </aside>
+
+    <form class="lab-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <section id="essential" class="form-card">
+        <header class="section-header">
+          <span class="section-icon section-icon-violet">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10M9 14h6"></path>
+            </svg>
+          </span>
+          <span
+            ><h2>Product essentials</h2>
+            <small>The core details customers will see.</small></span
+          >
+          <span class="section-status"><i></i> Complete</span>
+        </header>
+
+        <div class="form-grid">
+          <label class="field field-wide">
+            <span
+              >Product name <b>*</b><em>{{ form.controls.name.value.length }}/80</em></span
+            >
+            <span class="input-shell" [class.invalid]="fieldInvalid('name')">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m12 3 9 5-9 5-9-5 9-5ZM3 13l9 5 9-5"></path>
+              </svg>
+              <input
+                formControlName="name"
+                placeholder="Enter a clear product name"
+                maxlength="80"
+              />
+            </span>
+            @if (fieldInvalid('name')) {
+              <small class="error">A product name is required.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>SKU <b>*</b></span>
+            <span class="input-shell" [class.invalid]="fieldInvalid('sku')">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 5h2v14H4zM9 5h1v14H9zM13 5h3v14h-3zM19 5h1v14h-1z"></path>
+              </svg>
+              <input formControlName="sku" placeholder="e.g. AUR-SNK-001" />
+              <i class="verified"
+                ><svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-8"></path></svg
+              ></i>
+            </span>
+          </label>
+
+          <label class="field">
+            <span>Brand <b>*</b></span>
+            <span class="input-shell" [class.invalid]="fieldInvalid('brand')">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 12 12 20 4 12V4h8l8 8Z"></path>
+                <circle cx="9" cy="9" r="1"></circle>
+              </svg>
+              <input formControlName="brand" placeholder="Enter brand name" />
+            </span>
+          </label>
+
+          <label class="field">
+            <span>Category <b>*</b></span>
+            <span class="input-shell select-shell" [class.invalid]="fieldInvalid('category')">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 5h6v6H4zM14 5h6v6h-6zM4 15h6v4H4zM14 15h6v4h-6z"></path>
+              </svg>
+              <select formControlName="category">
+                @for (category of categories; track category) {
+                  <option [value]="category">{{ category }}</option>
+                }
+              </select>
+            </span>
+          </label>
+
+          <fieldset class="field product-type">
+            <legend>Product type</legend>
+            <div class="type-options">
+              <label [class.selected]="form.controls.productType.value === 'physical'">
+                <input type="radio" formControlName="productType" value="physical" />
+                <span class="radio-dot"></span>
+                <svg viewBox="0 0 24 24">
+                  <path d="m12 3 9 5-9 5-9-5 9-5ZM3 8v8l9 5 9-5V8M12 13v8"></path>
+                </svg>
+                <span><strong>Physical</strong><small>Shipped item</small></span>
+              </label>
+              <label [class.selected]="form.controls.productType.value === 'digital'">
+                <input type="radio" formControlName="productType" value="digital" />
+                <span class="radio-dot"></span>
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 5h16v12H4zM8 21h8M12 17v4M9 10l3 3 3-3"></path>
+                </svg>
+                <span><strong>Digital</strong><small>Downloadable</small></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <label class="field field-wide">
+            <span
+              >Description <em>{{ form.controls.description.value.length }}/240</em></span
+            >
+            <span class="textarea-shell">
+              <textarea
+                formControlName="description"
+                rows="4"
+                maxlength="240"
+                placeholder="Describe the product"
+              ></textarea>
+              <span class="editor-tools" aria-hidden="true"
+                ><b>B</b><i>I</i><u>U</u><span>≡</span><span>⋮</span></span
+              >
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <section id="pricing" class="form-card">
+        <header class="section-header">
+          <span class="section-icon section-icon-blue"
+            ><svg viewBox="0 0 24 24">
+              <path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"></path></svg
+          ></span>
+          <span
+            ><h2>Pricing & inventory</h2>
+            <small>Set pricing and stock availability.</small></span
+          >
+        </header>
+        <div class="form-grid four-columns">
+          <label class="field">
+            <span>Price <b>*</b></span>
+            <span class="input-shell money" [class.invalid]="fieldInvalid('price')"
+              ><i>$</i><input type="number" formControlName="price" min="0"
+            /></span>
+          </label>
+          <label class="field">
+            <span>Compare at</span>
+            <span class="input-shell money"
+              ><i>$</i><input type="number" formControlName="comparePrice" min="0"
+            /></span>
+          </label>
+          <label class="field">
+            <span>Quantity <b>*</b></span>
+            <span class="input-shell"
+              ><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM2 3h20v4H2z"></path></svg
+              ><input type="number" formControlName="quantity" min="0"
+            /></span>
+          </label>
+          <label class="field">
+            <span>Low stock alert</span>
+            <span class="input-shell"
+              ><svg viewBox="0 0 24 24">
+                <path d="M12 9v4M12 17h.01M10 3 2 20h20L14 3a2 2 0 0 0-4 0Z"></path></svg
+              ><input type="number" formControlName="lowStock" min="0"
+            /></span>
+          </label>
+        </div>
+        <label class="switch-row">
+          <span class="switch-copy"
+            ><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM2 3h20v4H2zM9 11h6"></path></svg
+            ><span
+              ><strong>Track inventory</strong
+              ><small>Update stock automatically when orders are placed.</small></span
+            ></span
+          >
+          <input type="checkbox" formControlName="trackInventory" /><i></i>
+        </label>
+      </section>
+
+      <section id="media" class="form-card">
+        <header class="section-header">
+          <span class="section-icon section-icon-orange"
+            ><svg viewBox="0 0 24 24">
+              <path d="M4 5h16v14H4zM4 15l4-4 4 4 3-3 5 5"></path>
+              <circle cx="9" cy="9" r="1"></circle></svg
+          ></span>
+          <span
+            ><h2>Product media</h2>
+            <small>Use a clean image with a simple background.</small></span
+          >
+          <span class="optional">Optional</span>
+        </header>
+        <div class="media-layout">
+          @if (imagePreview()) {
+            <div class="uploaded-image">
+              <img [src]="imagePreview()" alt="Uploaded product preview" /><button
+                type="button"
+                (click)="removeImage()"
+                aria-label="Remove image"
+              >
+                ×
+              </button>
+            </div>
+          }
+          <label class="drop-zone" (dragover)="allowDrop($event)" (drop)="onImageDrop($event)">
+            <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+            <span class="upload-icon"
+              ><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 15v5h16v-5"></path></svg
+            ></span>
+            <strong>Drop your image here</strong>
+            <small>or <b>browse files</b> · PNG, JPG or WebP up to 5 MB</small>
+          </label>
+          <div class="media-note">
+            <span>✦</span><strong>Image tip</strong
+            ><small>Square images at least 1200 × 1200 px look best across the storefront.</small>
+          </div>
+        </div>
+      </section>
+
+      <section id="publishing" class="form-card compact-card">
+        <header class="section-header">
+          <span class="section-icon section-icon-green"
+            ><svg viewBox="0 0 24 24">
+              <path d="M12 3v18M3 12h18"></path>
+              <circle cx="12" cy="12" r="9"></circle></svg
+          ></span>
+          <span
+            ><h2>Publishing</h2>
+            <small>Control where and how this product appears.</small></span
+          >
+        </header>
+        <div class="publishing-grid">
+          <label class="field">
+            <span>Status</span>
+            <span class="input-shell select-shell"
+              ><svg viewBox="0 0 24 24">
+                <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM8 12l3 3 5-6"></path></svg
+              ><select formControlName="status">
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+                <option value="archived">Archived</option>
+              </select></span
+            >
+          </label>
+          <div class="accent-field">
+            <span>Accent color</span>
+            <div class="swatches">
+              @for (accent of accents; track accent.value) {
+                <button
+                  type="button"
+                  [style.background]="accent.value"
+                  [class.selected]="selectedAccent() === accent.value"
+                  [attr.aria-label]="accent.name"
+                  (click)="selectAccent(accent.value)"
+                >
+                  <svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-8"></path></svg>
+                </button>
+              }
+            </div>
+          </div>
+          <label class="switch-row standalone">
+            <span class="switch-copy"
+              ><span
+                ><strong>Featured product</strong
+                ><small>Highlight this item in featured collections.</small></span
+              ></span
+            >
+            <input type="checkbox" formControlName="featured" /><i></i>
+          </label>
+        </div>
+      </section>
+
+      <footer class="mobile-submit">
+        <button type="button" class="button button-ghost" (click)="saveDraft()">Save draft</button>
+        <button type="submit" class="button button-primary">Create product</button>
+      </footer>
+    </form>
+
+    <aside class="preview-column">
+      <div class="preview-card">
+        <header><span>Live preview</span><i>Storefront card</i></header>
+        <div class="preview-media" [class.has-image]="imagePreview()">
+          @if (imagePreview()) {
+            <img [src]="imagePreview()" alt="Product" />
+          } @else {
+            <svg viewBox="0 0 24 24">
+              <path d="M4 5h16v14H4zM4 15l4-4 4 4 3-3 5 5"></path>
+              <circle cx="9" cy="9" r="1"></circle></svg
+            ><span>Add an image</span>
+          }
+          <button type="button" aria-label="Favorite product">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.7-7.5a5.5 5.5 0 0 0 1.1-8.9Z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div class="preview-content">
+          <span class="preview-category">{{ productCategory() || 'Category' }}</span>
+          <h3>{{ productName() || 'Untitled product' }}</h3>
+          <div class="preview-price">
+            <strong>{{ productPrice() | currency }}</strong>
+            @if (productComparePrice() > productPrice()) {
+              <s>{{ productComparePrice() | currency }}</s>
+            }
+          </div>
+          <div
+            class="preview-stock"
+            [class.low]="stockLabel() === 'Low stock'"
+            [class.out]="stockLabel() === 'Out of stock'"
+          >
+            <i></i>{{ stockLabel() }} · {{ productQuantity() }} units
+          </div>
+          <button type="button" [style.background]="selectedAccent()">Add to cart</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>

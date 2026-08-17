@@ -1,0 +1,31 @@
+<div class="manager-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><span>Store Management</span><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg><strong>Managers</strong></nav>
+  <header class="page-header"><div><h1>Managers</h1><p>Managers assigned through branches for {{ selectedStore().name }}.</p></div></header>
+
+  <section class="summary-grid" aria-label="Manager summary">
+    @for (item of stats(); track item.label) {
+      <article class="summary-card"><span [class]="'summary-icon ' + item.tone"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2"></path></svg></span><span><small>{{ item.label }}</small><strong>{{ item.value }}</strong><em>{{ item.helper }}</em></span></article>
+    }
+  </section>
+
+  <section class="manager-panel">
+    <div class="toolbar"><label><input type="search" [value]="searchQuery()" (input)="onSearch($event)" placeholder="Search managers, branches, or locations..." aria-label="Search managers"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></label></div>
+
+    @if (managers().length) {
+      <div class="table-wrap">
+        <table><thead><tr><th>Manager</th><th>Contact</th><th>Assigned Branches</th><th>Locations</th><th>Active</th><th>Actions</th></tr></thead>
+          <tbody>
+            @for (manager of filteredManagers(); track manager.key) {
+              <tr><td><span class="manager-cell"><span class="avatar">{{ initials(manager.name) }}</span><strong>{{ manager.name }}</strong></span></td><td><span class="contact"><strong>{{ manager.email || 'Email not provided' }}</strong><small>{{ manager.phone }}</small></span></td><td><span class="branch-list" [title]="branchNames(manager)">{{ branchNames(manager) }}</span></td><td>{{ locations(manager) }}</td><td><span class="active-count">{{ activeAssignments(manager) }} / {{ manager.branches.length }}</span></td><td><button class="edit-button" type="button" title="Edit manager through branch" aria-label="Edit manager through branch" (click)="editManager(manager)"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"></path></svg></button></td></tr>
+            } @empty {
+              <tr><td class="empty-row" colspan="6">No managers match your search.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <footer>Showing {{ filteredManagers().length }} of {{ managers().length }} managers</footer>
+    } @else {
+      <div class="empty-state"><span><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2"></path></svg></span><h2>No Managers Found</h2><p>Create a branch and enter its manager details to see the manager here.</p><button type="button" (click)="openCreateBranch()">Create Branch</button></div>
+    }
+  </section>
+</div>

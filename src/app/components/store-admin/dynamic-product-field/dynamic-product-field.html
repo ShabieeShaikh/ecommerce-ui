@@ -1,0 +1,82 @@
+<div
+  class="dynamic-field"
+  [class.full-field]="definition().inputType === 'textarea'"
+  [class.boolean-field]="definition().inputType === 'boolean'"
+>
+  <label [for]="'attribute-' + definition().key"
+    >{{ definition().label }}
+    @if (definition().required) {
+      <span>*</span>
+    }
+  </label>
+  @if (isOccasion()) {
+    <div
+      class="checkbox-options"
+      [class.invalid]="invalid()"
+      [id]="'attribute-' + definition().key"
+    >
+      @for (option of definition().options ?? []; track option) {
+        <label class="checkbox-option">
+          <input
+            type="checkbox"
+            [checked]="optionChecked(option)"
+            (change)="toggleOption(option, $any($event.target).checked)"
+          />
+          <span>{{ option }}</span>
+        </label>
+      }
+    </div>
+  } @else {
+    @switch (definition().inputType) {
+      @case ('select') {
+        <div class="field-control" [class.invalid]="invalid()">
+          <select [id]="'attribute-' + definition().key" [formControl]="control()">
+            <option value="">Select {{ definition().label.toLowerCase() }}</option>
+            @for (option of definition().options ?? []; track option) {
+              <option [value]="option">{{ option }}</option>
+            }
+          </select>
+        </div>
+      }
+      @case ('multi-select') {
+        <div class="field-control multi-control" [class.invalid]="invalid()">
+          <select multiple [id]="'attribute-' + definition().key" [formControl]="control()">
+            @for (option of definition().options ?? []; track option) {
+              <option [value]="option">{{ option }}</option>
+            }
+          </select>
+        </div>
+      }
+      @case ('boolean') {
+        <label class="toggle-control" [for]="'attribute-' + definition().key"
+          ><input
+            [id]="'attribute-' + definition().key"
+            type="checkbox"
+            [formControl]="control()"
+          /><span></span><small>{{ control().value ? 'Yes' : 'No' }}</small></label
+        >
+      }
+      @case ('textarea') {
+        <div class="textarea-control" [class.invalid]="invalid()">
+          <textarea
+            [id]="'attribute-' + definition().key"
+            rows="3"
+            [formControl]="control()"
+          ></textarea>
+        </div>
+      }
+      @default {
+        <div class="field-control" [class.invalid]="invalid()">
+          <input
+            [id]="'attribute-' + definition().key"
+            [type]="definition().inputType === 'number' ? 'number' : 'text'"
+            [formControl]="control()"
+          /><span class="unit">{{ definition().unit }}</span>
+        </div>
+      }
+    }
+  }
+  @if (invalid()) {
+    <small class="field-error">{{ definition().label }} is required.</small>
+  }
+</div>

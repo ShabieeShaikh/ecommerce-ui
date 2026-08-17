@@ -1,0 +1,223 @@
+<div class="store-details-page">
+  <nav class="details-breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/store-admin/stores">Store Management</a>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <span>Store Details</span>
+  </nav>
+
+  <header class="page-header">
+    <div>
+      <h1>Store Details</h1>
+    </div>
+    <a class="back-link" routerLink="/store-admin/stores">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+      <span>Back to Stores</span>
+    </a>
+  </header>
+
+  @if (store(); as currentStore) {
+    <section class="identity-panel" aria-labelledby="store-name">
+      <div
+        class="store-logo"
+        [style.background]="currentStore.logoUrl ? '#fff' : currentStore.accentColor"
+      >
+        @if (currentStore.logoUrl) {
+          <img [src]="logoUrl(currentStore)" [alt]="currentStore.name + ' logo'" />
+        } @else {
+          <span>{{ storeInitials(currentStore) }}</span>
+        }
+      </div>
+
+      <div class="store-identity">
+        <div class="identity-title">
+          <h2 id="store-name">{{ currentStore.name }}</h2>
+          <span class="status-pill" [class]="'status-pill status-' + currentStore.status">{{
+            statusLabel(currentStore.status)
+          }}</span>
+        </div>
+        <span class="store-id">Store ID: {{ displayStoreId(currentStore) }}</span>
+      </div>
+
+      <div class="identity-actions">
+        <button class="action-button primary-outline" type="button" (click)="editStore()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"></path>
+          </svg>
+          <span>Edit Store</span>
+        </button>
+        <button class="action-button" type="button" (click)="manageBranches()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 21V8l8-5 8 5v13"></path>
+            <path d="M2 21h20M8 12h2M14 12h2M10 21v-4h4v4"></path>
+          </svg>
+          <span>Manage Branches</span>
+        </button>
+        <button class="action-button" type="button" (click)="viewProducts()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m12 2 9 5-9 5-9-5 9-5Z"></path>
+            <path d="M3 12l9 5 9-5M3 17l9 5 9-5"></path>
+          </svg>
+          <span>View Products</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="stats-grid" aria-label="Store summary">
+      @for (stat of stats(); track stat.label) {
+        <article class="stat-card">
+          <span class="stat-icon" [class]="'stat-icon stat-icon--' + stat.tone" aria-hidden="true">
+            @switch (stat.icon) {
+              @case ('branch') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 21V8l8-5 8 5v13M2 21h20M8 12h2M14 12h2"></path>
+                </svg>
+              }
+              @case ('product') {
+                <svg viewBox="0 0 24 24">
+                  <path d="m12 2 9 5-9 5-9-5 9-5Z"></path>
+                  <path d="M3 12l9 5 9-5M3 17l9 5 9-5"></path>
+                </svg>
+              }
+              @case ('orders') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M6 3h12v18H6zM9 3V1h6v2M9 8h6M9 12h6M9 16h4"></path>
+                </svg>
+              }
+              @case ('revenue') {
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8M12 6v12"></path>
+                </svg>
+              }
+            }
+          </span>
+          <span class="stat-copy">
+            <span>{{ stat.label }}</span>
+            <strong>{{ stat.value }}</strong>
+          </span>
+        </article>
+      }
+    </section>
+
+    <section class="information-grid">
+      <article class="information-panel">
+        <h2>Store Information</h2>
+        <dl class="detail-list">
+          <div>
+            <dt>Email</dt>
+            <dd>{{ currentStore.email }}</dd>
+          </div>
+          <div>
+            <dt>Phone</dt>
+            <dd>{{ currentStore.phone }}</dd>
+          </div>
+          <div>
+            <dt>Category</dt>
+            <dd>{{ currentStore.category }}</dd>
+          </div>
+          <div>
+            <dt>Created Date</dt>
+            <dd>{{ formatDate(currentStore.createdAt) }}</dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>{{ currentStore.city }}, {{ currentStore.country }}</dd>
+          </div>
+          <div>
+            <dt>Address</dt>
+            <dd>{{ fullAddress(currentStore) || 'Not provided' }}</dd>
+          </div>
+          <div>
+            <dt>Inventory Limit</dt>
+            <dd>{{ currentStore.inventoryAllocationLimit.toLocaleString('en-US') }} units</dd>
+          </div>
+          <div>
+            <dt>Total Physical Stock</dt>
+            <dd>{{ allocatedInventory().toLocaleString('en-US') }} units</dd>
+          </div>
+          <div>
+            <dt>Available Capacity</dt>
+            <dd>{{ availableInventory().toLocaleString('en-US') }} units</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="information-panel owner-panel">
+        <h2>Owner Information</h2>
+        <div class="owner-identity">
+          <span class="owner-avatar" [style.background]="currentStore.accentColor">{{
+            ownerInitials(currentStore)
+          }}</span>
+          <span>
+            <strong>{{ currentStore.owner || 'Owner not provided' }}</strong>
+            <span class="owner-email">{{ currentStore.email }}</span>
+          </span>
+        </div>
+        <dl class="detail-list owner-details">
+          <div>
+            <dt>Phone</dt>
+            <dd>{{ currentStore.phone }}</dd>
+          </div>
+          <div>
+            <dt>Role</dt>
+            <dd>Store Owner</dd>
+          </div>
+          <div>
+            <dt>Store</dt>
+            <dd>{{ currentStore.name }}</dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>{{ currentStore.city }}, {{ currentStore.country }}</dd>
+          </div>
+        </dl>
+      </article>
+    </section>
+
+    <section class="activity-panel" aria-labelledby="recent-activity-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="recent-activity-title">Recent Activity</h2>
+        </div>
+      </div>
+
+      <div class="activity-list">
+        @for (activity of activities(); track activity.id) {
+          <div class="activity-row">
+            <span
+              class="activity-icon"
+              [class]="'activity-icon activity-icon--' + activity.type"
+              aria-hidden="true"
+            >
+              @switch (activity.type) {
+                @case ('branch') {
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 21V8l8-5 8 5v13M2 21h20M8 12h2M14 12h2"></path>
+                  </svg>
+                }
+                @case ('product') {
+                  <svg viewBox="0 0 24 24">
+                    <path d="m12 2 9 5-9 5-9-5 9-5Z"></path>
+                    <path d="M3 12l9 5 9-5M3 17l9 5 9-5"></path>
+                  </svg>
+                }
+                @case ('store') {
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10"></path>
+                  </svg>
+                }
+              }
+            </span>
+            <span class="activity-message">{{ activity.message }}</span>
+            <time [attr.datetime]="activity.occurredAt.toISOString()">{{
+              relativeTime(activity.occurredAt)
+            }}</time>
+          </div>
+        } @empty {
+          <div class="empty-activity">No activity has been recorded for this store yet.</div>
+        }
+      </div>
+    </section>
+  }
+</div>

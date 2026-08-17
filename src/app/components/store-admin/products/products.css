@@ -121,10 +121,22 @@ svg {
   height: 25px;
 }
 
-.summary-icon--purple { color: #7C3AED; background: rgba(124, 58, 237, 0.14); }
-.summary-icon--green { color: #10B981; background: rgba(16, 185, 129, 0.13); }
-.summary-icon--orange { color: #F97316; background: rgba(249, 115, 22, 0.13); }
-.summary-icon--blue { color: #2563EB; background: rgba(37, 99, 235, 0.13); }
+.summary-icon--purple {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.14);
+}
+.summary-icon--green {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.13);
+}
+.summary-icon--orange {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.13);
+}
+.summary-icon--blue {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.13);
+}
 
 .summary-text {
   display: grid;
@@ -138,7 +150,7 @@ svg {
 }
 
 .summary-text strong {
-  color: #090D1F;
+  color: #090d1f;
   font-size: 23px;
   font-weight: 800;
   line-height: 1;
@@ -281,6 +293,22 @@ svg {
   flex: 0 0 auto;
 }
 
+.product-thumb-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  color: #98a2b3;
+  background: #f3f4f8;
+  flex: 0 0 auto;
+}
+
+.product-thumb-placeholder svg {
+  width: 20px;
+  height: 20px;
+}
+
 .product-cell span {
   min-width: 0;
   overflow: hidden;
@@ -289,11 +317,11 @@ svg {
 }
 
 .stock-low {
-  color: #F97316 !important;
+  color: #f97316 !important;
 }
 
 .stock-zero {
-  color: #F04438 !important;
+  color: #f04438 !important;
 }
 
 .status-pill {
@@ -307,22 +335,22 @@ svg {
 }
 
 .status-stock {
-  color: #027A48;
+  color: #027a48;
   background: rgba(16, 185, 129, 0.15);
 }
 
 .status-low {
-  color: #C4320A;
+  color: #c4320a;
   background: rgba(249, 115, 22, 0.14);
 }
 
 .status-out {
-  color: #F04438;
+  color: #f04438;
   background: rgba(239, 68, 68, 0.13);
 }
 
 .status-draft {
-  color: #6D28D9;
+  color: #6d28d9;
   background: rgba(124, 58, 237, 0.13);
 }
 
@@ -413,6 +441,9 @@ svg {
   font-size: 15px;
   font-weight: 800;
 }
+.form-header h2 {
+  font-size: 18px;
+}
 
 .details-hero {
   position: relative;
@@ -429,6 +460,21 @@ svg {
   border-radius: 8px;
   object-fit: cover;
   background: #f3f4f8;
+}
+
+.details-image-placeholder {
+  width: 100px;
+  height: 136px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #98a2b3;
+  background: #f3f4f8;
+}
+
+.details-image-placeholder svg {
+  width: 36px;
+  height: 36px;
 }
 
 .details-title {
@@ -491,7 +537,7 @@ svg {
 }
 
 .detail-stats strong {
-  color: #027A48;
+  color: #027a48;
   font-size: 15px;
   font-weight: 800;
 }
@@ -589,7 +635,7 @@ svg {
 }
 
 .danger-action {
-  color: #F04438;
+  color: #f04438;
 }
 
 .danger-action:hover {
@@ -641,7 +687,7 @@ svg {
   border-radius: 8px;
   display: grid;
   place-items: center;
-  color: #98A2B3;
+  color: #98a2b3;
   background: #f8fafc;
   border: 1px dashed var(--clr-border);
 }

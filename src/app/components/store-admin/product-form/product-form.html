@@ -1,0 +1,739 @@
+<div class="product-editor-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/store-admin/products">Products</a>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <span>{{ isEditMode ? 'Edit Product' : 'Add Product' }}</span>
+  </nav>
+
+  <header class="page-header">
+    <div>
+      <h1>{{ isEditMode ? 'Edit Product' : 'Add Product' }}</h1>
+    </div>
+    <a class="back-link" routerLink="/store-admin/products">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+      <span>Back to Products</span>
+    </a>
+  </header>
+
+  <form [formGroup]="productForm" novalidate>
+    <div class="editor-layout">
+      <main class="form-column">
+        <section
+          class="form-section"
+          [class.section-invalid]="
+            submitted() &&
+            (fieldInvalid('name') ||
+              fieldInvalid('sku') ||
+              fieldInvalid('category') ||
+              !!skuError())
+          "
+        >
+          <header class="section-header">
+            <span class="section-number">1</span>
+            <div>
+              <h2>Basic Product Details</h2>
+            </div>
+          </header>
+
+          <div class="field-grid">
+            <div class="form-field">
+              <label for="product-name">Product Name <span>*</span></label>
+              <div class="field-control" [class.invalid]="fieldInvalid('name')">
+                <input id="product-name" type="text" formControlName="name" maxlength="100" />
+              </div>
+              @if (fieldError('name')) {
+                <small class="field-error">{{ fieldError('name') }}</small>
+              }
+            </div>
+
+            <div class="form-field">
+              <label for="product-sku">SKU <span>*</span></label>
+              <div class="field-control" [class.invalid]="fieldInvalid('sku') || !!skuError()">
+                <input
+                  id="product-sku"
+                  type="text"
+                  formControlName="sku"
+                  maxlength="40"
+                  (blur)="normalizeSku()"
+                />
+              </div>
+              @if (skuError()) {
+                <small class="field-error">{{ skuError() }}</small>
+              } @else if (fieldError('sku')) {
+                <small class="field-error">{{ fieldError('sku') }}</small>
+              }
+            </div>
+
+            <div class="form-field">
+              <label for="product-category">Category <span>*</span></label>
+              <div class="field-control" [class.invalid]="fieldInvalid('category')">
+                <select id="product-category" formControlName="category">
+                  <option value="">Select category</option>
+                  @for (category of categories(); track category.id) {
+                    <option [value]="category.id">{{ category.name }}</option>
+                  }
+                </select>
+              </div>
+              @if (fieldError('category')) {
+                <small class="field-error">{{ fieldError('category') }}</small>
+              }
+            </div>
+
+            <div class="form-field">
+              <label for="product-brand">Brand</label>
+              <div class="field-control" [class.invalid]="fieldInvalid('brand')">
+                <select id="product-brand" formControlName="brand">
+                  <option value="">Select brand</option>
+                  @for (brand of brands(); track brand) {
+                    <option [value]="brand">{{ brand }}</option>
+                  }
+                </select>
+              </div>
+              @if (fieldError('brand')) {
+                <small class="field-error">{{ fieldError('brand') }}</small>
+              }
+            </div>
+
+            @if (isEditMode) {
+              <div class="form-field barcode-form-field">
+                <label for="product-barcode">Barcode</label>
+                <div id="product-barcode" class="field-control generated-barcode-field">
+                  <app-barcode-display
+                    [value]="productForm.controls.barcode.value"
+                    size="inline"
+                  ></app-barcode-display>
+                </div>
+                @if (barcodeError()) {
+                  <small class="field-error">{{ barcodeError() }}</small>
+                } @else if (fieldError('barcode')) {
+                  <small class="field-error">{{ fieldError('barcode') }}</small>
+                }
+              </div>
+            }
+          </div>
+        </section>
+
+        <section
+          class="form-section specifications-section"
+          [class.section-invalid]="specificationsInvalid()"
+        >
+          <header class="section-header compact-header">
+            <span class="section-number">2</span>
+            <div>
+              <h2>Product Specifications</h2>
+            </div>
+          </header>
+          @if (!productForm.controls.category.value) {
+            <div class="specifications-empty">
+              Select a category to load its product specifications.
+            </div>
+          } @else if (!specificationAttributes().length) {
+            <div class="specifications-empty">
+              No additional specifications are configured for this category.
+            </div>
+          } @else {
+            <div class="specifications-grid" formGroupName="attributes">
+              @for (attribute of specificationAttributes(); track attribute.id) {
+                <app-dynamic-product-field
+                  [definition]="attribute"
+                  [control]="getAttributeControl(attribute.key)"
+                  [submitted]="submitted()"
+                ></app-dynamic-product-field>
+              }
+            </div>
+          }
+        </section>
+
+        @if (variantAttributes().length) {
+          <section
+            class="form-section variants-section"
+            [class.section-invalid]="submitted() && !!variantError()"
+          >
+            <header class="section-header compact-header">
+              <span class="section-number">3</span>
+              <div>
+                <h2>Product Variants</h2>
+              </div>
+            </header>
+
+            <div class="variant-selectors" formGroupName="variantSelections">
+              @for (attribute of variantAttributes(); track attribute.id) {
+                <fieldset
+                  class="variant-selector"
+                  [class.invalid]="variantSelectionInvalid(attribute)"
+                >
+                  <legend>
+                    {{ attribute.label }}
+                    @if (attribute.required) {
+                      <span>*</span>
+                    }
+                  </legend>
+                  <div class="variant-options">
+                    @for (option of attribute.options ?? []; track option) {
+                      <label [class.selected]="variantValueSelected(attribute.key, option)">
+                        <input
+                          type="checkbox"
+                          [checked]="variantValueSelected(attribute.key, option)"
+                          (change)="toggleVariantValue(attribute, option)"
+                        />
+                        <span>{{ option }}</span>
+                      </label>
+                    }
+                  </div>
+                  @if (variantSelectionInvalid(attribute)) {
+                    <small class="field-error"
+                      >Select at least one {{ attribute.label.toLowerCase() }}.</small
+                    >
+                  }
+                </fieldset>
+              }
+            </div>
+
+            <div class="variant-generate-row">
+              <button class="generate-variants-button" type="button" (click)="generateVariants()">
+                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+                <span>{{ variantRows.length ? 'Regenerate Variants' : 'Generate Variants' }}</span>
+              </button>
+            </div>
+
+            @if (variantRows.length) {
+              <div class="generated-variants-heading">
+                <div>
+                  <h3>Generated Variants</h3>
+                </div>
+              </div>
+              <div class="variant-table-wrap">
+                <table class="variant-table">
+                  <thead>
+                    <tr>
+                      <th>Variant</th>
+                      <th>SKU <span>*</span></th>
+                      <th>Barcode</th>
+                      <th>Price Override</th>
+                      <th>Variant Image</th>
+                      <th>Status</th>
+                      <th><span class="sr-only">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (
+                      variantGroup of variantRows.controls;
+                      track variantGroup;
+                      let index = $index
+                    ) {
+                      <tr>
+                        <td>
+                          <strong>{{ variantName(variantGroup.controls.attributes.value) }}</strong>
+                        </td>
+                        <td>
+                          <input
+                            class="variant-input sku-input"
+                            [class.invalid]="variantFieldInvalid(index, 'sku')"
+                            type="text"
+                            [formControl]="variantGroup.controls.sku"
+                            maxlength="80"
+                            (blur)="normalizeVariantSku(index)"
+                            [attr.aria-label]="
+                              variantName(variantGroup.controls.attributes.value) + ' SKU'
+                            "
+                          />
+                        </td>
+                        <td>
+                          <div class="variant-barcode-field">
+                            <app-barcode-display
+                              [value]="variantGroup.controls.barcode.value"
+                            ></app-barcode-display>
+                          </div>
+                        </td>
+                        <td>
+                          <input
+                            class="variant-input price-input"
+                            [class.invalid]="variantFieldInvalid(index, 'priceOverride')"
+                            type="number"
+                            [formControl]="variantGroup.controls.priceOverride"
+                            min="0"
+                            step="0.01"
+                            (input)="onVariantPriceInput(index, $event)"
+                            [attr.aria-label]="
+                              variantName(variantGroup.controls.attributes.value) +
+                              ' price override'
+                            "
+                          />
+                        </td>
+                        <td>
+                          <div class="variant-image-cell">
+                            <div class="variant-image-preview">
+                              @if (variantGroup.controls.imageUrl.value) {
+                                <img
+                                  [src]="variantGroup.controls.imageUrl.value"
+                                  [alt]="
+                                    variantName(variantGroup.controls.attributes.value) +
+                                    ' variant image'
+                                  "
+                                />
+                              } @else if (images()[0]) {
+                                <img
+                                  class="fallback"
+                                  [src]="images()[0]"
+                                  [alt]="
+                                    variantName(variantGroup.controls.attributes.value) +
+                                    ' main product image'
+                                  "
+                                />
+                              } @else {
+                                <svg viewBox="0 0 24 24">
+                                  <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                  <circle cx="9" cy="10" r="2"></circle>
+                                  <path d="m3 17 5-5 4 4 3-3 6 6"></path>
+                                </svg>
+                              }
+                            </div>
+                            <div class="variant-image-actions">
+                              <input
+                                #variantImageFile
+                                class="hidden-file-input"
+                                type="file"
+                                accept="image/png,image/jpeg,image/webp"
+                                (change)="onVariantImageSelected($event, index)"
+                              />
+                              <button
+                                class="variant-image-button"
+                                type="button"
+                                [title]="
+                                  variantGroup.controls.imageUrl.value
+                                    ? 'Change variant image'
+                                    : 'Upload variant image'
+                                "
+                                (click)="variantImageFile.click()"
+                              >
+                                <svg viewBox="0 0 24 24">
+                                  <path d="M16 16l-4-4-4 4M12 12v9"></path>
+                                  <path d="M20.4 16.6A5 5 0 0 0 18 7h-1.3A8 8 0 1 0 4 15.3"></path>
+                                </svg>
+                                <span>{{
+                                  variantGroup.controls.imageUrl.value ? 'Change' : 'Upload'
+                                }}</span>
+                              </button>
+                              @if (variantGroup.controls.imageUrl.value) {
+                                <button
+                                  class="variant-image-remove"
+                                  type="button"
+                                  title="Remove variant image"
+                                  (click)="removeVariantImage(index)"
+                                >
+                                  <svg viewBox="0 0 24 24">
+                                    <path d="M18 6 6 18M6 6l12 12"></path>
+                                  </svg>
+                                </button>
+                              }
+                            </div>
+                            @if (variantGroup.controls.imageError.value) {
+                              <small class="variant-image-error">{{
+                                variantGroup.controls.imageError.value
+                              }}</small>
+                            }
+                          </div>
+                        </td>
+                        <td>
+                          <select
+                            class="variant-input status-select"
+                            [formControl]="variantGroup.controls.status"
+                            [attr.aria-label]="
+                              variantName(variantGroup.controls.attributes.value) + ' status'
+                            "
+                          >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                          </select>
+                        </td>
+                        <td>
+                          <button
+                            class="remove-variant-button"
+                            type="button"
+                            title="Remove variant"
+                            [attr.aria-label]="
+                              'Remove ' + variantName(variantGroup.controls.attributes.value)
+                            "
+                            (click)="removeVariant(index)"
+                          >
+                            <svg viewBox="0 0 24 24">
+                              <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"></path>
+                            </svg>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+            @if (variantError()) {
+              <div class="variant-error">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="M12 8v5M12 16h.01"></path></svg
+                ><span>{{ variantError() }}</span>
+              </div>
+            }
+          </section>
+        }
+
+        <section
+          class="form-section"
+          [class.section-invalid]="
+            submitted() && (!!priceError() || fieldInvalid('price') || fieldInvalid('comparePrice'))
+          "
+        >
+          <header class="section-header compact-header">
+            <span class="section-number">{{ variantAttributes().length ? 4 : 3 }}</span>
+            <div>
+              <h2>Pricing & Status</h2>
+            </div>
+          </header>
+          <div class="pricing-grid">
+            <div class="form-field">
+              <label for="product-price">Price <span>*</span></label>
+              <div class="field-control currency-control" [class.invalid]="fieldInvalid('price')">
+                <span>$</span
+                ><input
+                  id="product-price"
+                  type="number"
+                  formControlName="price"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              @if (fieldError('price')) {
+                <small class="field-error">{{ fieldError('price') }}</small>
+              }
+            </div>
+            <div class="form-field">
+              <label for="discount-price">Discount Price</label>
+              <div
+                class="field-control currency-control"
+                [class.invalid]="fieldInvalid('comparePrice') || !!priceError()"
+              >
+                <span>$</span
+                ><input
+                  id="discount-price"
+                  type="number"
+                  formControlName="comparePrice"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              @if (priceError()) {
+                <small class="field-error">{{ priceError() }}</small>
+              } @else if (fieldError('comparePrice')) {
+                <small class="field-error">{{ fieldError('comparePrice') }}</small>
+              }
+            </div>
+            <div class="form-field">
+              <label for="tax-class">Tax Class</label>
+              <div class="field-control">
+                <select id="tax-class" formControlName="taxClass">
+                  @for (taxClass of taxClasses; track taxClass.value) {
+                    <option [value]="taxClass.value">{{ taxClass.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="product-status">Product Status</label>
+              <div class="field-control status-control">
+                <span [class]="'status-dot status-' + productForm.controls.status.value"></span
+                ><select id="product-status" formControlName="status">
+                  <option value="draft">Draft</option>
+                  <option value="active">Active</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="form-section media-description-section"
+          [class.section-invalid]="
+            submitted() &&
+            (!!imageError() || fieldInvalid('shortDescription') || fieldInvalid('description'))
+          "
+        >
+          <header class="section-header compact-header">
+            <span class="section-number">{{ variantAttributes().length ? 5 : 4 }}</span>
+            <div>
+              <h2>Media & Product Description</h2>
+            </div>
+          </header>
+
+          <div class="media-description-grid">
+            <div class="media-column">
+              <label class="column-label">Product Images <span>*</span></label>
+              <input
+                #productImages
+                class="hidden-file-input"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                multiple
+                (change)="onImagesSelected($event)"
+              />
+              <button
+                class="media-upload"
+                type="button"
+                [class.invalid]="!!imageError()"
+                (click)="productImages.click()"
+                (dragover)="onImageDragOver($event)"
+                (drop)="onImageDrop($event)"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M16 16l-4-4-4 4M12 12v9"></path>
+                  <path d="M20.4 16.6A5 5 0 0 0 18 7h-1.3A8 8 0 1 0 4 15.3"></path>
+                </svg>
+                <span><strong>Click to upload</strong> or drag and drop</span
+                ><small>PNG, JPG, or WEBP up to 5MB each</small>
+              </button>
+              @if (images().length) {
+                <div class="media-previews">
+                  @for (image of images(); track image; let index = $index) {
+                    <figure>
+                      <img
+                        [src]="image"
+                        [alt]="index === 0 ? 'Primary product preview' : 'Product preview'"
+                      />
+                      <figcaption>
+                        {{ index === 0 ? 'Primary' : 'Image ' + (index + 1) }}
+                      </figcaption>
+                      <button
+                        type="button"
+                        [attr.aria-label]="'Remove image ' + (index + 1)"
+                        (click)="removeImage(index)"
+                      >
+                        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                      </button>
+                    </figure>
+                  }
+                </div>
+              }
+              @if (imageError()) {
+                <small class="field-error media-error">{{ imageError() }}</small>
+              }
+            </div>
+
+            <div class="form-field short-description-field">
+              <label for="short-description">Short Description</label>
+              <div
+                class="field-control short-description-control"
+                [class.invalid]="fieldInvalid('shortDescription')"
+              >
+                <input id="short-description" type="text" formControlName="shortDescription" />
+                <span
+                  >{{ wordCount(productForm.controls.shortDescription.value) }} / 100 words</span
+                >
+              </div>
+              @if (fieldError('shortDescription')) {
+                <small class="field-error">{{ fieldError('shortDescription') }}</small>
+              }
+            </div>
+          </div>
+
+          <div class="form-field long-description-field">
+            <label>Long Description</label>
+            <div class="rich-editor" [class.invalid]="fieldInvalid('description')">
+              <div class="editor-toolbar" aria-label="Description formatting">
+                <button
+                  type="button"
+                  title="Bold"
+                  (mousedown)="$event.preventDefault()"
+                  (click)="formatDescription('bold')"
+                >
+                  <strong>B</strong>
+                </button>
+                <button
+                  type="button"
+                  title="Italic"
+                  (mousedown)="$event.preventDefault()"
+                  (click)="formatDescription('italic')"
+                >
+                  <em>I</em>
+                </button>
+                <button
+                  type="button"
+                  title="Underline"
+                  (mousedown)="$event.preventDefault()"
+                  (click)="formatDescription('underline')"
+                >
+                  <u>U</u>
+                </button>
+                <button
+                  type="button"
+                  title="Bulleted list"
+                  (mousedown)="$event.preventDefault()"
+                  (click)="formatDescription('insertUnorderedList')"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path d="M8 6h13M8 12h13M8 18h13"></path>
+                    <circle cx="3" cy="6" r="1"></circle>
+                    <circle cx="3" cy="12" r="1"></circle>
+                    <circle cx="3" cy="18" r="1"></circle>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  title="Numbered list"
+                  (mousedown)="$event.preventDefault()"
+                  (click)="formatDescription('insertOrderedList')"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path d="M9 6h12M9 12h12M9 18h12M3 5h1v3M3 11h2l-2 3h2M3 17h2v3H3"></path>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  title="Add link"
+                  (mousedown)="$event.preventDefault()"
+                  (click)="addDescriptionLink()"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.1 1.1M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+              <div
+                #descriptionEditor
+                class="editor-content"
+                contenteditable="true"
+                dir="ltr"
+                role="textbox"
+                aria-multiline="true"
+                [innerHTML]="editingProduct?.description ?? ''"
+                (input)="onDescriptionInput($event)"
+              ></div>
+            </div>
+            @if (fieldError('description')) {
+              <small class="field-error">{{ fieldError('description') }}</small>
+            }
+          </div>
+        </section>
+
+      </main>
+
+      <aside class="preview-column">
+        <section class="side-panel flow-panel">
+          <h2>Recommended Flow</h2>
+          <ol>
+            <li class="complete"><span>1</span>Add basic product details</li>
+            <li class="complete"><span>2</span>Enter product specifications</li>
+            @if (variantAttributes().length) {
+              <li class="complete"><span>3</span>Generate product variants</li>
+            }
+            <li class="complete">
+              <span>{{ variantAttributes().length ? 4 : 3 }}</span
+              >Set pricing
+            </li>
+            <li class="complete">
+              <span>{{ variantAttributes().length ? 5 : 4 }}</span
+              >Add media & descriptions
+            </li>
+            <li>
+              <span>{{ variantAttributes().length ? 6 : 5 }}</span
+              >Create product
+            </li>
+          </ol>
+        </section>
+
+        <section class="side-panel product-preview">
+          <h2>Product Preview</h2>
+          <div class="preview-media">
+            @if (images()[0]) {
+              <img [src]="images()[0]" alt="Product preview" />
+            } @else {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                <circle cx="9" cy="10" r="2"></circle>
+                <path d="m3 17 5-5 4 4 3-3 6 6"></path>
+              </svg>
+            }
+          </div>
+          <div class="preview-title">
+            <strong>{{ productForm.controls.name.value || 'Product Name' }}</strong
+            ><span [class]="'preview-status ' + productForm.controls.status.value">{{
+              productForm.controls.status.value | titlecase
+            }}</span>
+          </div>
+          <strong class="preview-price">{{
+            formatCurrency(productForm.controls.price.value)
+          }}</strong>
+          <dl>
+            <div>
+              <dt>Price</dt>
+              <dd>
+                {{
+                  productForm.controls.comparePrice.value > 0
+                    ? formatCurrency(productForm.controls.comparePrice.value)
+                    : 'Not set'
+                }}
+              </dd>
+            </div>
+            <div>
+              <dt>Category</dt>
+              <dd>{{ productForm.controls.category.value || 'Not selected' }}</dd>
+            </div>
+            <div>
+              <dt>Brand</dt>
+              <dd>{{ productForm.controls.brand.value || 'Not selected' }}</dd>
+            </div>
+            <div>
+              <dt>SKU</dt>
+              <dd>{{ productForm.controls.sku.value || '-' }}</dd>
+            </div>
+          </dl>
+          @if (productForm.controls.barcode.value) {
+            <div class="barcode-preview" aria-label="Generated product barcode">
+              <app-barcode-display
+                [value]="productForm.controls.barcode.value"
+                size="medium"
+              ></app-barcode-display>
+            </div>
+          }
+        </section>
+
+        <section class="side-panel specification-summary">
+          <h2>Specifications</h2>
+          @if (specificationAttributes().length) {
+            <dl>
+              @for (attribute of specificationAttributes(); track attribute.id) {
+                <div>
+                  <dt>{{ attribute.label }}</dt>
+                  <dd>{{ attributePreview(attribute) }}</dd>
+                </div>
+              }
+            </dl>
+          }
+        </section>
+      </aside>
+    </div>
+
+    <footer class="form-actions">
+      <a class="cancel-button" routerLink="/store-admin/products">Cancel</a>
+      <button
+        class="draft-button"
+        type="button"
+        [disabled]="isSaving() || isProcessingMedia()"
+        (click)="saveAsDraft()"
+      >
+        Save as Draft
+      </button>
+      <button
+        class="create-button"
+        type="button"
+        [disabled]="isSaving() || isProcessingMedia()"
+        (click)="createProduct()"
+      >
+        <span>{{ isSaving() ? 'Saving...' : isEditMode ? 'Save Product' : 'Create Product' }}</span
+        ><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg>
+      </button>
+    </footer>
+  </form>
+</div>

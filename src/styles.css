@@ -1,3 +1,43 @@
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/poppins-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/poppins-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/poppins-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/poppins-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/poppins-800.woff2') format('woff2');
+}
+
 /* ============================================================
    GLOBAL STYLES — DigiShop Admin Design System
    ============================================================ */
@@ -5,19 +45,26 @@
 
 /* ── CSS Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+html { font-size: 18px; -webkit-font-smoothing: antialiased; }
 body {
   min-width: 0;
   min-height: 100%;
   overflow-x: hidden;
   background: var(--clr-bg);
-  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 16px;
 }
 a { text-decoration: none; color: inherit; }
 button { border: none; cursor: pointer; background: none; font-family: inherit; }
 input, select, textarea { font-family: inherit; }
 img { max-width: 100%; display: block; }
 ul, ol { list-style: none; }
+
+/* Keep readable interface text consistent across component-scoped styles. */
+:where(p, a, label, li, td, th, dt, dd, small),
+:where(button, input, select, textarea, [contenteditable='true']) {
+  font-size: 16px !important;
+}
 
 html, body, app-root {
   width: 100%;
@@ -33,6 +80,9 @@ app-root {
 
 /* ── Admin Theme Tokens ── */
 :root {
+  --form-control-height: 44px;
+  --form-label-gap: 8px;
+
   /* Brand */
   --clr-primary:       #7C3AED;
   --clr-primary-dark:  #6D28D9;
@@ -97,6 +147,162 @@ app-root {
   --tr-fast: 0.15s var(--ease);
   --tr-base: 0.25s var(--ease);
   --tr-slow: 0.35s var(--ease);
+}
+
+/* ============================================================
+   SHARED FORM GEOMETRY
+   Keeps titles, required markers, and controls aligned even when
+   a component uses a wrapping label instead of a separate label.
+   ============================================================ */
+
+:where(
+  .form-field > label,
+  .media-field > label,
+  .field-group > label,
+  .form-row > .form-label
+) {
+  display: inline-flex !important;
+  width: max-content;
+  max-width: 100%;
+  min-height: 22px;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+:where(form, .form-grid, .limit-editor, .editor-fields, .operation-fields, .adjustment-grid, .report-filters, .stacked-fields)
+  label:has(> input:not([type='checkbox']):not([type='radio']):not([type='file']), > select, > textarea, > .control, > .field-control, > .phone-control, > .plain-control, > .input-suffix) {
+  display: block !important;
+  min-width: 0;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+:where(form, .form-grid, .limit-editor, .editor-fields, .operation-fields, .adjustment-grid, .report-filters, .stacked-fields)
+  label:has(> input:not([type='checkbox']):not([type='radio']):not([type='file']), > select, > textarea, > .control, > .field-control, > .phone-control, > .plain-control, > .input-suffix)
+  > :where(input, select, textarea, .control, .field-control, .phone-control, .plain-control, .input-suffix) {
+  display: flex;
+  width: 100%;
+  margin-top: var(--form-label-gap) !important;
+  white-space: normal;
+}
+
+.required-marker,
+label > .required-marker {
+  display: inline !important;
+  margin: 0 !important;
+  color: var(--clr-danger, #d92d20) !important;
+  font: inherit;
+  line-height: inherit;
+}
+
+:where(form, .editor-fields, .operation-fields, .adjustment-grid, .report-filters, .stacked-fields)
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.otp-input), select) {
+  min-height: var(--form-control-height);
+}
+
+:where(form, .editor-fields, .operation-fields, .adjustment-grid, .report-filters, .stacked-fields)
+  :where(.control, .field-control, .phone-control, .status-control, .plain-control, .input-suffix) {
+  min-height: var(--form-control-height);
+}
+
+:where(.information-grid, .branding-grid, .field-grid, .pricing-grid, .form-grid, .editor-fields, .operation-fields, .adjustment-grid, .report-filters) {
+  align-items: start;
+}
+
+/* Shared dropdown, date, and time control treatment. */
+:where(input, select, textarea, option) {
+  font-weight: 400 !important;
+}
+
+:where(input, select, textarea)::placeholder {
+  color: var(--clr-text-muted);
+  font-weight: 400;
+  opacity: 1;
+}
+
+select {
+  appearance: none;
+  padding-right: 42px !important;
+  color: var(--clr-text-primary);
+  background-color: var(--clr-surface);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--clr-primary) 50%),
+    linear-gradient(135deg, var(--clr-primary) 50%, transparent 50%);
+  background-position:
+    calc(100% - 17px) 50%,
+    calc(100% - 12px) 50%;
+  background-repeat: no-repeat;
+  background-size: 5px 5px, 5px 5px;
+  cursor: pointer;
+  transition:
+    border-color var(--tr-fast),
+    box-shadow var(--tr-fast),
+    background-color var(--tr-fast);
+}
+
+select:hover:not(:disabled) {
+  border-color: rgba(124, 58, 237, .5) !important;
+  background-color: #FDFCFF;
+}
+
+select:focus-visible {
+  border-color: var(--clr-primary) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, .12) !important;
+}
+
+select:disabled {
+  color: var(--clr-text-muted);
+  background-color: #F8FAFC;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #98A2B3 50%),
+    linear-gradient(135deg, #98A2B3 50%, transparent 50%);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+select option {
+  color: var(--clr-text-primary);
+  background: var(--clr-surface);
+}
+
+:where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month']) {
+  color: var(--clr-text-primary);
+  color-scheme: light;
+  background-color: var(--clr-surface);
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition:
+    border-color var(--tr-fast),
+    box-shadow var(--tr-fast),
+    background-color var(--tr-fast);
+}
+
+:where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month']):hover:not(:disabled) {
+  border-color: rgba(124, 58, 237, .5) !important;
+  background-color: #FDFCFF;
+}
+
+:where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month']):focus-visible {
+  border-color: var(--clr-primary) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, .12) !important;
+}
+
+:where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month'])::-webkit-calendar-picker-indicator {
+  width: 18px;
+  height: 18px;
+  padding: 4px;
+  border-radius: 5px;
+  cursor: pointer;
+  filter: invert(31%) sepia(90%) saturate(2635%) hue-rotate(251deg) brightness(91%) contrast(91%);
+  opacity: .9;
+}
+
+:where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month'])::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(124, 58, 237, .1);
 }
 
 /* ── Scrollbar ── */

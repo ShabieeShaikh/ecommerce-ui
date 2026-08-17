@@ -1,0 +1,1398 @@
+<section class="inventory-page" [class.overview-active]="activeSection() === 'overview'">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">Inventory Management</span>
+      <h1>{{ sectionMeta().title }}</h1>
+      <p>{{ sectionMeta().description }} Data is scoped to {{ selectedStore().name }}.</p>
+    </div>
+    <div class="header-actions">
+      @if (activeSection() !== 'reports') {
+        <button class="secondary-button" type="button" (click)="navigate('reports')">
+          <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Reports
+        </button>
+      }
+      @if (activeSection() === 'overview') {
+        <button class="primary-button" type="button" (click)="navigate('add')">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>Add Stock
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (actionError()) {
+    <div class="feedback error" role="alert">{{ actionError() }}</div>
+  }
+  @if (actionSuccess()) {
+    <div class="feedback success" role="status">{{ actionSuccess() }}</div>
+  }
+
+  @if (activeSection() === 'overview') {
+    <div class="metric-grid">
+      @for (metric of dashboard().metrics; track metric.label) {
+        <article [class]="'metric-card tone-' + metric.tone">
+          <span class="metric-icon">
+            @switch (metric.icon) {
+              @case ('limit') {
+                <svg viewBox="0 0 24 24"><path d="M5 7h14v14H5zM8 7V4h3v3M16 7V4h3v3"></path></svg>
+              }
+              @case ('stock') {
+                <svg viewBox="0 0 24 24">
+                  <path d="m12 2 9 5-9 5-9-5 9-5ZM3 7v10l9 5 9-5V7M12 12v10"></path>
+                </svg>
+              }
+              @case ('capacity') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 8h14v13H5zM8 8V5a4 4 0 0 1 8 0v3M9 14l2 2 4-5"></path>
+                </svg>
+              }
+              @case ('warning') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 3 2 21h20L12 3ZM12 9v5M12 17h.01"></path>
+                </svg>
+              }
+              @case ('out') {
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="m9 9 6 6M15 9l-6 6"></path>
+                </svg>
+              }
+              @case ('unallocated') {
+                <svg viewBox="0 0 24 24">
+                  <path d="m12 3 8 4-8 4-8-4 8-4ZM4 7v10l8 4 8-4V7M12 11v10"></path>
+                </svg>
+              }
+            }
+          </span>
+          <div>
+            <span>{{ metric.label }}</span
+            ><strong>{{ metric.value.toLocaleString() }}</strong
+            ><small>{{ metric.unit }}</small>
+          </div>
+          @if (metric.progress !== undefined) {
+            <span class="progress"><i [style.width.%]="metric.progress"></i></span>
+          }
+          <p>{{ metric.helper }}</p>
+          @if (metric.icon === 'limit') {
+            <button type="button" (click)="startLimitEdit()">Configure Limit <span>→</span></button>
+          }
+        </article>
+      }
+    </div>
+
+    @if (limitEditing()) {
+      <section class="surface limit-editor">
+        <div>
+          <h2>Inventory Limit</h2>
+          <p>The limit cannot be lower than current physical stock.</p>
+        </div>
+        <label
+          >Maximum Units<input
+            type="number"
+            min="1"
+            [value]="limitDraft()"
+            (input)="setLimit($event)"
+        /></label>
+        <button class="secondary-button" type="button" (click)="limitEditing.set(false)">
+          Cancel
+        </button>
+        <button class="primary-button" type="button" (click)="saveLimit()">Save Limit</button>
+      </section>
+    }
+
+    <div class="overview-grid">
+      <section class="surface distribution-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Stock by Location</h2>
+            <p>Physical units across branches, warehouses, and the unallocated pool.</p>
+          </div>
+        </div>
+        @if (dashboard().locationShares.length) {
+          <div class="distribution-body">
+            <div class="donut" [style.background]="donutBackground()">
+              <span
+                ><strong>{{ dashboard().totalUnits.toLocaleString() }}</strong
+                ><small>Total Units</small></span
+              >
+            </div>
+            <div class="legend">
+              @for (share of dashboard().locationShares; track share.location) {
+                <div>
+                  <i [style.background]="share.color"></i><span>{{ share.location }}</span
+                  ><strong
+                    >{{ share.units.toLocaleString() }}
+                    <small>{{ share.percentage }}%</small></strong
+                  >
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="empty-state compact">
+            <h3>No inventory yet</h3>
+            <p>Add stock to start tracking location distribution.</p>
+          </div>
+        }
+      </section>
+
+      <section class="surface status-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Inventory Status</h2>
+            <p>Location-level availability after reservations.</p>
+          </div>
+        </div>
+        <div class="status-list">
+          @for (status of dashboard().statuses; track status.label) {
+            <div>
+              <span>{{ status.label }}</span
+              ><span class="status-track"
+                ><i [class]="'fill-' + status.tone" [style.width.%]="status.percentage"></i></span
+              ><strong>{{ status.count }} records</strong>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="surface quick-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Quick Actions</h2>
+            <p>Common inventory workflows.</p>
+          </div>
+        </div>
+        <div class="quick-actions">
+          <button type="button" (click)="navigate('add')">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg
+            ><span><strong>Add Stock</strong><small>Receive into store or warehouse</small></span>
+          </button>
+          <button type="button" (click)="navigate('allocate')">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7h6v5H4zM14 7h6v5h-6zM9 17h6M7 12v5h10v-5"></path></svg
+            ><span><strong>Allocate Stock</strong><small>Distribute to branches</small></span>
+          </button>
+          <button type="button" (click)="navigate('transfer')">
+            <svg viewBox="0 0 24 24">
+              <path d="M5 7h14M15 3l4 4-4 4M19 17H5M9 13l-4 4 4 4"></path></svg
+            ><span><strong>Stock Transfer</strong><small>Move between locations</small></span>
+          </button>
+          <button type="button" (click)="navigate('adjustment')">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5"></path></svg
+            ><span
+              ><strong>Stock Adjustment</strong
+              ><small>Correct quantities and thresholds</small></span
+            >
+          </button>
+          <button type="button" (click)="navigate('orders')">
+            <svg viewBox="0 0 24 24"><path d="M4 5h2l2 10h9l2-7H7M10 20h.01M17 20h.01"></path></svg
+            ><span
+              ><strong>Order Integration</strong
+              ><small>Reserve and deduct branch stock</small></span
+            >
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <div class="activity-grid">
+      <section class="surface table-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Recent Stock Movements</h2>
+            <p>Latest persisted inventory transactions.</p>
+          </div>
+          <button class="text-button" type="button" (click)="navigate('reports')">
+            View History →
+          </button>
+        </div>
+        @if (dashboard().movements.length) {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Product</th>
+                  <th>Type</th>
+                  <th>Route</th>
+                  <th>Quantity</th>
+                  <th>Reference</th>
+                  <th>User</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (movement of dashboard().movements; track movement.id) {
+                  <tr>
+                    <td>{{ formatDate(movement.occurredAt) }}</td>
+                    <td>
+                      <strong>{{ productName(movement.productId) }}</strong
+                      ><small>{{ productSku(movement.productId) }}</small>
+                    </td>
+                    <td>
+                      <span [class]="'type-badge type-' + movement.type">{{
+                        transactionLabel(movement.type)
+                      }}</span>
+                    </td>
+                    <td>{{ transactionRoute(movement) }}</td>
+                    <td [class.negative]="movement.quantity < 0">
+                      {{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}
+                    </td>
+                    <td>{{ movement.referenceNumber }}</td>
+                    <td>{{ movement.createdBy }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="empty-state compact">
+            <h3>No stock movements</h3>
+            <p>Completed inventory actions will appear here.</p>
+          </div>
+        }
+      </section>
+
+      <section class="surface alerts-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Low Stock Alerts</h2>
+            <p>Products requiring attention by location.</p>
+          </div>
+        </div>
+        @if (dashboard().alerts.length) {
+          <div class="alert-list">
+            @for (alert of dashboard().alerts; track alert.productId + alert.location) {
+              <div class="alert-row">
+                <img [src]="alert.imageUrl" [alt]="alert.product" /><span
+                  ><strong>{{ alert.product }}</strong
+                  ><small>{{ alert.location }}</small></span
+                ><span
+                  ><small>Available</small><strong>{{ alert.available }}</strong></span
+                ><span
+                  ><small>Threshold</small><strong>{{ alert.threshold }}</strong></span
+                ><b [class.out]="alert.status === 'Out of Stock'">{{ alert.status }}</b>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state compact">
+            <h3>No active alerts</h3>
+            <p>All tracked inventory is above its threshold.</p>
+          </div>
+        }
+      </section>
+    </div>
+  }
+
+  @if (activeSection() === 'add') {
+    <div class="operation-layout">
+      <section class="surface operation-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Add Stock to Unallocated Pool</h2>
+            <p>
+              Stock received into a warehouse remains available there until allocated or
+              transferred.
+            </p>
+          </div>
+          <span class="reference-chip">{{ addDraft().referenceNumber }}</span>
+        </div>
+        <div class="form-grid two-columns">
+          <label
+            >Product <span>*</span
+            ><select [value]="addDraft().productId" (change)="setAddField('productId', $event)">
+              <option value="">Select product</option>
+              @for (product of products(); track product.id) {
+                <option [value]="product.id">{{ product.name }} ({{ product.sku }})</option>
+              }
+            </select></label
+          >
+          <label
+            >Destination Location <span>*</span
+            ><select
+              [value]="addDraft().destinationLocationKey"
+              (change)="setAddField('destinationLocationKey', $event)"
+            >
+              @for (location of addDestinations(); track location.key) {
+                <option [value]="location.key">{{ location.name }} ({{ location.code }})</option>
+              }
+            </select></label
+          >
+          <label
+            >Supplier
+            @if (selectedAddDestination()?.type === 'warehouse') {
+              <span>*</span>
+            }
+            <input
+              type="text"
+              placeholder="Supplier or source"
+              [value]="addDraft().supplierName"
+              (input)="setAddField('supplierName', $event)"
+          /></label>
+          <label
+            >Reference Number <span>*</span
+            ><input
+              type="text"
+              [value]="addDraft().referenceNumber"
+              (input)="setAddField('referenceNumber', $event)"
+          /></label>
+          <label
+            >Receipt Date <span>*</span
+            ><input
+              type="date"
+              [value]="addDraft().occurredAt"
+              (change)="setAddField('occurredAt', $event)"
+          /></label>
+        </div>
+        @if (addDraft().productId) {
+          <div class="receipt-lines-heading">
+            <div>
+              <h3>
+                {{ hasVariants(addDraft().productId) ? 'Select Variants' : 'Stock Quantity' }}
+              </h3>
+              <p>
+                {{
+                  hasVariants(addDraft().productId)
+                    ? 'Choose variants and enter the incoming quantity for each one.'
+                    : 'Enter the incoming quantity for this product.'
+                }}
+              </p>
+            </div>
+            @if (hasVariants(addDraft().productId)) {
+              <div class="receipt-line-actions">
+                <button type="button" (click)="selectAllAddLines()">Select All</button>
+                <button type="button" (click)="clearAddLines()">Clear</button>
+              </div>
+            }
+          </div>
+          <div class="table-wrap receipt-lines-table">
+            <table>
+              <thead>
+                <tr>
+                  <th class="selection-column">Add</th>
+                  <th>Variant</th>
+                  <th>SKU</th>
+                  <th>Quantity <span>*</span></th>
+                  <th>Unit Cost</th>
+                  <th>Line Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (line of addLines(); track line.variantId ?? 'simple'; let index = $index) {
+                  <tr [class.unselected-line]="!line.selected">
+                    <td class="selection-column">
+                      <input
+                        class="row-checkbox"
+                        type="checkbox"
+                        [checked]="line.selected"
+                        [disabled]="!hasVariants(addDraft().productId)"
+                        (change)="toggleAddLine(index, $event)"
+                        [attr.aria-label]="
+                          'Include ' + variantLabel(addDraft().productId, line.variantId)
+                        "
+                      />
+                    </td>
+                    <td>
+                      <strong>{{ variantLabel(addDraft().productId, line.variantId) }}</strong>
+                    </td>
+                    <td>{{ itemSku(addDraft().productId, line.variantId) }}</td>
+                    <td>
+                      <div class="input-suffix receipt-number-input">
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          [disabled]="!line.selected"
+                          [value]="line.quantity"
+                          (input)="setAddLineField(index, 'quantity', $event)"
+                        /><span>Units</span>
+                      </div>
+                    </td>
+                    <td>
+                      <input
+                        class="receipt-cost-input"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        [disabled]="!line.selected"
+                        [value]="line.unitCost"
+                        (input)="setAddLineField(index, 'unitCost', $event)"
+                      />
+                    </td>
+                    <td>
+                      <strong>{{ (line.quantity * line.unitCost).toLocaleString() }}</strong>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6" class="empty-cell">
+                      No active variants are available for this product.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="receipt-totals">
+            <span
+              >Selected <strong>{{ selectedAddLines().length }}</strong></span
+            >
+            <span
+              >Total Quantity <strong>{{ addTotalQuantity().toLocaleString() }} units</strong></span
+            >
+            <span
+              >Total Cost <strong>{{ addTotalCost().toLocaleString() }}</strong></span
+            >
+          </div>
+        }
+        <div class="form-actions">
+          <button class="secondary-button" type="button" (click)="navigate('overview')">
+            Cancel</button
+          ><button class="primary-button" type="button" (click)="submitAddStock()">
+            Add Stock
+          </button>
+        </div>
+      </section>
+      <aside class="surface summary-panel">
+        <h2>Store Inventory Summary</h2>
+        <dl>
+          <div>
+            <dt>Inventory Limit</dt>
+            <dd>{{ dashboard().limit.toLocaleString() }}</dd>
+          </div>
+          <div>
+            <dt>Total Stock</dt>
+            <dd>{{ dashboard().totalUnits.toLocaleString() }}</dd>
+          </div>
+          <div>
+            <dt>Available Capacity</dt>
+            <dd>{{ dashboard().remainingCapacity.toLocaleString() }}</dd>
+          </div>
+          <div>
+            <dt>Selected Variants</dt>
+            <dd>{{ selectedAddLines().length }}</dd>
+          </div>
+          <div>
+            <dt>Incoming Stock</dt>
+            <dd>{{ addTotalQuantity().toLocaleString() }}</dd>
+          </div>
+          <div>
+            <dt>After Addition</dt>
+            <dd [class.limit-exceeded]="addCapacityExceeded()">
+              {{ (dashboard().totalUnits + addTotalQuantity()).toLocaleString() }}
+            </dd>
+          </div>
+        </dl>
+        <div class="capacity-track">
+          <i
+            [style.width.%]="
+              dashboard().limit
+                ? ((dashboard().totalUnits + addTotalQuantity()) / dashboard().limit) * 100
+                : 0
+            "
+          ></i>
+        </div>
+        @if (addCapacityExceeded()) {
+          <p class="capacity-error">Incoming stock exceeds the available store capacity.</p>
+        }
+      </aside>
+    </div>
+  }
+
+  @if (activeSection() === 'allocate') {
+    <section class="surface operation-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Allocate Stock to Branches</h2>
+          <p>Distribute available store-level stock across one or more active branches.</p>
+        </div>
+        <span class="availability-chip"
+          >Available: {{ allocationAvailable().toLocaleString() }} units</span
+        >
+      </div>
+      @if (!branches().length) {
+        <div class="empty-state">
+          <h3>No active branches</h3>
+          <p>Create an active branch before allocating inventory.</p>
+        </div>
+      } @else {
+        <div class="form-grid three-columns allocation-head">
+          <label
+            >Product <span>*</span
+            ><select [value]="allocationProductId()" (change)="setAllocationProduct($event)">
+              @for (product of products(); track product.id) {
+                <option [value]="product.id">{{ product.name }} ({{ product.sku }})</option>
+              }
+            </select></label
+          >
+          @if (hasVariants(allocationProductId())) {
+            <label
+              >Variant <span>*</span
+              ><select
+                [value]="allocationVariantId() ?? ''"
+                (change)="setAllocationVariant($event)"
+              >
+                <option value="">Select variant</option>
+                @for (variant of variantsFor(allocationProductId()); track variant.id) {
+                  <option [value]="variant.id">
+                    {{ variantLabel(allocationProductId(), variant.id + '') }} ({{ variant.sku }})
+                  </option>
+                }
+              </select></label
+            >
+          }
+          <label
+            >Source Location <span>*</span
+            ><select [value]="allocationSourceKey()" (change)="setAllocationSource($event)">
+              @for (location of allocationSources(); track location.key) {
+                <option [value]="location.key">{{ location.name }}</option>
+              }
+            </select></label
+          >
+          <label
+            >Reference Number <span>*</span
+            ><input
+              type="text"
+              [value]="allocationReference()"
+              (input)="setAllocationReference($event)" /></label
+          ><label
+            >Allocation Date <span>*</span
+            ><input type="date" [value]="allocationDate()" (change)="setAllocationDate($event)"
+          /></label>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Branch</th>
+                <th>Location</th>
+                <th>Current Stock</th>
+                <th>Reserved</th>
+                <th>Allocate Quantity</th>
+                <th>After Allocation</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of allocationRows(); track row.branch.key) {
+                <tr>
+                  <td>
+                    <strong>{{ row.branch.name }}</strong
+                    ><small>{{ row.branch.code }}</small>
+                  </td>
+                  <td>{{ row.branch.code }}</td>
+                  <td>{{ row.balance.quantity.toLocaleString() }}</td>
+                  <td>{{ row.balance.reservedQuantity.toLocaleString() }}</td>
+                  <td>
+                    <input
+                      class="table-input"
+                      type="number"
+                      min="0"
+                      step="1"
+                      [value]="row.quantity"
+                      (input)="setAllocationQuantity(row.branch.entityId!, $event)"
+                    />
+                  </td>
+                  <td>
+                    <strong>{{ row.after.toLocaleString() }}</strong>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="allocation-footer">
+          <span
+            >Total Allocated: <strong>{{ allocationTotal().toLocaleString() }}</strong></span
+          ><span
+            >Remaining Unallocated:
+            <strong [class.negative]="allocationTotal() > allocationAvailable()">{{
+              (allocationAvailable() - allocationTotal()).toLocaleString()
+            }}</strong></span
+          ><button class="primary-button" type="button" (click)="submitAllocation()">
+            Allocate Stock
+          </button>
+        </div>
+      }
+    </section>
+  }
+
+  @if (activeSection() === 'transfer') {
+    <div class="operation-layout">
+      <section class="surface operation-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Stock Transfer</h2>
+            <p>Move available stock without changing the store-wide inventory total.</p>
+          </div>
+          <span class="reference-chip">{{ transferDraft().referenceNumber }}</span>
+        </div>
+        <div class="form-grid two-columns">
+          <label
+            >Product <span>*</span
+            ><select
+              [value]="transferDraft().productId"
+              (change)="setTransferField('productId', $event)"
+            >
+              @for (product of products(); track product.id) {
+                <option [value]="product.id">{{ product.name }} ({{ product.sku }})</option>
+              }
+            </select></label
+          >
+          @if (hasVariants(transferDraft().productId)) {
+            <label
+              >Variant <span>*</span
+              ><select
+                [value]="transferDraft().variantId ?? ''"
+                (change)="setTransferField('variantId', $event)"
+              >
+                <option value="">Select variant</option>
+                @for (variant of variantsFor(transferDraft().productId); track variant.id) {
+                  <option [value]="variant.id">
+                    {{ variantLabel(transferDraft().productId, variant.id + '') }} ({{
+                      variant.sku
+                    }})
+                  </option>
+                }
+              </select></label
+            >
+          }
+          <label
+            >Transfer Date <span>*</span
+            ><input
+              type="date"
+              [value]="transferDraft().occurredAt"
+              (change)="setTransferField('occurredAt', $event)"
+          /></label>
+          <label
+            >From Location <span>*</span
+            ><select
+              [value]="transferDraft().sourceLocationKey"
+              (change)="setTransferField('sourceLocationKey', $event)"
+            >
+              @for (location of locations(); track location.key) {
+                <option [value]="location.key">{{ location.name }} ({{ location.code }})</option>
+              }
+            </select></label
+          >
+          @if (hasVariants(adjustmentDraft().productId)) {
+            <label
+              >Variant <span>*</span
+              ><select
+                [value]="adjustmentDraft().variantId ?? ''"
+                (change)="setAdjustmentField('variantId', $event)"
+              >
+                <option value="">Select variant</option>
+                @for (variant of variantsFor(adjustmentDraft().productId); track variant.id) {
+                  <option [value]="variant.id">
+                    {{ variantLabel(adjustmentDraft().productId, variant.id + '') }} ({{
+                      variant.sku
+                    }})
+                  </option>
+                }
+              </select></label
+            >
+          }
+          <label
+            >To Location <span>*</span
+            ><select
+              [value]="transferDraft().destinationLocationKey"
+              (change)="setTransferField('destinationLocationKey', $event)"
+            >
+              <option value="">Select destination</option>
+              @for (location of transferDestinations(); track location.key) {
+                <option [value]="location.key">{{ location.name }} ({{ location.code }})</option>
+              }
+            </select></label
+          >
+          <label
+            >Transfer Quantity <span>*</span>
+            <div class="input-suffix">
+              <input
+                type="number"
+                min="1"
+                step="1"
+                [max]="transferSourceBalance().availableQuantity"
+                [value]="transferDraft().quantity"
+                (input)="setTransferField('quantity', $event)"
+              /><span>Units</span>
+            </div></label
+          >
+          <label
+            >Reference Number <span>*</span
+            ><input
+              type="text"
+              [value]="transferDraft().referenceNumber"
+              (input)="setTransferField('referenceNumber', $event)"
+          /></label>
+        </div>
+        <div class="form-actions">
+          <button class="secondary-button" type="button" (click)="navigate('overview')">
+            Cancel</button
+          ><button class="primary-button" type="button" (click)="submitTransfer()">
+            Confirm Transfer
+          </button>
+        </div>
+      </section>
+      <aside class="surface summary-panel transfer-summary">
+        <h2>Transfer Summary</h2>
+        <div class="route-visual">
+          <span
+            ><svg viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13M2 21h20"></path></svg
+            ><strong>{{ locationName(transferDraft().sourceLocationKey) }}</strong></span
+          ><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"></path></svg
+          ><span
+            ><svg viewBox="0 0 24 24"><path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10"></path></svg
+            ><strong>{{ locationName(transferDraft().destinationLocationKey) }}</strong></span
+          >
+        </div>
+        <dl>
+          <div>
+            <dt>Available Source Stock</dt>
+            <dd>{{ transferSourceBalance().availableQuantity }}</dd>
+          </div>
+          <div>
+            <dt>Transfer Quantity</dt>
+            <dd>{{ transferDraft().quantity }}</dd>
+          </div>
+          <div>
+            <dt>Remaining Source Stock</dt>
+            <dd>{{ transferSourceBalance().availableQuantity - transferDraft().quantity }}</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  }
+
+  @if (activeSection() === 'adjustment') {
+    <div class="adjustment-layout">
+      <section class="surface operation-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Stock Adjustment</h2>
+            <p>Record the reason for every manual correction.</p>
+          </div>
+          <span class="reference-chip">{{ adjustmentDraft().referenceNumber }}</span>
+        </div>
+        <div class="form-grid four-columns">
+          <label
+            >Product <span>*</span
+            ><select
+              [value]="adjustmentDraft().productId"
+              (change)="setAdjustmentField('productId', $event)"
+            >
+              @for (product of products(); track product.id) {
+                <option [value]="product.id">{{ product.name }}</option>
+              }
+            </select></label
+          >
+          <label
+            >Location <span>*</span
+            ><select
+              [value]="adjustmentDraft().locationKey"
+              (change)="setAdjustmentField('locationKey', $event)"
+            >
+              @for (location of locations(); track location.key) {
+                <option [value]="location.key">{{ location.name }}</option>
+              }
+            </select></label
+          >
+          <label
+            >Adjustment Type <span>*</span
+            ><select
+              [value]="adjustmentDraft().adjustmentType"
+              (change)="setAdjustmentField('adjustmentType', $event)"
+            >
+              <option value="increase">Increase Stock</option>
+              <option value="decrease">Decrease Stock</option>
+            </select></label
+          >
+          <label
+            >Quantity <span>*</span
+            ><input
+              type="number"
+              min="0"
+              step="1"
+              [value]="adjustmentDraft().quantity"
+              (input)="setAdjustmentField('quantity', $event)"
+          /></label>
+          <label
+            >Reason <span>*</span
+            ><select
+              [value]="adjustmentDraft().reason"
+              (change)="setAdjustmentField('reason', $event)"
+            >
+              <option value="">Select reason</option>
+              <option value="Damaged Stock">Damaged Stock</option>
+              <option value="Lost Stock">Lost Stock</option>
+              <option value="Expired Stock">Expired Stock</option>
+              <option value="Physical Count Correction">Physical Count Correction</option>
+              <option value="Return">Return</option>
+              <option value="Administrative Correction">Administrative Correction</option>
+            </select></label
+          >
+          <label
+            >Adjustment Date <span>*</span
+            ><input
+              type="date"
+              [value]="adjustmentDraft().occurredAt"
+              (change)="setAdjustmentField('occurredAt', $event)"
+          /></label>
+          <label
+            >Reference <span>*</span
+            ><input
+              type="text"
+              [value]="adjustmentDraft().referenceNumber"
+              (input)="setAdjustmentField('referenceNumber', $event)"
+          /></label>
+          <label class="span-two"
+            >Note<textarea
+              rows="3"
+              placeholder="Describe the adjustment"
+              [value]="adjustmentDraft().note"
+              (input)="setAdjustmentField('note', $event)"
+            ></textarea>
+          </label>
+        </div>
+        <div class="stock-readouts">
+          <div>
+            <span>Current Stock</span><strong>{{ adjustmentBalance().quantity }}</strong>
+          </div>
+          <div>
+            <span>Reserved</span><strong>{{ adjustmentBalance().reservedQuantity }}</strong>
+          </div>
+          <div [class.invalid]="adjustmentAfter() < adjustmentBalance().reservedQuantity">
+            <span>New Stock</span><strong>{{ adjustmentAfter() }}</strong>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="secondary-button" type="button" (click)="navigate('overview')">
+            Cancel</button
+          ><button class="primary-button" type="button" (click)="submitAdjustment()">
+            Submit Adjustment
+          </button>
+        </div>
+      </section>
+      <aside class="surface threshold-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Threshold Settings</h2>
+            <p>Set alerts per product and location.</p>
+          </div>
+        </div>
+        <div class="stacked-fields">
+          <label
+            >Product<select
+              [value]="thresholdDraft().productId"
+              (change)="setThresholdField('productId', $event)"
+            >
+              @for (product of products(); track product.id) {
+                <option [value]="product.id">{{ product.name }}</option>
+              }
+            </select></label
+          >
+          @if (hasVariants(thresholdDraft().productId)) {
+            <label
+              >Variant<select
+                [value]="thresholdDraft().variantId ?? ''"
+                (change)="setThresholdField('variantId', $event)"
+              >
+                <option value="">Select variant</option>
+                @for (variant of variantsFor(thresholdDraft().productId); track variant.id) {
+                  <option [value]="variant.id">
+                    {{ variantLabel(thresholdDraft().productId, variant.id + '') }}
+                  </option>
+                }
+              </select></label
+            >
+          }
+          <label
+            >Location<select
+              [value]="thresholdDraft().locationKey"
+              (change)="setThresholdField('locationKey', $event)"
+            >
+              @for (location of locations(); track location.key) {
+                <option [value]="location.key">{{ location.name }}</option>
+              }
+            </select></label
+          >
+          @if (hasVariants(orderDraft().productId)) {
+            <label
+              >Variant <span>*</span
+              ><select
+                [value]="orderDraft().variantId ?? ''"
+                (change)="setOrderField('variantId', $event)"
+              >
+                <option value="">Select variant</option>
+                @for (variant of variantsFor(orderDraft().productId); track variant.id) {
+                  <option [value]="variant.id">
+                    {{ variantLabel(orderDraft().productId, variant.id + '') }} ({{ variant.sku }})
+                  </option>
+                }
+              </select></label
+            >
+          }
+          <label
+            >Low Stock Threshold<input
+              type="number"
+              min="0"
+              [value]="thresholdDraft().threshold"
+              (input)="setThresholdField('threshold', $event)" /></label
+          ><button class="primary-button" type="button" (click)="saveThreshold()">
+            Save Threshold
+          </button>
+        </div>
+      </aside>
+    </div>
+  }
+
+  @if (activeSection() === 'reports') {
+    <section class="surface reports-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Inventory Reports</h2>
+          <p>Reports use current balances and the persisted transaction ledger.</p>
+        </div>
+        <button class="secondary-button" type="button" (click)="exportReport()">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"></path></svg>Export CSV
+        </button>
+      </div>
+      <div class="report-types">
+        @for (type of reportTypes; track type.id) {
+          <button
+            type="button"
+            [class.active]="reportType() === type.id"
+            (click)="setReportType(type.id)"
+          >
+            {{ type.label }}
+          </button>
+        }
+      </div>
+      <div class="report-filters">
+        <label
+          >Location<select [value]="reportLocationKey()" (change)="setReportLocation($event)">
+            <option value="all">All Locations</option>
+            @for (location of locations(); track location.key) {
+              <option [value]="location.key">{{ location.name }}</option>
+            }
+          </select></label
+        ><label
+          >From<input type="date" [value]="reportFrom()" (change)="setReportFrom($event)" /></label
+        ><label>To<input type="date" [value]="reportTo()" (change)="setReportTo($event)" /></label>
+      </div>
+      @if (reportUsesTransactions()) {
+        @if (filteredTransactions().length) {
+          <div class="table-wrap report-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Reference</th>
+                  <th>Type</th>
+                  <th>Product</th>
+                  <th>Route</th>
+                  <th>Quantity</th>
+                  <th>Reason</th>
+                  <th>User</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (transaction of filteredTransactions(); track transaction.id) {
+                  <tr>
+                    <td>{{ formatDate(transaction.occurredAt) }}</td>
+                    <td>
+                      <strong>{{ transaction.referenceNumber }}</strong>
+                    </td>
+                    <td>
+                      <span [class]="'type-badge type-' + transaction.type">{{
+                        transactionLabel(transaction.type)
+                      }}</span>
+                    </td>
+                    <td>{{ productName(transaction.productId) }}</td>
+                    <td>{{ transactionRoute(transaction) }}</td>
+                    <td>{{ transaction.quantity }}</td>
+                    <td>{{ transaction.reason }}</td>
+                    <td>{{ transaction.createdBy }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <h3>No matching transactions</h3>
+            <p>Adjust the date, location, or report type.</p>
+          </div>
+        }
+      } @else {
+        @if (reportBalances().length) {
+          <div class="table-wrap report-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Variant / SKU</th>
+                  <th>Location</th>
+                  <th>Type</th>
+                  <th>Total</th>
+                  <th>Reserved</th>
+                  <th>Available</th>
+                  <th>Threshold</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (balance of reportBalances(); track balance.id) {
+                  <tr>
+                    <td>
+                      <strong>{{ productName(balance.productId) }}</strong>
+                    </td>
+                    <td>
+                      {{ variantLabel(balance.productId, balance.variantId)
+                      }}<small>{{ itemSku(balance.productId, balance.variantId) }}</small>
+                    </td>
+                    <td>{{ balance.location.name }}</td>
+                    <td>{{ balance.location.type }}</td>
+                    <td>{{ balance.quantity }}</td>
+                    <td>{{ balance.reservedQuantity }}</td>
+                    <td>{{ balance.availableQuantity }}</td>
+                    <td>{{ balance.lowStockThreshold }}</td>
+                    <td>
+                      <span
+                        [class]="
+                          'stock-badge stock-' +
+                          balanceStatus(balance).toLowerCase().replaceAll(' ', '-')
+                        "
+                        >{{ balanceStatus(balance) }}</span
+                      >
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <h3>No matching stock records</h3>
+            <p>There is no inventory for the selected report filters.</p>
+          </div>
+        }
+      }
+    </section>
+  }
+
+  @if (activeSection() === 'warehouse') {
+    <div class="integration-stats">
+      <article>
+        <span>Active Warehouses</span><strong>{{ warehouses().length }}</strong>
+      </article>
+      <article>
+        <span>Warehouse Products</span><strong>{{ warehouseBalances().length }}</strong>
+      </article>
+      <article>
+        <span>Warehouse Units</span><strong>{{ warehouseTotal().toLocaleString() }}</strong>
+      </article>
+      <article>
+        <span>Branch Units</span><strong>{{ branchTotal().toLocaleString() }}</strong>
+      </article>
+    </div>
+    <section class="surface integration-flow">
+      <div class="panel-heading">
+        <div>
+          <h2>Warehouse to Branch Flow</h2>
+          <p>Each stage uses the same product and stock identifiers.</p>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-button" type="button" (click)="openWarehouseManagement()">
+            Warehouse Management</button
+          ><button class="primary-button" type="button" (click)="navigate('transfer')">
+            Stock Transfer
+          </button>
+        </div>
+      </div>
+      <div class="flow-steps">
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M3 7h11v10H3zM14 10h4l3 3v4h-7"></path></svg
+          ><strong>Receive Stock</strong><small>From supplier</small>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M3 21V8l9-5 9 5v13M1 21h22"></path></svg
+          ><strong>Warehouse Stock</strong><small>Stored and available</small>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3 4 7v5c0 5 3 8 8 10 5-2 8-5 8-10V7l-8-4Z"></path></svg
+          ><strong>Quality Check</strong><small>Optional control</small>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24"><path d="m12 3 8 4-8 4-8-4 8-4ZM4 7v10l8 4 8-4V7"></path></svg
+          ><strong>Inventory Pool</strong><small>Ready to distribute</small>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M7 7h13M16 3l4 4-4 4M17 17H4M8 13l-4 4 4 4"></path></svg
+          ><strong>Allocate / Transfer</strong><small>Move to branches</small>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10"></path></svg
+          ><strong>Branch Stock</strong><small>Ready for orders</small>
+        </div>
+      </div>
+    </section>
+    <section class="surface table-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Warehouse Inventory</h2>
+          <p>Live balances from Warehouse Management.</p>
+        </div>
+        <button class="text-button" type="button" (click)="navigate('reports')">
+          View Reports →
+        </button>
+      </div>
+      @if (warehouseBalances().length) {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Warehouse</th>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Total</th>
+                <th>Reserved</th>
+                <th>Available</th>
+                <th>Threshold</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (
+                balance of warehouseBalances();
+                track balance.productId + balance.location.key
+              ) {
+                <tr>
+                  <td>
+                    <strong>{{ balance.location.name }}</strong
+                    ><small>{{ balance.location.code }}</small>
+                  </td>
+                  <td>{{ productName(balance.productId) }}</td>
+                  <td>{{ productSku(balance.productId) }}</td>
+                  <td>{{ balance.quantity }}</td>
+                  <td>{{ balance.reservedQuantity }}</td>
+                  <td>{{ balance.availableQuantity }}</td>
+                  <td>{{ balance.lowStockThreshold }}</td>
+                  <td>
+                    <span
+                      [class]="
+                        'stock-badge stock-' +
+                        balanceStatus(balance).toLowerCase().replaceAll(' ', '-')
+                      "
+                      >{{ balanceStatus(balance) }}</span
+                    >
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <h3>No warehouse stock</h3>
+          <p>Create a warehouse and receive stock from Warehouse Management.</p>
+        </div>
+      }
+    </section>
+  }
+
+  @if (activeSection() === 'orders') {
+    <section class="surface order-flow">
+      <div class="flow-steps">
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M4 5h2l2 10h9l2-7H7"></path></svg
+          ><strong>Order Created</strong>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24">
+            <rect x="5" y="10" width="14" height="11"></rect>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg
+          ><strong>Stock Reserved</strong>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="m8 12 3 3 5-6"></path></svg
+          ><strong>Confirmed</strong>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M3 7h11v10H3zM14 10h4l3 3v4h-7"></path></svg
+          ><strong>Shipped</strong>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"></path></svg
+          ><strong>Stock Deducted</strong>
+        </div>
+        <i>→</i>
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6M4 4v6h6"></path></svg
+          ><strong>Return / Cancel</strong>
+        </div>
+      </div>
+    </section>
+    <div class="order-layout">
+      <section class="surface operation-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Create Inventory Order</h2>
+            <p>Orders reserve available stock from one active branch.</p>
+          </div>
+          <span class="availability-chip">Available: {{ orderAvailable() }}</span>
+        </div>
+        <div class="form-grid two-columns">
+          <label
+            >Customer Name <span>*</span
+            ><input
+              type="text"
+              [value]="orderDraft().customerName"
+              (input)="setOrderField('customerName', $event)" /></label
+          ><label
+            >Order Reference <span>*</span
+            ><input
+              type="text"
+              [value]="orderDraft().referenceNumber"
+              (input)="setOrderField('referenceNumber', $event)" /></label
+          ><label
+            >Branch <span>*</span
+            ><select [value]="orderDraft().branchId" (change)="setOrderField('branchId', $event)">
+              <option value="">Select branch</option>
+              @for (branch of branches(); track branch.key) {
+                <option [value]="branch.entityId">{{ branch.name }}</option>
+              }
+            </select></label
+          ><label
+            >Product <span>*</span
+            ><select [value]="orderDraft().productId" (change)="setOrderField('productId', $event)">
+              @for (product of products(); track product.id) {
+                <option [value]="product.id">{{ product.name }} ({{ product.sku }})</option>
+              }
+            </select></label
+          ><label
+            >Quantity <span>*</span
+            ><input
+              type="number"
+              min="1"
+              step="1"
+              [max]="orderAvailable()"
+              [value]="orderDraft().quantity"
+              (input)="setOrderField('quantity', $event)"
+          /></label>
+        </div>
+        <div class="form-actions">
+          <button class="primary-button" type="button" (click)="createOrder()">
+            Create and Reserve
+          </button>
+        </div>
+      </section>
+      <aside class="surface order-rules">
+        <h2>Stock Rules</h2>
+        <dl>
+          <div>
+            <dt>Physical Stock</dt>
+            <dd>All units at the branch</dd>
+          </div>
+          <div>
+            <dt>Reserved Stock</dt>
+            <dd>Held for open orders</dd>
+          </div>
+          <div>
+            <dt>Available Stock</dt>
+            <dd>Physical minus reserved</dd>
+          </div>
+          <div>
+            <dt>Shipment</dt>
+            <dd>Deducts reserved physical stock</dd>
+          </div>
+          <div>
+            <dt>Cancellation</dt>
+            <dd>Releases the reservation</dd>
+          </div>
+          <div>
+            <dt>Return</dt>
+            <dd>Adds shipped stock back</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+    <section class="surface table-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Inventory Orders</h2>
+          <p>Order lifecycle events update branch stock immediately.</p>
+        </div>
+      </div>
+      @if (orders().length) {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Customer</th>
+                <th>Branch</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Status</th>
+                <th>Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of orders(); track order.id) {
+                <tr>
+                  <td>
+                    <strong>{{ order.referenceNumber }}</strong>
+                  </td>
+                  <td>{{ order.customerName }}</td>
+                  <td>{{ locationName('branch:' + order.branchId) }}</td>
+                  <td>{{ productName(order.productId) }}</td>
+                  <td>{{ order.quantity }}</td>
+                  <td>
+                    <span [class]="'order-badge ' + orderStatusClass(order.status)">{{
+                      order.status
+                    }}</span>
+                  </td>
+                  <td>{{ formatDate(order.updatedAt) }}</td>
+                  <td>
+                    <span class="row-actions">
+                      @if (order.status === 'reserved') {
+                        <button type="button" (click)="confirmOrder(order)">Confirm</button>
+                      }
+                      @if (order.status === 'reserved' || order.status === 'confirmed') {
+                        <button type="button" (click)="shipOrder(order)">Ship</button
+                        ><button class="danger" type="button" (click)="cancelOrder(order)">
+                          Cancel
+                        </button>
+                      }
+                      @if (order.status === 'shipped') {
+                        <button type="button" (click)="returnOrder(order)">Return</button>
+                      }
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <h3>No inventory orders</h3>
+          <p>Create an order to test reservation and fulfillment behavior.</p>
+        </div>
+      }
+    </section>
+  }
+</section>

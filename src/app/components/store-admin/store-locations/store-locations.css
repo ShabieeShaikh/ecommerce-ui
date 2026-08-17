@@ -6,7 +6,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
-  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  font-family: 'Poppins', system-ui, sans-serif;
   color: var(--clr-text-primary, #F8FAFC);
 }
 
@@ -407,7 +407,7 @@
   backdrop-filter: blur(8px);
   color: #CBD5E1;
   font-size: 11px;
-  font-family: monospace;
+  font-family: 'Poppins', system-ui, sans-serif;
   padding: 6px 12px;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -550,7 +550,7 @@
 }
 
 .info-val.mono {
-  font-family: monospace;
+  font-family: 'Poppins', system-ui, sans-serif;
 }
 
 /* Delivery Zones */

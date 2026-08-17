@@ -1,0 +1,1233 @@
+<section class="warehouse-page">
+  <header class="warehouse-header">
+    <div>
+      <h1>{{ sectionMeta().title }}</h1>
+      <p>{{ sectionMeta().description }} Data is scoped to {{ selectedStore().name }}.</p>
+    </div>
+    @if (activeTab() === 'warehouses') {
+      <button class="primary-button" type="button" (click)="openCreateWarehouse()">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg><span>Add Warehouse</span>
+      </button>
+    }
+  </header>
+
+  @if (activeTab() === 'overview') {
+    <section class="stock-workspace">
+      <div class="stock-stat-grid overview-stat-grid">
+        <article>
+          <span>Total Warehouses</span><strong>{{ overviewSummary().totalWarehouses }}</strong>
+        </article>
+        <article class="green">
+          <span>Active Warehouses</span><strong>{{ overviewSummary().activeWarehouses }}</strong>
+        </article>
+        <article class="blue">
+          <span>Total Warehouse Stock</span
+          ><strong>{{ overviewSummary().totalStock.toLocaleString() }}</strong>
+        </article>
+        <article class="green">
+          <span>Received Stock</span
+          ><strong>{{ overviewSummary().incoming.toLocaleString() }}</strong>
+        </article>
+        <article class="orange">
+          <span>Outgoing Stock</span
+          ><strong>{{ overviewSummary().outgoing.toLocaleString() }}</strong>
+        </article>
+        <article class="orange">
+          <span>Low Stock Items</span><strong>{{ overviewSummary().lowStock }}</strong>
+        </article>
+      </div>
+      <section class="workspace-panel reports-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Recent Warehouse Movements</h2>
+            <p>Latest operations from Inventory transaction history.</p>
+          </div>
+          <button class="secondary-button" type="button" (click)="selectTab('movements')">
+            View All
+          </button>
+        </div>
+        @if (storeTransactions().length) {
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Product / Variant</th>
+                  <th>Type</th>
+                  <th>Route</th>
+                  <th>Quantity</th>
+                  <th>Reference</th>
+                  <th>User</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (transaction of storeTransactions().slice(0, 8); track transaction.id) {
+                  @for (line of transaction.lines; track $index) {
+                    <tr>
+                      <td>{{ formatDate(transaction.occurredAt) }}</td>
+                      <td>
+                        <strong>{{ productName(line.productId) }}</strong
+                        ><small
+                          >{{ variantLabel(line.productId, line.variantId) }} ·
+                          {{ itemSku(line.productId, line.variantId) }}</small
+                        >
+                      </td>
+                      <td>
+                        <span [class]="'transaction-type type-' + transaction.type">{{
+                          transaction.type
+                        }}</span>
+                      </td>
+                      <td>{{ transactionDestination(transaction) }}</td>
+                      <td>
+                        {{ line.quantity > 0 ? '+' : '' }}{{ line.quantity.toLocaleString() }}
+                      </td>
+                      <td>{{ transaction.referenceNumber }}</td>
+                      <td>{{ transaction.createdBy }}</td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="empty-report compact-report">
+            No warehouse movements have been recorded yet.
+          </div>
+        }
+      </section>
+    </section>
+  }
+
+  @if (activeTab() === 'warehouses') {
+    <div class="warehouse-list-layout" [class.with-editor]="warehouseEditorOpen()">
+      <section class="workspace-panel warehouse-list-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Warehouse List</h2>
+            <p>Warehouses belonging to the selected store.</p>
+          </div>
+          <label class="search-control"
+            ><svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-4-4"></path></svg
+            ><input
+              type="search"
+              placeholder="Search warehouses..."
+              [value]="searchQuery()"
+              (input)="onSearch($event)"
+          /></label>
+        </div>
+
+        @if (filteredWarehouses().length) {
+          <div class="data-table-wrap">
+            <table class="data-table warehouse-table">
+              <thead>
+                <tr>
+                  <th>Warehouse Name</th>
+                  <th>Code</th>
+                  <th>Location</th>
+                  <th>Manager</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (warehouse of filteredWarehouses(); track warehouse.id) {
+                  <tr>
+                    <td>
+                      <strong>{{ warehouse.name }}</strong
+                      ><small>{{ warehouse.address }}</small>
+                    </td>
+                    <td>{{ warehouse.code }}</td>
+                    <td>{{ warehouseLocation(warehouse) }}</td>
+                    <td>
+                      <strong>{{ warehouse.managerName }}</strong
+                      ><small>{{ warehouse.managerEmail || 'No email' }}</small>
+                    </td>
+                    <td>
+                      <span [class]="'status-badge status-' + warehouse.status">{{
+                        warehouse.status
+                      }}</span>
+                    </td>
+                    <td>
+                      <span class="row-actions"
+                        ><button
+                          type="button"
+                          title="Edit warehouse"
+                          aria-label="Edit warehouse"
+                          (click)="openEditWarehouse(warehouse)"
+                        >
+                          <svg viewBox="0 0 24 24">
+                            <path
+                              d="M12 20h9M16.5 3.5a2 2 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z"
+                            ></path>
+                          </svg></button
+                        ><button
+                          class="danger"
+                          type="button"
+                          title="Delete warehouse"
+                          aria-label="Delete warehouse"
+                          (click)="deleteWarehouse(warehouse)"
+                        >
+                          <svg viewBox="0 0 24 24">
+                            <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"></path>
+                          </svg></button
+                      ></span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <footer class="table-footer">
+            Showing {{ filteredWarehouses().length }} warehouse{{
+              filteredWarehouses().length === 1 ? '' : 's'
+            }}
+            for {{ selectedStore().name }}
+          </footer>
+        } @else {
+          <div class="empty-workspace">
+            <span
+              ><svg viewBox="0 0 24 24">
+                <path d="M4 21V8l8-5 8 5v13M2 21h20M8 12h2M14 12h2M10 21v-4h4v4"></path></svg
+            ></span>
+            <h3>{{ warehouses().length ? 'No matching warehouses' : 'No warehouses yet' }}</h3>
+            <p>
+              {{
+                warehouses().length
+                  ? 'Try a different search term.'
+                  : 'Create the first warehouse for ' +
+                    selectedStore().name +
+                    ' to begin receiving stock.'
+              }}
+            </p>
+            @if (!warehouses().length) {
+              <button class="primary-button" type="button" (click)="openCreateWarehouse()">
+                Create Warehouse
+              </button>
+            }
+          </div>
+        }
+      </section>
+
+      @if (warehouseEditorOpen()) {
+        <aside class="workspace-panel warehouse-editor">
+          <div class="editor-heading">
+            <div>
+              <h2>{{ editingWarehouseId() ? 'Edit Warehouse' : 'Add Warehouse' }}</h2>
+              <p>
+                {{
+                  editingWarehouseId()
+                    ? 'Update warehouse details.'
+                    : 'Create a warehouse for this store.'
+                }}
+              </p>
+            </div>
+            <button
+              type="button"
+              aria-label="Close warehouse editor"
+              (click)="closeWarehouseEditor()"
+            >
+              <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+            </button>
+          </div>
+          <div class="editor-fields">
+            <label
+              >Warehouse Name <span>*</span
+              ><input
+                type="text"
+                placeholder="e.g. Central Warehouse"
+                [value]="warehouseDraft().name"
+                (input)="setWarehouseField('name', $event)"
+              />
+              @if (warehouseErrors().name) {
+                <small>{{ warehouseErrors().name }}</small>
+              }
+            </label>
+            <label
+              >Warehouse Code <span>*</span
+              ><input
+                type="text"
+                placeholder="e.g. WH-001"
+                maxlength="20"
+                [value]="warehouseDraft().code"
+                (input)="setWarehouseField('code', $event)"
+              />
+              @if (warehouseErrors().code) {
+                <small>{{ warehouseErrors().code }}</small>
+              }
+            </label>
+            <label class="full"
+              >Address <span>*</span
+              ><input
+                type="text"
+                placeholder="Enter full address"
+                [value]="warehouseDraft().address"
+                (input)="setWarehouseField('address', $event)"
+              />
+              @if (warehouseErrors().address) {
+                <small>{{ warehouseErrors().address }}</small>
+              }
+            </label>
+            <label
+              >City <span>*</span
+              ><input
+                type="text"
+                [value]="warehouseDraft().city"
+                (input)="setWarehouseField('city', $event)"
+              />
+              @if (warehouseErrors().city) {
+                <small>{{ warehouseErrors().city }}</small>
+              }
+            </label>
+            <label
+              >State / Province<input
+                type="text"
+                [value]="warehouseDraft().state"
+                (input)="setWarehouseField('state', $event)"
+            /></label>
+            <label
+              >Country <span>*</span
+              ><input
+                type="text"
+                [value]="warehouseDraft().country"
+                (input)="setWarehouseField('country', $event)"
+              />
+              @if (warehouseErrors().country) {
+                <small>{{ warehouseErrors().country }}</small>
+              }
+            </label>
+            <label
+              >Warehouse Manager <span>*</span
+              ><select
+                [value]="warehouseDraft().managerKey"
+                (change)="setWarehouseField('managerKey', $event)"
+              >
+                <option value="">Select manager</option>
+                @for (manager of managers(); track manager.key) {
+                  <option
+                    [value]="manager.key"
+                    [selected]="manager.key === warehouseDraft().managerKey"
+                  >
+                    {{ manager.name }} - {{ manager.source }}
+                  </option>
+                }
+              </select>
+              @if (warehouseErrors().managerKey) {
+                <small>{{ warehouseErrors().managerKey }}</small>
+              }
+            </label>
+            <label
+              >Status <span>*</span
+              ><select
+                [value]="warehouseDraft().status"
+                (change)="setWarehouseField('status', $event)"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select></label
+            >
+            @if (warehouseErrors().form) {
+              <div class="form-error full">{{ warehouseErrors().form }}</div>
+            }
+          </div>
+          <div class="editor-actions">
+            <button class="secondary-button" type="button" (click)="closeWarehouseEditor()">
+              Cancel</button
+            ><button class="primary-button" type="button" (click)="saveWarehouse()">
+              {{ editingWarehouseId() ? 'Save Warehouse' : 'Create Warehouse' }}
+            </button>
+          </div>
+        </aside>
+      }
+    </div>
+  }
+
+  @if (activeTab() === 'receive') {
+    @if (!activeWarehouses().length) {
+      <div class="workspace-panel prerequisite">
+        <h2>Create an active warehouse first</h2>
+        <p>Stock receipts need an active warehouse owned by {{ selectedStore().name }}.</p>
+        <button class="primary-button" type="button" (click)="openWarehouseCreationPage()">
+          Go to Warehouses
+        </button>
+      </div>
+    } @else if (!products().length) {
+      <div class="workspace-panel prerequisite">
+        <h2>No products available</h2>
+        <p>Create products for this store before receiving warehouse stock.</p>
+      </div>
+    } @else {
+      <section class="workspace-panel operation-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Receive Stock</h2>
+            <p>Record incoming stock from a supplier into an active warehouse.</p>
+          </div>
+          <span class="reference-chip">{{ receiveDraft().referenceNumber }}</span>
+        </div>
+        <div class="operation-fields four-columns">
+          <label
+            >Warehouse <span>*</span
+            ><select
+              [value]="receiveDraft().warehouseId"
+              (change)="setReceiveField('warehouseId', $event)"
+            >
+              @for (warehouse of activeWarehouses(); track warehouse.id) {
+                <option
+                  [value]="warehouse.id"
+                  [selected]="warehouse.id === receiveDraft().warehouseId"
+                >
+                  {{ warehouse.name }} ({{ warehouse.code }})
+                </option>
+              }
+            </select></label
+          >
+          <label
+            >Supplier <span>*</span
+            ><input
+              type="text"
+              list="warehouse-suppliers"
+              placeholder="Enter supplier name"
+              [value]="receiveDraft().supplierName"
+              (input)="setReceiveField('supplierName', $event)" /><datalist
+              id="warehouse-suppliers"
+            >
+              @for (supplier of suppliers(); track supplier) {
+                <option [value]="supplier"></option>
+              }</datalist
+          ></label>
+          <label
+            >Reference No. <span>*</span
+            ><input
+              type="text"
+              [value]="receiveDraft().referenceNumber"
+              (input)="setReceiveField('referenceNumber', $event)"
+          /></label>
+          <label
+            >Date <span>*</span
+            ><input
+              type="date"
+              [value]="receiveDraft().occurredAt"
+              (change)="setReceiveField('occurredAt', $event)"
+          /></label>
+        </div>
+
+        <div class="operation-body with-summary">
+          <div>
+            <div class="line-table-wrap">
+              <table class="line-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Variant</th>
+                    <th>SKU</th>
+                    <th>Batch (Optional)</th>
+                    <th>Quantity</th>
+                    <th>Unit Cost</th>
+                    <th>Total</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (line of receiveLines(); track $index; let index = $index) {
+                    <tr>
+                      <td>
+                        <select
+                          [value]="line.productId"
+                          (change)="updateReceiveLine(index, 'productId', $event)"
+                        >
+                          <option value="">Select product</option>
+                          @for (product of products(); track product.id) {
+                            <option [value]="product.id">{{ product.name }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td>
+                        @if (hasVariants(line.productId)) {
+                          <select
+                            [value]="line.variantId ?? ''"
+                            (change)="updateReceiveLine(index, 'variantId', $event)"
+                          >
+                            <option value="">Select variant</option>
+                            @for (variant of variantsFor(line.productId); track variant.id) {
+                              <option [value]="variant.id">
+                                {{ variantLabel(line.productId, variant.id + '') }}
+                              </option>
+                            }
+                          </select>
+                        } @else {
+                          <span>{{ line.productId ? 'Simple product' : '-' }}</span>
+                        }
+                      </td>
+                      <td>{{ line.productId ? itemSku(line.productId, line.variantId) : '-' }}</td>
+                      <td>
+                        <input
+                          type="text"
+                          placeholder="Batch no."
+                          [value]="line.batchNumber"
+                          (input)="updateReceiveLine(index, 'batchNumber', $event)"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          [value]="line.quantity"
+                          (input)="updateReceiveLine(index, 'quantity', $event)"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          [value]="line.unitCost"
+                          (input)="updateReceiveLine(index, 'unitCost', $event)"
+                        />
+                      </td>
+                      <td>
+                        <strong>{{ formatMoney(line.quantity * line.unitCost) }}</strong>
+                      </td>
+                      <td>
+                        <button
+                          class="icon-button danger"
+                          type="button"
+                          title="Remove product"
+                          aria-label="Remove product"
+                          (click)="removeReceiveLine(index)"
+                        >
+                          <svg viewBox="0 0 24 24">
+                            <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"></path>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <button class="add-line-button" type="button" (click)="addReceiveLine()">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>Add Product
+            </button>
+          </div>
+          <aside class="operation-summary">
+            <h3>Summary</h3>
+            <dl>
+              <div>
+                <dt>Total Items</dt>
+                <dd>{{ receiveSummary().items }}</dd>
+              </div>
+              <div>
+                <dt>Total Quantity</dt>
+                <dd>{{ receiveSummary().quantity.toLocaleString() }}</dd>
+              </div>
+              <div>
+                <dt>Sub Total</dt>
+                <dd>{{ formatMoney(receiveSummary().total) }}</dd>
+              </div>
+              <div>
+                <dt>Tax (0%)</dt>
+                <dd>{{ formatMoney(0) }}</dd>
+              </div>
+              <div class="total">
+                <dt>Total Amount</dt>
+                <dd>{{ formatMoney(receiveSummary().total) }}</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+        @if (receiveError()) {
+          <div class="form-error">{{ receiveError() }}</div>
+        }
+        <div class="operation-actions">
+          <button
+            class="secondary-button"
+            type="button"
+            (click)="receiveLines.set([emptyReceiveLine()])"
+          >
+            Clear</button
+          ><button class="primary-button" type="button" (click)="saveReceipt()">
+            Save & Confirm
+          </button>
+        </div>
+      </section>
+    }
+  }
+
+  @if (activeTab() === 'stock') {
+    @if (!activeWarehouses().length) {
+      <div class="workspace-panel prerequisite">
+        <h2>No active warehouses</h2>
+        <p>Create a warehouse to view warehouse stock.</p>
+        <button class="primary-button" type="button" (click)="openWarehouseCreationPage()">
+          Create Warehouse
+        </button>
+      </div>
+    } @else {
+      <section class="stock-workspace">
+        <div class="stock-toolbar">
+          <div>
+            <h2>Warehouse Stock Overview</h2>
+            <p>Real-time stock currently available in the selected warehouse.</p>
+          </div>
+          <select [value]="selectedStockWarehouse()?.id ?? ''" (change)="setStockWarehouse($event)">
+            @for (warehouse of activeWarehouses(); track warehouse.id) {
+              <option
+                [value]="warehouse.id"
+                [selected]="warehouse.id === selectedStockWarehouse()?.id"
+              >
+                {{ warehouse.name }} ({{ warehouse.code }})
+              </option>
+            }
+          </select>
+        </div>
+        <div class="stock-stat-grid">
+          <article>
+            <span>Total Products</span><strong>{{ stockSummary().products }}</strong>
+          </article>
+          <article class="blue">
+            <span>Total Quantity</span><strong>{{ stockSummary().total.toLocaleString() }}</strong>
+          </article>
+          <article class="orange">
+            <span>Reserved Quantity</span
+            ><strong>{{ stockSummary().reserved.toLocaleString() }}</strong>
+          </article>
+          <article class="green">
+            <span>Available Quantity</span
+            ><strong>{{ stockSummary().available.toLocaleString() }}</strong>
+          </article>
+        </div>
+        <div class="stock-layout">
+          <section class="workspace-panel stock-table-panel">
+            @if (stockRows().length) {
+              <div class="data-table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Variant</th>
+                      <th>SKU</th>
+                      <th>Total Stock</th>
+                      <th>Reserved</th>
+                      <th>Available</th>
+                      <th>Avg. Cost</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of stockRows(); track row.stock.id) {
+                      <tr>
+                        <td>
+                          <strong>{{ row.product.name }}</strong>
+                        </td>
+                        <td>{{ variantLabel(row.product.id, row.stock.variantId) }}</td>
+                        <td>{{ itemSku(row.product.id, row.stock.variantId) }}</td>
+                        <td>{{ row.stock.quantity.toLocaleString() }}</td>
+                        <td>{{ row.stock.reservedQuantity.toLocaleString() }}</td>
+                        <td>{{ availableStock(row.stock).toLocaleString() }}</td>
+                        <td>{{ formatMoney(row.stock.averageUnitCost) }}</td>
+                        <td>
+                          <span [class]="'stock-status stock-' + stockTone(row.stock)">{{
+                            stockStatusLabel(row.stock)
+                          }}</span>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <div class="empty-workspace compact">
+                <h3>No warehouse stock</h3>
+                <p>Receive products into this warehouse to populate the overview.</p>
+                <button class="primary-button" type="button" (click)="selectTab('receive')">
+                  Receive Stock
+                </button>
+              </div>
+            }
+          </section>
+          <aside class="stock-sidebar">
+            <section class="workspace-panel stock-status-panel">
+              <h3>Stock by Status</h3>
+              <div class="mini-donut" [style.background]="stockDonutBackground()">
+                <span>{{ stockSummary().products }}</span>
+              </div>
+              <ul>
+                <li>
+                  <i class="in"></i><span>In Stock</span
+                  ><strong>{{ stockStatusCounts().in }}</strong>
+                </li>
+                <li>
+                  <i class="low"></i><span>Low Stock</span
+                  ><strong>{{ stockStatusCounts().low }}</strong>
+                </li>
+                <li>
+                  <i class="out"></i><span>Out of Stock</span
+                  ><strong>{{ stockStatusCounts().out }}</strong>
+                </li>
+              </ul>
+            </section>
+            <section class="workspace-panel stock-quick-panel">
+              <h3>Quick Actions</h3>
+              <button type="button" (click)="selectTab('receive')">
+                Add Stock <small>Receive stock in warehouse</small></button
+              ><button type="button" (click)="selectTab('transfer')">
+                Stock Transfer <small>Move stock to branches</small></button
+              ><button type="button" (click)="selectTab('adjustment')">
+                Stock Adjustment <small>Correct warehouse quantity</small></button
+              ><button type="button" (click)="selectTab('reports')">
+                View History <small>Review all movements</small>
+              </button>
+            </section>
+          </aside>
+        </div>
+      </section>
+    }
+  }
+
+  @if (activeTab() === 'transfer') {
+    @if (!activeWarehouses().length) {
+      <div class="workspace-panel prerequisite">
+        <h2>Create an active warehouse first</h2>
+        <p>Transfers require an active source warehouse.</p>
+        <button class="primary-button" type="button" (click)="openWarehouseCreationPage()">
+          Go to Warehouses
+        </button>
+      </div>
+    } @else if (transferLocations().length < 2) {
+      <div class="workspace-panel prerequisite">
+        <h2>Another inventory location is required</h2>
+        <p>Create an active branch or another warehouse before transferring stock.</p>
+      </div>
+    } @else {
+      <section class="workspace-panel operation-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Stock Transfer</h2>
+            <p>Move available stock between warehouse and branch locations.</p>
+          </div>
+          <span class="reference-chip">{{ transferDraft().referenceNumber }}</span>
+        </div>
+        <div class="operation-fields four-columns">
+          <label
+            >From Location <span>*</span
+            ><select
+              [value]="transferDraft().sourceLocationKey"
+              (change)="setTransferField('sourceLocationKey', $event)"
+            >
+              @for (location of transferLocations(); track location.key) {
+                <option [value]="location.key">{{ location.name }} ({{ location.type }})</option>
+              }
+            </select></label
+          ><label
+            >To Location <span>*</span
+            ><select
+              [value]="transferDraft().destinationLocationKey"
+              (change)="setTransferField('destinationLocationKey', $event)"
+            >
+              @for (location of transferDestinations(); track location.key) {
+                <option [value]="location.key">{{ location.name }} ({{ location.type }})</option>
+              }
+            </select></label
+          ><label
+            >Reference No. <span>*</span
+            ><input
+              type="text"
+              [value]="transferDraft().referenceNumber"
+              (input)="setTransferField('referenceNumber', $event)" /></label
+          ><label
+            >Transfer Date <span>*</span
+            ><input
+              type="date"
+              [value]="transferDraft().occurredAt"
+              (change)="setTransferField('occurredAt', $event)"
+          /></label>
+        </div>
+        <div class="operation-body with-summary">
+          <div>
+            <div class="line-table-wrap">
+              <table class="line-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Variant</th>
+                    <th>SKU</th>
+                    <th>Available Stock</th>
+                    <th>Transfer Quantity</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (line of transferLines(); track $index; let index = $index) {
+                    <tr>
+                      <td>
+                        <select
+                          [value]="line.productId"
+                          (change)="updateTransferLine(index, 'productId', $event)"
+                        >
+                          <option value="">Select product</option>
+                          @for (product of transferableProducts(); track product.id) {
+                            <option [value]="product.id">{{ product.name }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td>
+                        @if (hasVariants(line.productId)) {
+                          <select
+                            [value]="line.variantId ?? ''"
+                            (change)="updateTransferLine(index, 'variantId', $event)"
+                          >
+                            <option value="">Select variant</option>
+                            @for (
+                              variant of transferVariantsFor(line.productId);
+                              track variant.id
+                            ) {
+                              <option [value]="variant.id">
+                                {{ variantLabel(line.productId, variant.id + '') }}
+                              </option>
+                            }
+                          </select>
+                        } @else {
+                          <span>{{ line.productId ? 'Simple product' : '-' }}</span>
+                        }
+                      </td>
+                      <td>{{ line.productId ? itemSku(line.productId, line.variantId) : '-' }}</td>
+                      <td>
+                        {{ availableForTransfer(line.productId, line.variantId).toLocaleString() }}
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          [max]="availableForTransfer(line.productId, line.variantId)"
+                          [value]="line.quantity"
+                          (input)="updateTransferLine(index, 'quantity', $event)"
+                        /><small
+                          >Max:
+                          {{
+                            availableForTransfer(line.productId, line.variantId).toLocaleString()
+                          }}</small
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="icon-button danger"
+                          type="button"
+                          title="Remove product"
+                          aria-label="Remove product"
+                          (click)="removeTransferLine(index)"
+                        >
+                          <svg viewBox="0 0 24 24">
+                            <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"></path>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <button class="add-line-button" type="button" (click)="addTransferLine()">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>Add Product
+            </button>
+          </div>
+          <aside class="operation-summary transfer-summary">
+            <h3>Transfer Summary</h3>
+            <dl>
+              <div>
+                <dt>Total Items</dt>
+                <dd>{{ transferSummary().items }}</dd>
+              </div>
+              <div>
+                <dt>Total Quantity</dt>
+                <dd>{{ transferSummary().quantity.toLocaleString() }}</dd>
+              </div>
+            </dl>
+            <div class="transfer-route">
+              <span
+                ><svg viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13M2 21h20"></path></svg
+                ><small>{{ locationName(transferDraft().sourceLocationKey) }}</small></span
+              ><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"></path></svg
+              ><span
+                ><svg viewBox="0 0 24 24">
+                  <path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10"></path></svg
+                ><small>{{ locationName(transferDraft().destinationLocationKey) }}</small></span
+              >
+            </div>
+          </aside>
+        </div>
+        @if (transferError()) {
+          <div class="form-error">{{ transferError() }}</div>
+        }
+        <div class="operation-actions">
+          <button
+            class="secondary-button"
+            type="button"
+            (click)="transferLines.set([emptyTransferLine()])"
+          >
+            Clear</button
+          ><button class="primary-button" type="button" (click)="confirmTransfer()">
+            Confirm Transfer
+          </button>
+        </div>
+      </section>
+    }
+  }
+
+  @if (activeTab() === 'adjustment') {
+    @if (!activeWarehouses().length) {
+      <div class="workspace-panel prerequisite">
+        <h2>Create an active warehouse first</h2>
+        <p>Adjustments require warehouse stock.</p>
+      </div>
+    } @else if (!adjustmentProducts().length) {
+      <div class="workspace-panel prerequisite">
+        <h2>No stock to adjust</h2>
+        <p>Receive stock into a warehouse before making adjustments.</p>
+        <button class="primary-button" type="button" (click)="selectTab('receive')">
+          Receive Stock
+        </button>
+      </div>
+    } @else {
+      <section class="workspace-panel operation-panel adjustment-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Stock Adjustment</h2>
+            <p>Correct damaged, lost, found, or counted stock.</p>
+          </div>
+          <span class="reference-chip">{{ adjustmentDraft().referenceNumber }}</span>
+        </div>
+        <div class="operation-fields six-columns">
+          <label
+            >Warehouse <span>*</span
+            ><select
+              [value]="adjustmentDraft().warehouseId"
+              (change)="setAdjustmentField('warehouseId', $event)"
+            >
+              @for (warehouse of activeWarehouses(); track warehouse.id) {
+                <option [value]="warehouse.id">{{ warehouse.name }}</option>
+              }
+            </select></label
+          ><label
+            >Product <span>*</span
+            ><select
+              [value]="adjustmentDraft().productId"
+              (change)="setAdjustmentField('productId', $event)"
+            >
+              @for (product of adjustmentProducts(); track product.id) {
+                <option [value]="product.id">{{ product.name }} ({{ product.sku }})</option>
+              }
+            </select></label
+          ><label
+            >Variant
+            @if (hasVariants(adjustmentDraft().productId)) {
+              <span>*</span>
+            }
+            <select
+              [disabled]="!hasVariants(adjustmentDraft().productId)"
+              [value]="adjustmentDraft().variantId ?? ''"
+              (change)="setAdjustmentField('variantId', $event)"
+            >
+              @if (!hasVariants(adjustmentDraft().productId)) {
+                <option value="">Simple product</option>
+              } @else {
+                <option value="">Select variant</option>
+                @for (
+                  variant of adjustmentVariantsFor(adjustmentDraft().productId);
+                  track variant.id
+                ) {
+                  <option [value]="variant.id">
+                    {{ variantLabel(adjustmentDraft().productId, variant.id + '') }}
+                  </option>
+                }
+              }
+            </select></label
+          ><label
+            >Adjustment Type <span>*</span
+            ><select
+              [value]="adjustmentDraft().adjustmentType"
+              (change)="setAdjustmentField('adjustmentType', $event)"
+            >
+              @for (type of adjustmentTypes; track type.value) {
+                <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select></label
+          ><label
+            >Reference <span>*</span
+            ><input
+              type="text"
+              [value]="adjustmentDraft().referenceNumber"
+              (input)="setAdjustmentField('referenceNumber', $event)" /></label
+          ><label
+            >Adjustment Date <span>*</span
+            ><input
+              type="date"
+              [value]="adjustmentDraft().occurredAt"
+              (change)="setAdjustmentField('occurredAt', $event)"
+          /></label>
+        </div>
+        <div class="adjustment-grid">
+          <div class="stock-readout">
+            <span>Current Stock</span
+            ><strong>{{ adjustmentCurrentStock().toLocaleString() }}</strong
+            ><small>Units</small>
+          </div>
+          <label
+            >Adjustment Quantity <span>*</span
+            ><input
+              type="number"
+              min="0"
+              step="1"
+              [value]="adjustmentDraft().quantity"
+              (input)="setAdjustmentField('quantity', $event)"
+          /></label>
+          <div class="stock-readout" [class.negative]="adjustmentNewStock() < 0">
+            <span>New Stock (After)</span
+            ><strong>{{ adjustmentNewStock().toLocaleString() }}</strong
+            ><small>Units</small>
+          </div>
+          <label
+            >Reason <span>*</span
+            ><input
+              type="text"
+              placeholder="e.g. Damaged stock"
+              [value]="adjustmentDraft().reason"
+              (input)="setAdjustmentField('reason', $event)" /></label
+          ><label class="full"
+            >Note (Optional)<textarea
+              rows="3"
+              placeholder="Add adjustment notes"
+              [value]="adjustmentDraft().note"
+              (input)="setAdjustmentField('note', $event)"
+            ></textarea>
+          </label>
+        </div>
+        @if (adjustmentError()) {
+          <div class="form-error">{{ adjustmentError() }}</div>
+        }
+        <div class="operation-actions">
+          <button class="secondary-button" type="button" (click)="selectTab('stock')">Cancel</button
+          ><button class="primary-button" type="button" (click)="confirmAdjustment()">
+            Confirm Adjustment
+          </button>
+        </div>
+      </section>
+    }
+  }
+
+  @if (activeTab() === 'movements') {
+    <section class="workspace-panel reports-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Warehouse Stock Movement</h2>
+          <p>Inventory transactions involving warehouse locations.</p>
+        </div>
+        <button class="secondary-button" type="button" (click)="selectTab('reports')">
+          Open Reports
+        </button>
+      </div>
+      @if (storeTransactions().length) {
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date / Time</th>
+                <th>Product</th>
+                <th>Variant</th>
+                <th>Type</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Quantity</th>
+                <th>Reference</th>
+                <th>User</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (transaction of storeTransactions(); track transaction.id) {
+                @for (line of transaction.lines; track $index) {
+                  <tr>
+                    <td>{{ formatDate(transaction.occurredAt) }}</td>
+                    <td>
+                      <strong>{{ productName(line.productId) }}</strong
+                      ><small>{{ itemSku(line.productId, line.variantId) }}</small>
+                    </td>
+                    <td>{{ variantLabel(line.productId, line.variantId) }}</td>
+                    <td>
+                      <span [class]="'transaction-type type-' + transaction.type">{{
+                        transaction.type
+                      }}</span>
+                    </td>
+                    <td>
+                      {{
+                        transaction.type === 'receive'
+                          ? (transaction.supplierName ?? 'Supplier')
+                          : locationName(transaction.sourceLocationKey)
+                      }}
+                    </td>
+                    <td>{{ locationName(transaction.destinationLocationKey) }}</td>
+                    <td>{{ line.quantity > 0 ? '+' : '' }}{{ line.quantity.toLocaleString() }}</td>
+                    <td>{{ transaction.referenceNumber }}</td>
+                    <td>{{ transaction.createdBy }}</td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-report">No warehouse movements have been recorded.</div>
+      }
+    </section>
+  }
+
+  @if (activeTab() === 'reports') {
+    <section class="workspace-panel reports-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Warehouse Reports</h2>
+          <p>Filter live warehouse stock and transaction records for {{ selectedStore().name }}.</p>
+        </div>
+        <button class="secondary-button export-button" type="button" (click)="exportReport()">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"></path></svg>Export CSV
+        </button>
+      </div>
+      <div class="report-types">
+        @for (type of reportTypes; track type.id) {
+          <button
+            type="button"
+            [class.active]="reportType() === type.id"
+            (click)="setReportType(type.id)"
+          >
+            {{ type.label }}
+          </button>
+        }
+      </div>
+      <div class="report-filters">
+        <label
+          >Warehouse<select [value]="reportWarehouseId()" (change)="setReportWarehouse($event)">
+            <option value="all">All Warehouses</option>
+            @for (warehouse of warehouses(); track warehouse.id) {
+              <option [value]="warehouse.id">{{ warehouse.name }}</option>
+            }
+          </select></label
+        ><label
+          >From<input
+            type="date"
+            [value]="reportFrom()"
+            (change)="setReportDate('from', $event)" /></label
+        ><label
+          >To<input type="date" [value]="reportTo()" (change)="setReportDate('to', $event)"
+        /></label>
+      </div>
+      <div class="reports-layout">
+        <div class="report-table-area">
+          @if (reportType() === 'stock' || reportType() === 'low') {
+            @if (reportType() === 'low' ? reportLowStocks() : reportStocks(); as rows) {
+              @if (rows.length) {
+                <div class="data-table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Warehouse</th>
+                        <th>Product</th>
+                        <th>Variant</th>
+                        <th>SKU</th>
+                        <th>Total</th>
+                        <th>Reserved</th>
+                        <th>Available</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (row of rows; track row.stock.id) {
+                        <tr>
+                          <td>{{ row.warehouse.name }}</td>
+                          <td>
+                            <strong>{{ row.product.name }}</strong>
+                          </td>
+                          <td>{{ variantLabel(row.product.id, row.stock.variantId) }}</td>
+                          <td>{{ itemSku(row.product.id, row.stock.variantId) }}</td>
+                          <td>{{ row.stock.quantity }}</td>
+                          <td>{{ row.stock.reservedQuantity }}</td>
+                          <td>{{ availableStock(row.stock) }}</td>
+                          <td>
+                            <span [class]="'stock-status stock-' + stockTone(row.stock)">{{
+                              stockStatusLabel(row.stock)
+                            }}</span>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              } @else {
+                <div class="empty-report">No stock records match this report.</div>
+              }
+            }
+          } @else {
+            @if (reportTransactions().length) {
+              <div class="data-table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Reference</th>
+                      <th>Type</th>
+                      <th>Warehouse</th>
+                      <th>Source / Destination</th>
+                      <th>Quantity</th>
+                      <th>Amount</th>
+                      <th>User</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (transaction of reportTransactions(); track transaction.id) {
+                      <tr>
+                        <td>{{ formatDate(transaction.occurredAt) }}</td>
+                        <td>
+                          <strong>{{ transaction.referenceNumber }}</strong>
+                        </td>
+                        <td>
+                          <span [class]="'transaction-type type-' + transaction.type">{{
+                            transaction.type
+                          }}</span>
+                        </td>
+                        <td>{{ warehouseName(transaction.warehouseId) }}</td>
+                        <td>{{ transactionDestination(transaction) }}</td>
+                        <td>{{ transactionQuantity(transaction).toLocaleString() }}</td>
+                        <td>{{ formatMoney(transaction.totalCost) }}</td>
+                        <td>{{ transaction.createdBy }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <div class="empty-report">No warehouse movements match these filters.</div>
+            }
+          }
+        </div>
+        <aside class="report-trend">
+          <h3>Stock Movement Trend</h3>
+          @if (reportTrend().length) {
+            <div class="trend-chart">
+              @for (point of reportTrend(); track $index) {
+                <div>
+                  <span [style.height.%]="point.height" [title]="point.value + ' units'"></span
+                  ><small>{{ point.label }}</small>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="trend-empty">
+              Transactions will appear here after receiving, transferring, or adjusting stock.
+            </div>
+          }
+        </aside>
+      </div>
+    </section>
+  }
+</section>
