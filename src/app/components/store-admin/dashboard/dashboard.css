@@ -107,13 +107,364 @@
   box-shadow: 0 12px 32px rgba(124, 58, 237, 0.36);
 }
 
-.kpi-grid {
+/* .kpi-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 18px;
+} */
+
+.kpi-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
 }
 
-.metric-card,
+
+.metric-card{
+
+  position: relative;
+  overflow: hidden;
+
+  min-width: 0;
+  min-height: 205px;
+
+  padding: 20px;
+
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-content: start;
+  gap: 12px;
+
+  color: #6437e8;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 36%,
+      #f7f3ff 100%
+    );
+
+  border: 1px solid rgba(100, 55, 232, 0.17);
+  border-radius: 14px;
+
+  box-shadow:
+    0 10px 28px rgba(16, 24, 40, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+}
+
+
+/* Decorative background circle */
+
+.metric-card::after {
+  content: '';
+
+  position: absolute;
+
+  width: 120px;
+  height: 120px;
+
+  right: -48px;
+  bottom: -62px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+
+  opacity: 0.055;
+}
+
+/* Colored top accent */
+
+.metric-card::before {
+  content: '';
+
+  position: absolute;
+
+  inset: 0 0 auto;
+
+  height: 3px;
+
+  background: currentColor;
+}
+
+
+/* Keep card content above decoration */
+
+.metric-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hover */
+
+.metric-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 14px 32px rgba(16, 24, 40, 0.1);
+}
+
+/* =========================
+   ICON
+========================= */
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid currentColor;
+  border-radius: 12px;
+
+  background: rgba(100, 55, 232, 0.09);
+}
+
+.metric-icon svg {
+  width: 23px;
+  height: 23px;
+
+  fill: none;
+
+  stroke: currentColor;
+  stroke-width: 2;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.metric-body {
+  min-width: 0;
+
+  display: grid;
+
+  align-content: start;
+
+  gap: 6px;
+}
+
+
+.metric-label {
+  overflow: hidden;
+
+  color: currentColor;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metric-value {
+  color: #101828;
+
+  font-size: 24px;
+  font-weight: 800;
+
+  line-height: 1.1;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.metric-footer {
+  grid-column: 1 / -1;
+
+  margin-top: 8px;
+  padding-top: 13px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  border-top:
+    1px solid rgba(102, 112, 133, 0.14);
+}
+
+.metric-change {
+  width: max-content;
+
+  padding: 5px 8px;
+
+  color: #027a48;
+  background: #ecfdf3;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+
+.metric-change::before {
+  content: '↗';
+
+  margin-right: 3px;
+
+  font-size: 10px;
+}
+
+
+/* Down trend */
+
+.metric-change.metric-down {
+  color: #b42318;
+  background: #fef3f2;
+}
+
+
+.metric-change.metric-down::before {
+  content: '↘';
+}
+
+
+.metric-compare {
+  overflow: hidden;
+
+  color: #667085;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =====================================================
+   CARD TONES
+===================================================== */
+
+
+/* PURPLE */
+
+.tone-purple {
+  color: #6437e8;
+
+  border-color:
+    rgba(100, 55, 232, 0.17);
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 36%,
+      #f7f3ff 100%
+    );
+}
+
+
+.tone-purple .metric-icon {
+  background:
+    rgba(100, 55, 232, 0.09);
+}
+
+
+/* BLUE */
+
+.tone-blue {
+  color: #1671dc;
+
+  border-color:
+    rgba(22, 113, 220, 0.18);
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 36%,
+      #eef7ff 100%
+    );
+}
+
+
+.tone-blue .metric-icon {
+  background:
+    rgba(22, 113, 220, 0.09);
+}
+
+
+/* GREEN */
+
+.tone-green {
+  color: #118848;
+
+  border-color:
+    rgba(17, 136, 72, 0.18);
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 36%,
+      #effcf4 100%
+    );
+}
+
+
+.tone-green .metric-icon {
+  background:
+    rgba(17, 136, 72, 0.09);
+}
+
+
+/* ORANGE */
+
+.tone-orange {
+  color: #ed6c02;
+
+  border-color:
+    rgba(237, 108, 2, 0.2);
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 36%,
+      #fff7ed 100%
+    );
+}
+
+
+.tone-orange .metric-icon {
+  background:
+    rgba(237, 108, 2, 0.09);
+}
+
+
+/* VIOLET */
+
+.tone-violet {
+  color: #7c3aed;
+
+  border-color:
+    rgba(124, 58, 237, 0.18);
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 36%,
+      #f5f1ff 100%
+    );
+}
+
+
+.tone-violet .metric-icon {
+  background:
+    rgba(124, 58, 237, 0.09);
+}
+
+
+
 .panel {
   background: #fff;
   border: 1px solid var(--clr-border);
@@ -121,15 +472,22 @@
   box-shadow: 0 12px 34px rgba(17, 24, 39, 0.05);
 }
 
-.metric-card {
+.panel {
+  background: #fff;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  box-shadow: 0 12px 34px rgba(17, 24, 39, 0.05);
+}
+
+/* .metric-card {
   min-height: 134px;
   padding: 18px 16px;
   display: flex;
   align-items: center;
   gap: 16px;
-}
+} */
 
-.metric-icon {
+/* .metric-icon {
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -187,7 +545,7 @@
   color: #667085;
   font-size: 11px;
   font-weight: 500;
-}
+} */
 
 .chart-grid {
   display: grid;

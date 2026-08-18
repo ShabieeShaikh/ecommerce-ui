@@ -8,26 +8,28 @@ interface NavigationItem {
   label: string;
   route?: string;
   icon:
-    | 'dashboard'
-    | 'store'
-    | 'branch'
-    | 'products'
-    | 'catalog'
-    | 'attributes'
-    | 'brands'
-    | 'inventory'
-    | 'warehouse'
-    | 'receive'
-    | 'stock'
-    | 'transfer'
-    | 'adjustment'
-    | 'reports'
-    | 'managers'
-    | 'staff'
-    | 'analytics'
-    | 'location'
-    | 'settings'
-    | 'profile';
+  | 'dashboard'
+  | 'store'
+  | 'branch'
+  | 'products'
+  | 'catalog'
+  | 'attributes'
+  | 'brands'
+  | 'inventory'
+  | 'warehouse'
+  | 'receive'
+  | 'stock'
+  | 'transfer'
+  | 'adjustment'
+  | 'reports'
+  | 'managers'
+  | 'staff'
+  | 'purchasing'
+  | 'supplier'
+  | 'analytics'
+  | 'location'
+  | 'settings'
+  | 'profile';
   exact?: boolean;
   children?: NavigationSubItem[];
 }
@@ -70,7 +72,9 @@ export class StoreAdminLayout {
         ? 'Inventory'
         : this.router.url.startsWith('/store-admin/catalog')
           ? 'Catalog'
-          : 'Store',
+          : this.router.url.startsWith('/store-admin/purchasing')
+            ? 'Purchasing'
+            : 'Store',
   );
 
   readonly currentUser = computed(() => this.authService.getCurrentUser());
@@ -220,6 +224,18 @@ export class StoreAdminLayout {
               label: 'Reports',
               route: '/store-admin/warehouses/reports',
               icon: 'reports',
+              exact: true,
+            },
+          ],
+        },
+        {
+          label: 'Purchasing',
+          icon: 'purchasing',
+          children: [
+            {
+              label: 'Suppliers',
+              route: '/store-admin/purchasing/suppliers',
+              icon: 'supplier',
               exact: true,
             },
           ],

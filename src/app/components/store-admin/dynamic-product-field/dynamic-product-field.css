@@ -127,7 +127,8 @@ textarea {
 }
 .checkbox-options {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 7px;
   padding: 8px;
   border: 1px solid #d7dde7;

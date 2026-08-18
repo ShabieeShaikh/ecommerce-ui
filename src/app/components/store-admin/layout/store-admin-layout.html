@@ -1,300 +1,268 @@
-<div
-  class="admin-shell"
-  [class.collapsed]="sidebarCollapsed()"
-  [class.drawer-open]="mobileDrawerOpen()"
->
-  <button
-    class="drawer-overlay"
-    type="button"
-    aria-label="Close navigation"
-    (click)="closeMobileDrawer()"
-  ></button>
+<div class="admin-shell" [class.collapsed]="sidebarCollapsed()" [class.drawer-open]="mobileDrawerOpen()">
+  <button class="drawer-overlay" type="button" aria-label="Close navigation" (click)="closeMobileDrawer()"></button>
 
   <aside class="sidebar" aria-label="Store admin navigation">
     <div class="sidebar-brand">
-      <a
-        class="brand-logo-wrap"
-        routerLink="/store-admin/dashboard"
-        (click)="onNavItemClick()"
-        aria-label="DigiShop dashboard"
-      >
+      <a class="brand-logo-wrap" routerLink="/store-admin/dashboard" (click)="onNavItemClick()"
+        aria-label="DigiShop dashboard">
         <span class="brand-logo">
           <img src="dts-logo-white.png" alt="Digisoft" />
         </span>
       </a>
 
-      <button
-        class="sidebar-collapse-btn"
-        type="button"
-        (click)="toggleDesktopSidebar()"
+      <button class="sidebar-collapse-btn" type="button" (click)="toggleDesktopSidebar()"
         [attr.aria-label]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
-        [attr.aria-expanded]="!sidebarCollapsed()"
-      >
+        [attr.aria-expanded]="!sidebarCollapsed()">
         <span class="icon-chevron" [class.rotated]="sidebarCollapsed()"></span>
       </button>
     </div>
 
     <nav class="sidebar-nav">
       @for (group of navigationGroups; track group.label) {
-        <section class="nav-group" [attr.aria-label]="group.label">
-          <span class="nav-group-label">{{ group.label }}</span>
+      <section class="nav-group" [attr.aria-label]="group.label">
+        <span class="nav-group-label">{{ group.label }}</span>
 
-          @for (item of group.items; track item.label) {
-            @if (item.children) {
-              <div
-                class="nav-tree"
-                routerLinkActive="nav-tree-active"
-                [routerLinkActiveOptions]="{ exact: false }"
-              >
-                <button
-                  class="nav-item nav-parent"
-                  type="button"
-                  [class.expanded]="isNavigationTreeOpen(item.label)"
-                  [title]="item.label"
-                  [attr.aria-expanded]="isNavigationTreeOpen(item.label)"
-                  [attr.aria-controls]="navigationTreeId(item.label)"
-                  (click)="toggleNavigationTree(item.label)"
-                >
-                  <span class="nav-icon" aria-hidden="true">
-                    @switch (item.icon) {
-                      @case ('warehouse') {
-                        <svg viewBox="0 0 24 24">
-                          <path d="M3 21V8l9-5 9 5v13"></path>
-                          <path d="M1 21h22M7 21v-8h10v8M7 16h10"></path>
-                        </svg>
-                      }
-                      @case ('inventory') {
-                        <svg viewBox="0 0 24 24">
-                          <path d="M4 7h16v13H4zM2 3h20v4H2zM9 11h6M9 15h6"></path>
-                        </svg>
-                      }
-                      @case ('catalog') {
-                        <svg viewBox="0 0 24 24">
-                          <path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"></path>
-                        </svg>
-                      }
-                      @default {
-                        <svg viewBox="0 0 24 24">
-                          <path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10M9 20v-6h6v6"></path>
-                        </svg>
-                      }
-                    }
-                  </span>
-                  <span class="nav-label">{{ item.label }}</span>
-                  <span class="nav-parent-caret" aria-hidden="true"
-                    ><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg
-                  ></span>
-                </button>
+        @for (item of group.items; track item.label) {
+        @if (item.children) {
+        <div class="nav-tree" routerLinkActive="nav-tree-active" [routerLinkActiveOptions]="{ exact: false }">
+          <button class="nav-item nav-parent" type="button" [class.expanded]="isNavigationTreeOpen(item.label)"
+            [title]="item.label" [attr.aria-expanded]="isNavigationTreeOpen(item.label)"
+            [attr.aria-controls]="navigationTreeId(item.label)" (click)="toggleNavigationTree(item.label)">
+            <span class="nav-icon" aria-hidden="true">
+              @switch (item.icon) {
+              @case ('warehouse') {
+              <svg viewBox="0 0 24 24">
+                <path d="M3 21V8l9-5 9 5v13"></path>
+                <path d="M1 21h22M7 21v-8h10v8M7 16h10"></path>
+              </svg>
+              }
+              @case ('inventory') {
+              <svg viewBox="0 0 24 24">
+                <path d="M4 7h16v13H4zM2 3h20v4H2zM9 11h6M9 15h6"></path>
+              </svg>
+              }
+              @case ('catalog') {
+              <svg viewBox="0 0 24 24">
+                <path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"></path>
+              </svg>
+              }
+              @case ('purchasing') {
+              <svg viewBox="0 0 24 24">
+                <path d="M3 7h18"></path>
+                <path d="M5 7l2-4h10l2 4"></path>
+                <path d="M5 7v14h14V7"></path>
+                <path d="M9 11h6"></path>
+                <path d="M9 15h6"></path>
+              </svg>
+              }
+              @default {
+              <svg viewBox="0 0 24 24">
+                <path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10M9 20v-6h6v6"></path>
+              </svg>
+              }
+              }
+            </span>
+            <span class="nav-label">{{ item.label }}</span>
+            <span class="nav-parent-caret" aria-hidden="true"><svg viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg></span>
+          </button>
 
-                @if (isNavigationTreeOpen(item.label) && !sidebarCollapsed()) {
-                  <div [id]="navigationTreeId(item.label)" class="nav-submenu">
-                    @for (child of item.children; track child.label) {
-                      @if (child.disabled) {
-                        <button
-                          class="nav-subitem disabled"
-                          type="button"
-                          disabled
-                          title="Staff management is coming soon"
-                        >
-                          <span class="nav-subicon" aria-hidden="true"
-                            ><svg viewBox="0 0 24 24">
-                              <path
-                                d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-                              ></path></svg
-                          ></span>
-                          <span>{{ child.label }}</span
-                          ><small>Soon</small>
-                        </button>
-                      } @else {
-                        <a
-                          class="nav-subitem"
-                          [routerLink]="child.route"
-                          routerLinkActive="nav-sub-active"
-                          [routerLinkActiveOptions]="{ exact: child.exact ?? false }"
-                          [title]="child.label"
-                          (click)="onNavItemClick()"
-                        >
-                          <span class="nav-subicon" aria-hidden="true">
-                            @switch (child.icon) {
-                              @case ('store') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10"></path>
-                                </svg>
-                              }
-                              @case ('branch') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="M4 21V8l8-5 8 5v13M2 21h20M8 12h2M14 12h2"></path>
-                                </svg>
-                              }
-                              @case ('products') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"></path>
-                                </svg>
-                              }
-                              @case ('catalog') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="M4 5h6v5H4zM14 14h6v5h-6zM7 10v4h10"></path>
-                                </svg>
-                              }
-                              @case ('attributes') {
-                                <svg viewBox="0 0 24 24">
-                                  <path
-                                    d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5M14 3v6M6 9v6M11 15v6"
-                                  ></path>
-                                </svg>
-                              }
-                              @case ('brands') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="M20 12 12 20 4 12V4h8l8 8Z"></path>
-                                  <circle cx="9" cy="9" r="1"></circle>
-                                </svg>
-                              }
-                              @case ('inventory') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="M4 7h16v13H4zM2 3h20v4H2zM9 11h6M9 15h6"></path>
-                                </svg>
-                              }
-                              @case ('warehouse') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="M3 21V8l9-5 9 5v13M1 21h22M7 21v-8h10v8"></path>
-                                </svg>
-                              }
-                              @case ('receive') {
-                                <svg viewBox="0 0 24 24">
-                                  <path
-                                    d="M3 7h11v10H3zM14 10h4l3 3v4h-7M6 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"
-                                  ></path>
-                                </svg>
-                              }
-                              @case ('stock') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="m12 2 9 5-9 5-9-5 9-5ZM3 7v10l9 5 9-5V7M12 12v10"></path>
-                                </svg>
-                              }
-                              @case ('transfer') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="M7 7h13M16 3l4 4-4 4M17 17H4M8 13l-4 4 4 4"></path>
-                                </svg>
-                              }
-                              @case ('adjustment') {
-                                <svg viewBox="0 0 24 24">
-                                  <path
-                                    d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5M14 3v6M6 9v6M11 15v6"
-                                  ></path>
-                                </svg>
-                              }
-                              @case ('reports') {
-                                <svg viewBox="0 0 24 24">
-                                  <path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>
-                                </svg>
-                              }
-                              @case ('managers') {
-                                <svg viewBox="0 0 24 24">
-                                  <circle cx="12" cy="7" r="4"></circle>
-                                  <path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2"></path>
-                                </svg>
-                              }
-                            }
-                          </span>
-                          <span>{{ child.label }}</span>
-                        </a>
-                      }
-                    }
-                  </div>
-                }
-              </div>
+          @if (isNavigationTreeOpen(item.label) && !sidebarCollapsed()) {
+          <div [id]="navigationTreeId(item.label)" class="nav-submenu">
+            @for (child of item.children; track child.label) {
+            @if (child.disabled) {
+            <button class="nav-subitem disabled" type="button" disabled title="Staff management is coming soon">
+              <span class="nav-subicon" aria-hidden="true"><svg viewBox="0 0 24 24">
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75">
+                  </path>
+                </svg></span>
+              <span>{{ child.label }}</span><small>Soon</small>
+            </button>
             } @else {
-              <a
-                class="nav-item"
-                [routerLink]="item.route"
-                routerLinkActive="nav-active"
-                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                [title]="item.label"
-                (click)="onNavItemClick()"
-              >
-                <span class="nav-icon" aria-hidden="true">
-                  @switch (item.icon) {
-                    @case ('dashboard') {
-                      <svg viewBox="0 0 24 24">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                      </svg>
-                    }
-                    @case ('store') {
-                      <svg viewBox="0 0 24 24">
-                        <path d="M4 10h16"></path>
-                        <path d="M5 10l1-6h12l1 6"></path>
-                        <path d="M6 10v10h12V10"></path>
-                        <path d="M9 20v-6h6v6"></path>
-                      </svg>
-                    }
-                    @case ('products') {
-                      <svg viewBox="0 0 24 24">
-                        <path
-                          d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
-                        ></path>
-                        <path d="M3.3 7 12 12l8.7-5"></path>
-                        <path d="M12 22V12"></path>
-                      </svg>
-                    }
-                    @case ('branch') {
-                      <svg viewBox="0 0 24 24">
-                        <path d="M4 21V8l8-5 8 5v13"></path>
-                        <path d="M2 21h20"></path>
-                        <path d="M8 11h2M14 11h2M8 15h2M14 15h2"></path>
-                        <path d="M10 21v-3h4v3"></path>
-                      </svg>
-                    }
-                    @case ('inventory') {
-                      <svg viewBox="0 0 24 24">
-                        <path d="M4 7h16v13H4z"></path>
-                        <path d="M2 3h20v4H2z"></path>
-                        <path d="M9 11h6M9 15h6"></path>
-                      </svg>
-                    }
-                    @case ('warehouse') {
-                      <svg viewBox="0 0 24 24">
-                        <path d="M3 21V8l9-5 9 5v13"></path>
-                        <path d="M1 21h22M7 21v-8h10v8M7 16h10"></path>
-                      </svg>
-                    }
-                    @case ('analytics') {
-                      <svg viewBox="0 0 24 24">
-                        <path d="M3 3v18h18"></path>
-                        <path d="M7 15l3-3 3 2 5-7"></path>
-                        <path d="M18 7h-4"></path>
-                        <path d="M18 7v4"></path>
-                      </svg>
-                    }
-                    @case ('location') {
-                      <svg viewBox="0 0 24 24">
-                        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                      </svg>
-                    }
-                    @case ('profile') {
-                      <svg viewBox="0 0 24 24">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                      </svg>
-                    }
-                    @case ('settings') {
-                      <svg viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path
-                          d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1A2 2 0 1 1 7 4.4l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
-                        ></path>
-                      </svg>
-                    }
-                  }
-                </span>
-                <span class="nav-label">{{ item.label }}</span>
-              </a>
+            <a class="nav-subitem" [routerLink]="child.route" routerLinkActive="nav-sub-active"
+              [routerLinkActiveOptions]="{ exact: child.exact ?? false }" [title]="child.label"
+              (click)="onNavItemClick()">
+              <span class="nav-subicon" aria-hidden="true">
+                @switch (child.icon) {
+                @case ('store') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10"></path>
+                </svg>
+                }
+                @case ('branch') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 21V8l8-5 8 5v13M2 21h20M8 12h2M14 12h2"></path>
+                </svg>
+                }
+                @case ('products') {
+                <svg viewBox="0 0 24 24">
+                  <path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"></path>
+                </svg>
+                }
+                @case ('catalog') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 5h6v5H4zM14 14h6v5h-6zM7 10v4h10"></path>
+                </svg>
+                }
+                @case ('attributes') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5M14 3v6M6 9v6M11 15v6"></path>
+                </svg>
+                }
+                @case ('brands') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 12 12 20 4 12V4h8l8 8Z"></path>
+                  <circle cx="9" cy="9" r="1"></circle>
+                </svg>
+                }
+                @case ('inventory') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 7h16v13H4zM2 3h20v4H2zM9 11h6M9 15h6"></path>
+                </svg>
+                }
+                @case ('warehouse') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 21V8l9-5 9 5v13M1 21h22M7 21v-8h10v8"></path>
+                </svg>
+                }
+                @case ('receive') {
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M3 7h11v10H3zM14 10h4l3 3v4h-7M6 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z">
+                  </path>
+                </svg>
+                }
+                @case ('stock') {
+                <svg viewBox="0 0 24 24">
+                  <path d="m12 2 9 5-9 5-9-5 9-5ZM3 7v10l9 5 9-5V7M12 12v10"></path>
+                </svg>
+                }
+                @case ('transfer') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M7 7h13M16 3l4 4-4 4M17 17H4M8 13l-4 4 4 4"></path>
+                </svg>
+                }
+                @case ('adjustment') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5M14 3v6M6 9v6M11 15v6"></path>
+                </svg>
+                }
+                @case ('reports') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>
+                </svg>
+                }
+                @case ('managers') {
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="7" r="4"></circle>
+                  <path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2"></path>
+                </svg>
+                }
+                @case ('supplier') {
+                <svg viewBox="0 0 24 24">
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M3 21v-2a6 6 0 0 1 6-6"></path>
+                  <path d="M14 11h7"></path>
+                  <path d="M18 7v8"></path>
+                </svg>
+                }
+                }
+              </span>
+              <span>{{ child.label }}</span>
+            </a>
             }
+            }
+          </div>
           }
-        </section>
+        </div>
+        } @else {
+        <a class="nav-item" [routerLink]="item.route" routerLinkActive="nav-active"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }" [title]="item.label" (click)="onNavItemClick()">
+          <span class="nav-icon" aria-hidden="true">
+            @switch (item.icon) {
+            @case ('dashboard') {
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            }
+            @case ('store') {
+            <svg viewBox="0 0 24 24">
+              <path d="M4 10h16"></path>
+              <path d="M5 10l1-6h12l1 6"></path>
+              <path d="M6 10v10h12V10"></path>
+              <path d="M9 20v-6h6v6"></path>
+            </svg>
+            }
+            @case ('products') {
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+              </path>
+              <path d="M3.3 7 12 12l8.7-5"></path>
+              <path d="M12 22V12"></path>
+            </svg>
+            }
+            @case ('branch') {
+            <svg viewBox="0 0 24 24">
+              <path d="M4 21V8l8-5 8 5v13"></path>
+              <path d="M2 21h20"></path>
+              <path d="M8 11h2M14 11h2M8 15h2M14 15h2"></path>
+              <path d="M10 21v-3h4v3"></path>
+            </svg>
+            }
+            @case ('inventory') {
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7h16v13H4z"></path>
+              <path d="M2 3h20v4H2z"></path>
+              <path d="M9 11h6M9 15h6"></path>
+            </svg>
+            }
+            @case ('warehouse') {
+            <svg viewBox="0 0 24 24">
+              <path d="M3 21V8l9-5 9 5v13"></path>
+              <path d="M1 21h22M7 21v-8h10v8M7 16h10"></path>
+            </svg>
+            }
+            @case ('analytics') {
+            <svg viewBox="0 0 24 24">
+              <path d="M3 3v18h18"></path>
+              <path d="M7 15l3-3 3 2 5-7"></path>
+              <path d="M18 7h-4"></path>
+              <path d="M18 7v4"></path>
+            </svg>
+            }
+            @case ('location') {
+            <svg viewBox="0 0 24 24">
+              <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            }
+            @case ('profile') {
+            <svg viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            }
+            @case ('settings') {
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1A2 2 0 1 1 7 4.4l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z">
+              </path>
+            </svg>
+            }
+            }
+          </span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+        }
+        }
+      </section>
       }
     </nav>
 
@@ -305,13 +273,7 @@
           <span class="sidebar-user-name">{{ userName() }}</span>
           <span class="sidebar-user-role">{{ userRole() }}</span>
         </div>
-        <button
-          class="sidebar-logout-btn"
-          type="button"
-          title="Logout"
-          aria-label="Logout"
-          (click)="logout()"
-        >
+        <button class="sidebar-logout-btn" type="button" title="Logout" aria-label="Logout" (click)="logout()">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <path d="M16 17l5-5-5-5"></path>
@@ -325,24 +287,13 @@
   <div class="admin-main">
     <header class="topbar">
       <div class="topbar-start">
-        <button
-          class="mobile-nav-btn icon-menu"
-          type="button"
-          (click)="openMobileDrawer($event)"
-          aria-label="Open navigation"
-          [attr.aria-expanded]="mobileDrawerOpen()"
-        ></button>
+        <button class="mobile-nav-btn icon-menu" type="button" (click)="openMobileDrawer($event)"
+          aria-label="Open navigation" [attr.aria-expanded]="mobileDrawerOpen()"></button>
 
         <div class="store-chip-wrap current-store-wrap">
           <span class="current-store-label">Current Store</span>
-          <button
-            class="store-chip"
-            type="button"
-            (click)="toggleStoreDropdown($event)"
-            [class.active]="showStoreDropdown()"
-            aria-haspopup="listbox"
-            [attr.aria-expanded]="showStoreDropdown()"
-          >
+          <button class="store-chip" type="button" (click)="toggleStoreDropdown($event)"
+            [class.active]="showStoreDropdown()" aria-haspopup="listbox" [attr.aria-expanded]="showStoreDropdown()">
             <span class="store-chip-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
                 <path d="M4 10h16"></path>
@@ -360,36 +311,26 @@
           </button>
 
           @if (showStoreDropdown()) {
-            <div
-              class="store-dropdown"
-              (click)="$event.stopPropagation()"
-              role="listbox"
-              aria-label="Switch active store"
-            >
-              <div class="dropdown-header">Switch Active Store</div>
-              @for (store of stores(); track store.id) {
-                <button
-                  class="store-dropdown-item"
-                  type="button"
-                  [class.selected]="store.id === selectedStoreId()"
-                  (click)="selectStore(store.id)"
-                  role="option"
-                  [attr.aria-selected]="store.id === selectedStoreId()"
-                >
-                  <span class="store-dd-avatar" [style.background]="store.accentColor">{{
-                    store.name.charAt(0)
-                  }}</span>
-                  <span class="store-dd-info">
-                    <span class="store-dd-name">{{ store.name }}</span>
-                    <span class="store-dd-cat">{{ store.category }}</span>
-                  </span>
-                  <span class="store-dd-status" [class]="'status-dot--' + store.status"></span>
-                  @if (store.id === selectedStoreId()) {
-                    <span class="icon-check" aria-hidden="true"></span>
-                  }
-                </button>
+          <div class="store-dropdown" (click)="$event.stopPropagation()" role="listbox"
+            aria-label="Switch active store">
+            <div class="dropdown-header">Switch Active Store</div>
+            @for (store of stores(); track store.id) {
+            <button class="store-dropdown-item" type="button" [class.selected]="store.id === selectedStoreId()"
+              (click)="selectStore(store.id)" role="option" [attr.aria-selected]="store.id === selectedStoreId()">
+              <span class="store-dd-avatar" [style.background]="store.accentColor">{{
+                store.name.charAt(0)
+                }}</span>
+              <span class="store-dd-info">
+                <span class="store-dd-name">{{ store.name }}</span>
+                <span class="store-dd-cat">{{ store.category }}</span>
+              </span>
+              <span class="store-dd-status" [class]="'status-dot--' + store.status"></span>
+              @if (store.id === selectedStoreId()) {
+              <span class="icon-check" aria-hidden="true"></span>
               }
-            </div>
+            </button>
+            }
+          </div>
           }
         </div>
       </div>
@@ -399,129 +340,88 @@
           <label class="sr-only" for="topbar-search-input">Search stores</label>
           <div class="topbar-search" role="search">
             <span class="search-ico icon-search" aria-hidden="true"></span>
-            <input
-              id="topbar-search-input"
-              type="search"
-              class="search-input"
-              [value]="searchQuery()"
-              (input)="onSearchInput($event)"
-              (focus)="searchFocused.set(true)"
-              placeholder="Search anything..."
-              autocomplete="off"
-            />
+            <input id="topbar-search-input" type="search" class="search-input" [value]="searchQuery()"
+              (input)="onSearchInput($event)" (focus)="searchFocused.set(true)" placeholder="Search anything..."
+              autocomplete="off" />
 
             @if (searchQuery()) {
-              <button
-                class="search-clear-btn icon-close"
-                type="button"
-                (click)="clearSearch($event)"
-                aria-label="Clear search"
-              ></button>
+            <button class="search-clear-btn icon-close" type="button" (click)="clearSearch($event)"
+              aria-label="Clear search"></button>
             }
           </div>
 
           @if (showSearchResults()) {
-            <div class="search-results-dropdown" role="listbox" aria-label="Store search results">
-              @if (searchResults().length > 0) {
-                <div class="dropdown-header">Stores matching "{{ searchQuery() }}"</div>
-                @for (store of searchResults(); track store.id) {
-                  <button
-                    class="search-result-item"
-                    type="button"
-                    (click)="navigateToStore(store.id)"
-                  >
-                    <span class="search-result-avatar" [style.background]="store.accentColor">{{
-                      store.name.charAt(0)
-                    }}</span>
-                    <span class="search-result-info">
-                      <span class="search-result-name">{{ store.name }}</span>
-                      <span class="search-result-meta"
-                        >{{ store.category }} · {{ store.city }}</span
-                      >
-                    </span>
-                    <span class="status-badge" [class]="'status-badge status--' + store.status">{{
-                      store.status
-                    }}</span>
-                  </button>
-                }
-              } @else {
-                <div class="search-no-results">No stores found for "{{ searchQuery() }}"</div>
-              }
-            </div>
+          <div class="search-results-dropdown" role="listbox" aria-label="Store search results">
+            @if (searchResults().length > 0) {
+            <div class="dropdown-header">Stores matching "{{ searchQuery() }}"</div>
+            @for (store of searchResults(); track store.id) {
+            <button class="search-result-item" type="button" (click)="navigateToStore(store.id)">
+              <span class="search-result-avatar" [style.background]="store.accentColor">{{
+                store.name.charAt(0)
+                }}</span>
+              <span class="search-result-info">
+                <span class="search-result-name">{{ store.name }}</span>
+                <span class="search-result-meta">{{ store.category }} · {{ store.city }}</span>
+              </span>
+              <span class="status-badge" [class]="'status-badge status--' + store.status">{{
+                store.status
+                }}</span>
+            </button>
+            }
+            } @else {
+            <div class="search-no-results">No stores found for "{{ searchQuery() }}"</div>
+            }
+          </div>
           }
         </div>
       </div>
 
       <div class="topbar-end">
         <div class="notif-wrap">
-          <button
-            class="topbar-icon-btn"
-            type="button"
-            aria-label="Notifications"
-            (click)="toggleNotifPanel($event)"
-            [class.active]="showNotifPanel()"
-            aria-haspopup="dialog"
-            [attr.aria-expanded]="showNotifPanel()"
-          >
+          <button class="topbar-icon-btn" type="button" aria-label="Notifications" (click)="toggleNotifPanel($event)"
+            [class.active]="showNotifPanel()" aria-haspopup="dialog" [attr.aria-expanded]="showNotifPanel()">
             <svg class="topbar-btn-svg" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
               <path d="M13.7 21a2 2 0 0 1-3.4 0"></path>
             </svg>
             @if (unreadCount() > 0) {
-              <span class="notif-badge">{{ unreadCount() }}</span>
+            <span class="notif-badge">{{ unreadCount() }}</span>
             }
           </button>
 
           @if (showNotifPanel()) {
-            <div
-              class="notif-panel"
-              role="dialog"
-              aria-label="Notifications"
-              (click)="$event.stopPropagation()"
-            >
-              <div class="notif-panel-header">
-                <span>Notifications</span>
-                <button class="notif-mark-read" type="button" (click)="markAllRead()">
-                  Mark all read
-                </button>
-              </div>
-              <div class="notif-list">
-                @for (notif of notifications(); track notif.id) {
-                  <div class="notif-item" [class.unread]="notif.unread">
-                    <span
-                      class="notif-item-icon"
-                      [class]="'notif-item-icon notif-icon--' + notif.icon"
-                    ></span>
-                    <span class="notif-item-body">
-                      <span class="notif-item-title">{{ notif.title }}</span>
-                      <span class="notif-item-msg">{{ notif.message }}</span>
-                      <span class="notif-item-time">{{ notif.time }}</span>
-                    </span>
-                    @if (notif.unread) {
-                      <span class="notif-unread-dot"></span>
-                    }
-                  </div>
+          <div class="notif-panel" role="dialog" aria-label="Notifications" (click)="$event.stopPropagation()">
+            <div class="notif-panel-header">
+              <span>Notifications</span>
+              <button class="notif-mark-read" type="button" (click)="markAllRead()">
+                Mark all read
+              </button>
+            </div>
+            <div class="notif-list">
+              @for (notif of notifications(); track notif.id) {
+              <div class="notif-item" [class.unread]="notif.unread">
+                <span class="notif-item-icon" [class]="'notif-item-icon notif-icon--' + notif.icon"></span>
+                <span class="notif-item-body">
+                  <span class="notif-item-title">{{ notif.title }}</span>
+                  <span class="notif-item-msg">{{ notif.message }}</span>
+                  <span class="notif-item-time">{{ notif.time }}</span>
+                </span>
+                @if (notif.unread) {
+                <span class="notif-unread-dot"></span>
                 }
               </div>
-              <div class="notif-panel-footer">
-                <a routerLink="/store-admin/dashboard" (click)="showNotifPanel.set(false)"
-                  >View all activity</a
-                >
-              </div>
+              }
             </div>
+            <div class="notif-panel-footer">
+              <a routerLink="/store-admin/dashboard" (click)="showNotifPanel.set(false)">View all activity</a>
+            </div>
+          </div>
           }
         </div>
 
         <div class="user-menu-wrap">
-          <button
-            class="user-menu"
-            type="button"
-            aria-label="User account menu"
-            (click)="toggleUserMenu($event)"
-            [class.active]="showUserMenu()"
-            aria-haspopup="menu"
-            [attr.aria-expanded]="showUserMenu()"
-          >
+          <button class="user-menu" type="button" aria-label="User account menu" (click)="toggleUserMenu($event)"
+            [class.active]="showUserMenu()" aria-haspopup="menu" [attr.aria-expanded]="showUserMenu()">
             <span class="avatar user-avatar-topbar">{{ userInitials() }}</span>
             <span class="user-meta">
               <span class="user-fullname">{{ userName() }}</span>
@@ -531,42 +431,27 @@
           </button>
 
           @if (showUserMenu()) {
-            <div class="user-dropdown" role="menu" (click)="$event.stopPropagation()">
-              <div class="user-dropdown-header">
-                <div class="avatar user-dd-avatar">{{ userInitials() }}</div>
-                <div class="user-dd-info">
-                  <span class="user-dd-name">{{ userName() }}</span>
-                  <span class="user-dd-email">{{ userEmail() }}</span>
-                  <span class="user-dd-role-badge">{{ userRole() }}</span>
-                </div>
+          <div class="user-dropdown" role="menu" (click)="$event.stopPropagation()">
+            <div class="user-dropdown-header">
+              <div class="avatar user-dd-avatar">{{ userInitials() }}</div>
+              <div class="user-dd-info">
+                <span class="user-dd-name">{{ userName() }}</span>
+                <span class="user-dd-email">{{ userEmail() }}</span>
+                <span class="user-dd-role-badge">{{ userRole() }}</span>
               </div>
-              <div class="user-dropdown-sep"></div>
-              <button
-                class="user-dd-item icon-profile"
-                type="button"
-                role="menuitem"
-                (click)="goToProfile()"
-              >
-                My Profile
-              </button>
-              <button
-                class="user-dd-item icon-settings"
-                type="button"
-                role="menuitem"
-                (click)="goToSettings()"
-              >
-                Settings
-              </button>
-              <div class="user-dropdown-sep"></div>
-              <button
-                class="user-dd-item danger icon-logout"
-                type="button"
-                role="menuitem"
-                (click)="logout()"
-              >
-                Sign Out
-              </button>
             </div>
+            <div class="user-dropdown-sep"></div>
+            <button class="user-dd-item icon-profile" type="button" role="menuitem" (click)="goToProfile()">
+              My Profile
+            </button>
+            <button class="user-dd-item icon-settings" type="button" role="menuitem" (click)="goToSettings()">
+              Settings
+            </button>
+            <div class="user-dropdown-sep"></div>
+            <button class="user-dd-item danger icon-logout" type="button" role="menuitem" (click)="logout()">
+              Sign Out
+            </button>
+          </div>
           }
         </div>
       </div>
@@ -579,16 +464,12 @@
 
   <div class="toast-container" aria-live="polite" aria-atomic="true">
     @for (toast of toasts(); track toast.id) {
-      <button
-        class="toast-card"
-        type="button"
-        [class]="'toast-card toast--' + toast.type"
-        (click)="removeToast(toast.id)"
-      >
-        <span class="toast-icon" [class]="'toast-icon toast-icon--' + toast.type"></span>
-        <span class="toast-msg">{{ toast.message }}</span>
-        <span class="toast-close" aria-hidden="true">&times;</span>
-      </button>
+    <button class="toast-card" type="button" [class]="'toast-card toast--' + toast.type"
+      (click)="removeToast(toast.id)">
+      <span class="toast-icon" [class]="'toast-icon toast-icon--' + toast.type"></span>
+      <span class="toast-msg">{{ toast.message }}</span>
+      <span class="toast-close" aria-hidden="true">&times;</span>
+    </button>
     }
   </div>
 </div>

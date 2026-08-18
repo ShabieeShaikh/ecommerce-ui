@@ -225,12 +225,12 @@ export class ProductForm {
           const confirmation =
             this.loadedCategoryId && categoryId !== this.loadedCategoryId && hasVariantWork
               ? from(
-                  this.confirmAction(
-                    'Change Category?',
-                    'Changing the category will clear the current product variants.',
-                    'Change Category',
-                  ),
-                )
+                this.confirmAction(
+                  'Change Category?',
+                  'Changing the category will clear the current product variants.',
+                  'Change Category',
+                ),
+              )
               : of(true);
 
           return confirmation.pipe(
@@ -737,11 +737,11 @@ export class ProductForm {
     const savedValues =
       selectedCategory === editingCategory
         ? new Map(
-            (this.editingProduct?.attributes ?? []).map((attribute) => [
-              attribute.key,
-              attribute.value,
-            ]),
-          )
+          (this.editingProduct?.attributes ?? []).map((attribute) => [
+            attribute.key,
+            attribute.value,
+          ]),
+        )
         : new Map<string, ProductAttributeData>();
 
     definitions

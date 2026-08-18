@@ -15,6 +15,7 @@ import { BranchForm } from './components/store-admin/branch-form/branch-form';
 import { ProductForm } from './components/store-admin/product-form/product-form';
 import { ManagerListing } from './components/store-admin/manager-listing/manager-listing';
 import { StoreDetails } from './components/store-admin/store-details/store-details';
+import { SupplierList } from './components/store-admin/purchasing/suppliers/supplier-list/supplier-list';
 
 const loadWarehouseManagement = () =>
   import('./components/store-admin/warehouse-management/warehouse-management').then(
@@ -50,6 +51,10 @@ export const routes: Routes = [
       {
         path: 'stores/create',
         component: CreateStore,
+      },
+      {
+        path: 'purchasing/suppliers',
+        component: SupplierList
       },
       {
         path: 'store-form-design-preview',

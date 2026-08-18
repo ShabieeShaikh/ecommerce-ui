@@ -161,15 +161,15 @@ svg {
 }
 
 .field-grid > .form-field {
-  grid-column: span 2;
+  grid-column: span 1;
 }
 
 .field-grid > .form-field:nth-last-child(-n + 2) {
-  grid-column: span 3;
+  grid-column: span 2;
 }
 .specifications-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px 10px;
 }
 .media-description-grid {
@@ -195,6 +195,13 @@ svg {
 .short-description-control input {
   padding-right: 92px;
 }
+
+#attribute-occasion {
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+}
+
+
 .short-description-control > span {
   position: absolute;
   right: 9px;

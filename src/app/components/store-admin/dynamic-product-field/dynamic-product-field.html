@@ -39,14 +39,27 @@
         </div>
       }
       @case ('multi-select') {
-        <div class="field-control multi-control" [class.invalid]="invalid()">
-          <select multiple [id]="'attribute-' + definition().key" [formControl]="control()">
-            @for (option of definition().options ?? []; track option) {
-              <option [value]="option">{{ option }}</option>
-            }
-          </select>
-        </div>
-      }
+  <div
+    class="checkbox-options"
+    [class.invalid]="invalid()"
+    [id]="'attribute-' + definition().key"
+  >
+    @for (option of definition().options ?? []; track option) {
+      <label
+        class="checkbox-option"
+        [class.selected]="optionChecked(option)"
+      >
+        <input
+          type="checkbox"
+          [checked]="optionChecked(option)"
+          (change)="toggleOption(option, $any($event.target).checked)"
+        />
+
+        <span>{{ option }}</span>
+      </label>
+    }
+  </div>
+}
       @case ('boolean') {
         <label class="toggle-control" [for]="'attribute-' + definition().key"
           ><input

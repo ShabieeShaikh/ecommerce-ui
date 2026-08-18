@@ -1,0 +1,303 @@
+<div class="supplier-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>Supplier Management</h1>
+      <p>
+        Manage suppliers for your currently selected store.
+      </p>
+    </div>
+
+    <button type="button" class="primary-btn" (click)="addSupplier()">
+      <span class="btn-icon">+</span>
+      Add Supplier
+    </button>
+  </div>
+
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+
+    <div class="summary-card">
+      <div class="summary-content">
+        <span class="summary-label">
+          Total Suppliers
+        </span>
+
+        <strong class="summary-value">
+          {{ totalSuppliers() }}
+        </strong>
+      </div>
+    </div>
+
+
+    <div class="summary-card">
+      <div class="summary-content">
+        <span class="summary-label">
+          Active Suppliers
+        </span>
+
+        <strong class="summary-value">
+          {{ activeSuppliers() }}
+        </strong>
+      </div>
+    </div>
+
+
+    <div class="summary-card">
+      <div class="summary-content">
+        <span class="summary-label">
+          Inactive Suppliers
+        </span>
+
+        <strong class="summary-value">
+          {{ inactiveSuppliers() }}
+        </strong>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Main Supplier Card -->
+  <div class="supplier-card">
+
+    <!-- Toolbar -->
+    <div class="supplier-toolbar">
+
+      <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search supplier, code, email, phone..."
+          [value]="searchTerm()" (input)="onSearch($event)">
+      </div>
+
+
+      <div class="filter-container">
+        <select class="status-filter" [value]="statusFilter()" (change)="onStatusChange($event)">
+
+          <option value="all">
+            All Status
+          </option>
+
+          <option value="active">
+            Active
+          </option>
+
+          <option value="inactive">
+            Inactive
+          </option>
+
+        </select>
+      </div>
+
+    </div>
+
+
+    <!-- Supplier Table -->
+    @if (filteredSuppliers().length > 0) {
+
+    <div class="table-wrapper">
+
+      <table class="supplier-table">
+
+        <thead>
+          <tr>
+            <th>Supplier</th>
+            <th>Supplier Code</th>
+            <th>Contact Person</th>
+            <th>Contact</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th class="actions-column">
+              Actions
+            </th>
+          </tr>
+        </thead>
+
+
+        <tbody>
+
+          @for (supplier of filteredSuppliers(); track supplier.id) {
+
+          <tr>
+
+            <!-- Supplier -->
+            <td>
+              <div class="supplier-info">
+
+                <div class="supplier-avatar">
+                  {{ supplier.name.charAt(0).toUpperCase() }}
+                </div>
+
+                <div>
+                  <strong class="supplier-name">
+                    {{ supplier.name }}
+                  </strong>
+
+                  @if (supplier.email) {
+                  <span class="supplier-email">
+                    {{ supplier.email }}
+                  </span>
+                  }
+                </div>
+
+              </div>
+            </td>
+
+
+            <!-- Code -->
+            <td>
+              <span class="supplier-code">
+                {{ supplier.supplierCode }}
+              </span>
+            </td>
+
+
+            <!-- Contact Person -->
+            <td>
+              {{ supplier.contactPerson || '—' }}
+            </td>
+
+
+            <!-- Contact -->
+            <td>
+              <div class="contact-info">
+                <span>
+                  {{ supplier.phone }}
+                </span>
+
+                @if (supplier.alternatePhone) {
+                <small>
+                  {{ supplier.alternatePhone }}
+                </small>
+                }
+              </div>
+            </td>
+
+
+            <!-- Location -->
+            <td>
+              @if (supplier.city || supplier.country) {
+
+              <div class="location-info">
+
+                @if (supplier.city) {
+                <span>
+                  {{ supplier.city }}
+                </span>
+                }
+
+                @if (supplier.country) {
+                <small>
+                  {{ supplier.country }}
+                </small>
+                }
+
+              </div>
+
+              } @else {
+
+              <span>—</span>
+
+              }
+            </td>
+
+
+            <!-- Status -->
+            <td>
+
+              <span class="status-badge" [class.status-active]="supplier.status === 'active'"
+                [class.status-inactive]="supplier.status === 'inactive'">
+
+                {{ supplier.status === 'active'
+                ? 'Active'
+                : 'Inactive'
+                }}
+
+              </span>
+
+            </td>
+
+
+            <!-- Created -->
+            <td>
+              {{ supplier.createdAt | date:'dd MMM yyyy' }}
+            </td>
+
+
+            <!-- Actions -->
+            <td>
+
+              <div class="action-buttons">
+
+                <button type="button" class="action-btn" title="View Supplier" (click)="viewSupplier(supplier.id)">
+                  View
+                </button>
+
+
+                <button type="button" class="action-btn" title="Edit Supplier" (click)="editSupplier(supplier.id)">
+                  Edit
+                </button>
+
+
+                <button type="button" class="action-btn status-action"
+                  [class.activate-action]="supplier.status === 'inactive'" (click)="toggleSupplierStatus(supplier)">
+
+                  {{ supplier.status === 'active'
+                  ? 'Deactivate'
+                  : 'Activate'
+                  }}
+
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    } @else {
+
+    <!-- Empty State -->
+    <div class="empty-state">
+
+      <div class="empty-icon">
+        S
+      </div>
+
+      <h3>No suppliers found</h3>
+
+      @if (searchTerm() || statusFilter() !== 'all') {
+
+      <p>
+        Try changing your search or filter.
+      </p>
+
+      } @else {
+
+      <p>
+        Add your first supplier to start managing purchases.
+      </p>
+
+      <button type="button" class="primary-btn" (click)="addSupplier()">
+        + Add Supplier
+      </button>
+
+      }
+
+    </div>
+
+    }
+
+  </div>
+
+</div>

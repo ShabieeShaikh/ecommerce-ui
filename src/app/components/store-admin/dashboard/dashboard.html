@@ -37,7 +37,7 @@
     </div>
   </header>
 
-  <section class="kpi-grid" aria-label="Store metrics">
+  <!-- <section class="kpi-grid" aria-label="Store metrics">
     @for (card of dashboard().kpis; track card.id) {
     <article class="metric-card">
       <div class="metric-icon" [class]="'metric-icon metric-icon--' + card.tone">
@@ -86,7 +86,83 @@
       </div>
     </article>
     }
-  </section>
+  </section> -->
+
+  <section class="kpi-grid" aria-label="Store metrics">
+  @for (card of dashboard().kpis; track card.id) {
+
+    <article [class]="'metric-card tone-' + card.tone">
+
+      <div class="metric-icon">
+        @switch (card.icon) {
+
+          @case ('revenue') {
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          }
+
+          @case ('orders') {
+            <svg viewBox="0 0 24 24">
+              <path d="M6 2h12l2 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8l2-6Z"></path>
+              <path d="M4 8h16M9 12a3 3 0 0 0 6 0"></path>
+            </svg>
+          }
+
+          @case ('customers') {
+            <svg viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.8M16 3.2a4 4 0 0 1 0 7.6"></path>
+            </svg>
+          }
+
+          @case ('cart') {
+            <svg viewBox="0 0 24 24">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 6H6"></path>
+            </svg>
+          }
+
+          @case ('products') {
+            <svg viewBox="0 0 24 24">
+              <path d="m21 8-9-5-9 5 9 5 9-5Z"></path>
+              <path d="M3 8v8l9 5 9-5V8"></path>
+              <path d="M12 13v8"></path>
+            </svg>
+          }
+
+        }
+      </div>
+
+      <div class="metric-body">
+        <span class="metric-label">
+          {{ card.label }}
+        </span>
+
+        <strong class="metric-value">
+          {{ card.value }}
+        </strong>
+      </div>
+
+      <div class="metric-footer">
+        <span
+          class="metric-change"
+          [class.metric-down]="card.trend === 'down'"
+        >
+          {{ card.trend === 'down' ? '' : '+' }}{{ card.change }}%
+        </span>
+
+        <span class="metric-compare">
+          {{ dashboard().previousRangeLabel }}
+        </span>
+      </div>
+
+    </article>
+
+  }
+</section>
 
   <section class="chart-grid">
     <article class="panel revenue-panel">
