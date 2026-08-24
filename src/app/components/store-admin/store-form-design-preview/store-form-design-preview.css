@@ -34,7 +34,7 @@ svg {
 }
 .preview-breadcrumb a,
 .preview-breadcrumb span {
-  font-size: 12px !important;
+  font-size: 12px;
 }
 .preview-breadcrumb svg {
   width: 13px;
@@ -58,8 +58,8 @@ svg {
   align-items: center;
   gap: 7px;
   color: var(--purple);
-  font-size: 10px !important;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -73,13 +73,13 @@ svg {
 .title-block h1 {
   margin: 0;
   color: #1d1f31;
-  font-size: 29px;
+  font-size: 28px;
   line-height: 1.15;
   letter-spacing: -0.035em;
 }
 .title-copy {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 .header-meta {
   display: flex;
@@ -95,7 +95,7 @@ svg {
   border-radius: 10px;
   color: #28815e;
   background: #f2faf6;
-  font-size: 10px !important;
+  font-size: 12px;
   font-weight: 700;
 }
 .safe-badge svg {
@@ -111,7 +111,7 @@ svg {
   border-radius: 10px;
   color: #565a70;
   background: #fff;
-  font-size: 11px !important;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -135,11 +135,11 @@ svg {
 }
 .completion-strip strong {
   color: #44475c;
-  font-size: 11px;
+  font-size: 12px;
 }
 .completion-strip small {
   color: #9a9dad;
-  font-size: 9px !important;
+  font-size: 12px;
 }
 .progress-line {
   height: 5px;
@@ -157,7 +157,7 @@ svg {
 }
 .progress-value {
   color: var(--purple);
-  font-size: 10px !important;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -187,11 +187,11 @@ svg {
   width: 15px;
 }
 .preview-message strong {
-  font-size: 11px;
+  font-size: 12px;
 }
 .preview-message small {
   color: #61967e;
-  font-size: 10px !important;
+  font-size: 12px;
 }
 .preview-message button {
   margin-left: auto;
@@ -223,8 +223,8 @@ svg {
 .nav-heading {
   padding: 0 8px 10px;
   color: #a0a3b2;
-  font-size: 9px !important;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -243,7 +243,7 @@ svg {
   background: #f1efff;
 }
 .nav-item span {
-  font-size: 9px !important;
+  font-size: 12px;
   font-weight: 700;
 }
 .nav-item > i {
@@ -259,8 +259,8 @@ svg {
 }
 .nav-item strong {
   overflow: hidden;
-  font-size: 10px;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -283,10 +283,10 @@ svg {
 }
 .nav-note strong {
   color: #575a70;
-  font-size: 9px;
+  font-size: 12px;
 }
 .nav-note small {
-  font-size: 8px !important;
+  font-size: 12px;
   line-height: 1.4;
 }
 
@@ -349,14 +349,14 @@ svg {
 }
 .card-header small {
   color: #989bac;
-  font-size: 10px !important;
+  font-size: 12px;
 }
 .required-note,
 .optional-badge {
   margin-left: auto;
   color: #9699aa;
-  font-size: 9px !important;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 600;
 }
 .required-note b {
   color: #df5361;
@@ -386,7 +386,7 @@ svg {
   align-items: center;
   gap: 4px;
   color: #4b4e63;
-  font-size: 11px !important;
+  font-size: 12px;
   font-weight: 700;
 }
 .form-field > span:first-child b {
@@ -395,7 +395,7 @@ svg {
 .form-field > span:first-child em {
   margin-left: auto;
   color: #a6a9b8;
-  font-size: 9px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 500;
 }
@@ -444,7 +444,7 @@ svg {
   outline: 0;
   color: #33364a;
   background: transparent;
-  font-size: 11px !important;
+  font-size: 12px;
 }
 .field-control input::placeholder,
 .phone-control input::placeholder,
@@ -482,7 +482,7 @@ textarea::placeholder {
 }
 .field-error {
   color: #d94f5b;
-  font-size: 9px !important;
+  font-size: 12px;
 }
 .description-field {
   grid-column: 1 / -1;
@@ -504,7 +504,7 @@ textarea::placeholder {
   outline: 0;
   color: #3d4054;
   background: #fff;
-  font-size: 11px !important;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -565,11 +565,11 @@ textarea::placeholder {
 }
 .upload-zone strong {
   color: #54576c;
-  font-size: 10px;
+  font-size: 12px;
 }
 .upload-zone small {
   color: #9fa2b2;
-  font-size: 8px !important;
+  font-size: 12px;
 }
 .file-details {
   display: flex;
@@ -587,13 +587,13 @@ textarea::placeholder {
 }
 .file-details strong {
   color: #505368;
-  font-size: 10px;
+  font-size: 12px;
 }
 .file-details small {
   overflow: hidden;
   max-width: 100%;
   color: #a0a3b2;
-  font-size: 8px !important;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -613,13 +613,13 @@ textarea::placeholder {
   color: #5b5e72;
   background: #fff;
   cursor: pointer;
-  font-size: 9px !important;
+  font-size: 12px;
   font-weight: 700;
 }
 .file-details button {
   color: #d8525e;
-  font-size: 9px;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .status-body {
@@ -655,11 +655,11 @@ textarea::placeholder {
 }
 .status-explanation strong {
   color: #55586c;
-  font-size: 10px;
+  font-size: 12px;
 }
 .status-explanation small {
   color: #9ca0b0;
-  font-size: 9px !important;
+  font-size: 12px;
 }
 
 .form-actions {
@@ -683,7 +683,7 @@ textarea::placeholder {
   gap: 7px;
   padding: 0 16px;
   border-radius: 10px;
-  font-size: 11px !important;
+  font-size: 12px;
   font-weight: 700;
 }
 .cancel-button {
@@ -721,15 +721,15 @@ textarea::placeholder {
 }
 .preview-card > header span {
   color: #45485c;
-  font-size: 10px;
-  font-weight: 750;
+  font-size: 12px;
+  font-weight: 700;
 }
 .preview-card > header i {
   padding: 4px 7px;
   border-radius: 20px;
   color: #7770d1;
   background: #efedff;
-  font-size: 8px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 700;
 }
@@ -790,7 +790,7 @@ textarea::placeholder {
   align-items: center;
   gap: 5px;
   color: #269069;
-  font-size: 8px !important;
+  font-size: 12px;
   font-weight: 700;
   text-transform: capitalize;
 }
@@ -810,21 +810,21 @@ textarea::placeholder {
   overflow: hidden;
   margin: 0;
   color: #292c3e;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .preview-owner {
   color: #9599aa;
-  font-size: 9px !important;
+  font-size: 12px;
 }
 .preview-location {
   display: flex;
   align-items: center;
   gap: 5px;
   color: #72768a;
-  font-size: 9px !important;
+  font-size: 12px;
 }
 .preview-location svg {
   width: 13px;
@@ -835,7 +835,7 @@ textarea::placeholder {
   min-height: 33px;
   overflow: hidden;
   color: #8c90a2;
-  font-size: 9px !important;
+  font-size: 12px;
   line-height: 1.5;
 }
 .preview-stats {
@@ -855,11 +855,11 @@ textarea::placeholder {
 }
 .preview-stats strong {
   color: #44475b;
-  font-size: 10px;
+  font-size: 12px;
 }
 .preview-stats small {
   color: #a0a3b1;
-  font-size: 8px !important;
+  font-size: 12px;
 }
 .approval-note {
   display: flex;
@@ -880,11 +880,11 @@ textarea::placeholder {
 }
 .approval-note strong {
   color: #56536f;
-  font-size: 9px;
+  font-size: 12px;
 }
 .approval-note small {
   color: #9290aa;
-  font-size: 8px !important;
+  font-size: 12px;
   line-height: 1.45;
 }
 
@@ -979,7 +979,7 @@ textarea::placeholder {
     min-height: 0;
   }
   .title-block h1 {
-    font-size: 25px;
+    font-size: 24px;
   }
   .card-header {
     padding: 11px 12px;

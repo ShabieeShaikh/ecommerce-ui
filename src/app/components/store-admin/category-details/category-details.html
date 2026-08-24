@@ -23,22 +23,26 @@
       </div>
     </header>
 
-    <section class="summary-grid">
-      <article>
-        <small>Parent Category</small><strong>{{ parent()?.name || 'Top level' }}</strong
-        ><em>Hierarchy placement</em>
+    <section class="summary-grid ds-metric-grid" aria-label="Category summary">
+      <article class="ds-metric-card ds-tone-purple">
+        <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"></path></svg></span>
+        <span class="ds-metric-body"><small class="ds-metric-label">Parent Category</small><strong class="ds-metric-value">{{ parent()?.name || 'Top level' }}</strong
+        ><em class="ds-metric-helper">Hierarchy placement</em></span>
       </article>
-      <article>
-        <small>Subcategories</small><strong>{{ subcategories().length }}</strong
-        ><em>Direct child categories</em>
+      <article class="ds-metric-card ds-tone-blue">
+        <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h6v5H4zM14 14h6v5h-6zM7 10v4h10"></path></svg></span>
+        <span class="ds-metric-body"><small class="ds-metric-label">Subcategories</small><strong class="ds-metric-value">{{ subcategories().length }}</strong
+        ><em class="ds-metric-helper">Direct child categories</em></span>
       </article>
-      <article>
-        <small>Assigned Attributes</small><strong>{{ assignments().length }}</strong
-        ><em>{{ assignments().length ? 'Configured product fields' : 'No fields configured' }}</em>
+      <article class="ds-metric-card ds-tone-green">
+        <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M8 12h8M10 17h4"></path></svg></span>
+        <span class="ds-metric-body"><small class="ds-metric-label">Assigned Attributes</small><strong class="ds-metric-value">{{ assignments().length }}</strong
+        ><em class="ds-metric-helper">{{ assignments().length ? 'Configured product fields' : 'No fields configured' }}</em></span>
       </article>
-      <article>
-        <small>Catalog Products</small><strong>{{ productsUsingCategory().length }}</strong
-        ><em>Stored product records</em>
+      <article class="ds-metric-card ds-tone-orange">
+        <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 7v10l9 5 9-5V7M12 12v10"></path></svg></span>
+        <span class="ds-metric-body"><small class="ds-metric-label">Catalog Products</small><strong class="ds-metric-value">{{ productsUsingCategory().length }}</strong
+        ><em class="ds-metric-helper">Stored product records</em></span>
       </article>
     </section>
 

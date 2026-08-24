@@ -29,9 +29,9 @@
        KPI SUMMARY ROW
   ══════════════════════ -->
   @if (isLoadingKpi()) {
-    <div class="analytics-kpi-grid">
+    <div class="analytics-kpi-grid ds-metric-grid">
       @for (_ of [1,2,3,4,5,6]; track $index) {
-        <div class="an-kpi-skel skeleton"></div>
+        <div class="an-kpi-skel skeleton ds-metric-skeleton"></div>
       }
     </div>
   } @else if (hasError()) {
@@ -41,17 +41,42 @@
       <button class="text-btn" id="retry-analytics-btn">Retry</button>
     </div>
   } @else {
-    <div class="analytics-kpi-grid">
+    <div class="analytics-kpi-grid ds-metric-grid">
       @for (kpi of kpis; track kpi.id) {
-        <div class="an-kpi-card" [class]="'an-kpi-card an-kpi--' + kpi.colorVar">
-          <div class="an-kpi-top">
-            <span class="an-kpi-label">{{ kpi.label }}</span>
-            <span class="an-kpi-trend" [class]="'an-kpi-trend an-trend--' + kpi.trend">
+        <article [class]="'an-kpi-card ds-metric-card an-kpi--' + kpi.colorVar + ' ds-tone-' + kpi.colorVar">
+          <div class="an-kpi-top ds-metric-topline">
+            <span class="ds-metric-icon" aria-hidden="true">
+              @switch (kpi.id) {
+                @case ('revenue') {
+                  <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                }
+                @case ('orders') {
+                  <svg viewBox="0 0 24 24"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h4"></path></svg>
+                }
+                @case ('visitors') {
+                  <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"></circle><path d="M2 21v-2a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v2M17 4a4 4 0 0 1 0 7M19 14a6 6 0 0 1 3 5v2"></path></svg>
+                }
+                @case ('conversion') {
+                  <svg viewBox="0 0 24 24"><path d="M4 5h16M7 12h10M10 19h4"></path></svg>
+                }
+                @case ('avg-order') {
+                  <svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1"></circle><circle cx="19" cy="20" r="1"></circle><path d="M3 3h2l2.7 11.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"></path></svg>
+                }
+                @default {
+                  <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>
+                }
+              }
+            </span>
+            <span class="an-kpi-trend ds-metric-trend" [class]="'an-kpi-trend ds-metric-trend an-trend--' + kpi.trend + (kpi.trend === 'down' ? ' ds-metric-trend--down' : kpi.trend === 'neutral' ? ' ds-metric-trend--neutral' : '')">
               {{ kpi.change > 0 ? '▲' : kpi.change < 0 ? '▼' : '–' }} {{ kpi.change > 0 ? '+' : '' }}{{ kpi.change }}%
             </span>
           </div>
-          <div class="an-kpi-value">{{ kpi.value }}</div>
-        </div>
+          <div class="ds-metric-body">
+            <span class="an-kpi-label ds-metric-label">{{ kpi.label }}</span>
+            <strong class="an-kpi-value ds-metric-value">{{ kpi.value }}</strong>
+            <span class="ds-metric-helper">Compared with previous period</span>
+          </div>
+        </article>
       }
     </div>
   }

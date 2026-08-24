@@ -22,7 +22,7 @@ svg {
   align-items: center;
   gap: 7px;
   color: #667085;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 .breadcrumb svg {
@@ -37,13 +37,13 @@ svg {
 }
 .form-page-header h1 {
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
 }
 .form-page-header p {
   margin-top: 5px;
   color: #667085;
-  font-size: 11px;
+  font-size: 12px;
 }
 .branch-form-panel {
   overflow: hidden;
@@ -64,7 +64,7 @@ svg {
   justify-items: center;
   gap: 7px;
   color: #667085;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   text-align: center;
 }
@@ -79,8 +79,8 @@ svg {
   place-items: center;
   color: #fff;
   background: #d0d5dd;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .step-number svg {
   width: 15px;
@@ -115,7 +115,7 @@ svg {
 }
 .section-heading h2 {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
 }
 .form-grid {
   display: grid;
@@ -131,8 +131,8 @@ svg {
   align-content: start;
   gap: 6px;
   color: #344054;
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .form-field > span {
   color: #d92d20;
@@ -180,7 +180,7 @@ textarea.invalid {
   color: #101828;
   background: transparent;
   font: inherit;
-  font-size: 10px;
+  font-size: 12px;
 }
 .control input,
 .control select {
@@ -216,7 +216,7 @@ textarea {
   color: #101828;
   background: #fff;
   font: inherit;
-  font-size: 10px;
+  font-size: 12px;
 }
 .plain-control {
   height: 40px;
@@ -245,7 +245,7 @@ textarea {
   background: #fffaeb;
   border: 1px solid #fedf89;
   border-radius: 7px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 }
 .location-alert > div {
@@ -262,8 +262,8 @@ textarea {
   color: #93370d;
   background: #fff;
   font: inherit;
-  font-size: 9px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .location-alert button:hover {
   color: #6437e8;
@@ -326,8 +326,8 @@ textarea {
 }
 .manager-mode-option strong {
   color: inherit;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .manager-selector-field {
   margin-top: 14px;
@@ -364,12 +364,12 @@ textarea {
 }
 .manager-empty-state strong {
   color: #101828;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .manager-empty-state div span {
   color: #667085;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
 }
 .manager-empty-state button {
@@ -379,8 +379,8 @@ textarea {
   background: #6437e8;
   border: 1px solid #6437e8;
   border-radius: 6px;
-  font-size: 9px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .manager-fields {
   margin-top: 14px;
@@ -392,7 +392,7 @@ textarea {
 .form-subheading h3 {
   color: #101828;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 .hours-heading {
   margin-top: 3px;
@@ -416,7 +416,7 @@ textarea {
   color: #475467;
   border-left: 1px solid #e1e6ee;
   border-right: 1px solid #e1e6ee;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 .duplicate-manager-error {
@@ -425,7 +425,7 @@ textarea {
   background: #fef3f2;
   border: 1px solid #fecdca;
   border-radius: 6px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 }
 .counter {
@@ -445,13 +445,13 @@ textarea {
 }
 .schedule-intro h4 {
   color: #101828;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .schedule-intro p {
   margin-top: 4px;
   color: #667085;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
 }
 .schedule-intro > span {
@@ -460,8 +460,8 @@ textarea {
   color: #027a48;
   background: #ecfdf3;
   border-radius: 5px;
-  font-size: 8px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .schedule-days {
   border-top: 1px solid #eaecf0;
@@ -490,8 +490,8 @@ textarea {
 }
 .schedule-day-name strong {
   color: #344054;
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .schedule-toggle {
   width: 34px;
@@ -537,7 +537,7 @@ textarea {
 }
 .time-slot-row > span {
   color: #667085;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   text-align: center;
 }
@@ -552,7 +552,7 @@ textarea {
   color: #101828;
   background: #fff;
   font: inherit;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 }
 .time-slot-row select:focus,
@@ -596,7 +596,7 @@ textarea {
   background: #f2f4f7;
   border: 1px solid #e4e7ec;
   border-radius: 6px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 }
 .schedule-day.closed .schedule-slots {
@@ -620,8 +620,8 @@ textarea {
   background: #fff;
   border: 1px solid rgba(100, 55, 232, 0.45);
   border-radius: 6px;
-  font-size: 9px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .add-slot-button:hover {
   background: rgba(100, 55, 232, 0.04);
@@ -644,8 +644,8 @@ textarea {
   color: #fff;
   background: #6437e8;
   border-radius: 6px;
-  font-size: 9px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .schedule-note {
   min-height: 43px;
@@ -658,7 +658,7 @@ textarea {
   background: #eff8ff;
   border: 1px solid #b2ddff;
   border-radius: 6px;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -675,7 +675,7 @@ textarea {
   background: #fef3f2;
   border: 1px solid #fecdca;
   border-radius: 6px;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
 }
 .status-field {
@@ -700,12 +700,12 @@ textarea {
 }
 .review-list dt {
   color: #667085;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 .review-list dd {
   color: #101828;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.5;
 }
@@ -723,12 +723,12 @@ textarea {
   grid-template-columns: 34px minmax(0, 1fr);
   gap: 7px;
   color: #475467;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
 }
 .review-hours dd strong {
   color: #101828;
-  font-weight: 800;
+  font-weight: 700;
 }
 .review-status {
   width: max-content;
@@ -736,8 +736,8 @@ textarea {
   border-radius: 6px;
   display: inline-flex;
   text-transform: capitalize;
-  font-size: 9px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .status-active {
   color: #027a48;
@@ -767,8 +767,8 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .back-button {
   color: #344054;
@@ -803,7 +803,7 @@ textarea {
     width: 70px;
   }
   .step > span:last-child {
-    font-size: 8px;
+    font-size: 12px;
   }
   .step-line {
     min-width: 8px;

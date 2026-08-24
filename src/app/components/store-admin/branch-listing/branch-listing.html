@@ -31,10 +31,13 @@
       </button>
     </section>
   } @else {
-    <section class="summary-grid" aria-label="Branch summary">
+    <section class="summary-grid ds-metric-grid" aria-label="Branch summary">
       @for (item of stats(); track item.label) {
-        <article class="summary-card">
-          <span class="summary-icon" [class]="'summary-icon summary-icon--' + item.tone">
+        <article [class]="'summary-card ds-metric-card ds-tone-' + item.tone">
+          <span
+            class="summary-icon ds-metric-icon"
+            [class]="'summary-icon ds-metric-icon summary-icon--' + item.tone"
+          >
             @switch (item.icon) {
               @case ('active') {
                 <svg viewBox="0 0 24 24">
@@ -54,9 +57,9 @@
               }
             }
           </span>
-          <span class="summary-text"
-            ><span>{{ item.label }}</span
-            ><strong>{{ item.value }}</strong></span
+          <span class="summary-text ds-metric-body"
+            ><span class="ds-metric-label">{{ item.label }}</span
+            ><strong class="ds-metric-value">{{ item.value }}</strong></span
           >
         </article>
       }

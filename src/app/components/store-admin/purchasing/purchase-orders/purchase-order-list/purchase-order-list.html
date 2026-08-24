@@ -1,0 +1,310 @@
+<main class="purchase-order-page">
+  <header class="page-header">
+    <div class="header-copy">
+      <span class="page-eyebrow">Purchasing</span>
+      <h1>Purchase Orders</h1>
+      <p>Manage supplier purchase orders and track their receiving progress.</p>
+    </div>
+
+    <button type="button" class="primary-btn" (click)="createPurchaseOrder()">
+      <span class="btn-icon" aria-hidden="true">+</span>
+      Create Purchase Order
+    </button>
+  </header>
+
+  <section class="summary-grid ds-metric-grid" aria-label="Purchase order summary">
+    <article class="summary-card tone-violet ds-metric-card ds-tone-violet">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h4"></path>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Total Purchase Orders</span>
+        <strong class="summary-value ds-metric-value">{{ totalPurchaseOrders() }}</strong>
+        <span class="ds-metric-helper">All purchasing records</span>
+      </div>
+    </article>
+
+    <article class="summary-card tone-neutral ds-metric-card ds-tone-neutral">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M12 7v5l3 2"></path>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Draft</span>
+        <strong class="summary-value ds-metric-value">{{ draftPurchaseOrders() }}</strong>
+        <span class="ds-metric-helper">Open for editing</span>
+      </div>
+    </article>
+
+    <article class="summary-card tone-blue ds-metric-card ds-tone-blue">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 12h14M13 7l5 5-5 5"></path>
+          <path d="M20 4v16"></path>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Ordered</span>
+        <strong class="summary-value ds-metric-value">{{ orderedPurchaseOrders() }}</strong>
+        <span class="ds-metric-helper">Awaiting receipt</span>
+      </div>
+    </article>
+
+    <article class="summary-card tone-orange ds-metric-card ds-tone-orange">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 7h12v10H3zM15 10h4l2 3v4h-6z"></path>
+          <circle cx="7" cy="18" r="2"></circle>
+          <circle cx="18" cy="18" r="2"></circle>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Partially Received</span>
+        <strong class="summary-value ds-metric-value">{{ partiallyReceivedPurchaseOrders() }}</strong>
+        <span class="ds-metric-helper">Receiving in progress</span>
+      </div>
+    </article>
+
+    <article class="summary-card tone-green ds-metric-card ds-tone-green">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="m8 12 2.5 2.5L16 9"></path>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Received</span>
+        <strong class="summary-value ds-metric-value">{{ receivedPurchaseOrders() }}</strong>
+        <span class="ds-metric-helper">Completed receipts</span>
+      </div>
+    </article>
+
+    <article class="summary-card tone-red ds-metric-card ds-tone-red">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="m9 9 6 6M15 9l-6 6"></path>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Cancelled</span>
+        <strong class="summary-value ds-metric-value">{{ cancelledPurchaseOrders() }}</strong>
+        <span class="ds-metric-helper">Retained for history</span>
+      </div>
+    </article>
+  </section>
+
+  <section class="purchase-order-card" aria-label="Purchase order list">
+    <div class="purchase-order-toolbar">
+      <label class="search-container">
+        <span class="control-label">Search</span>
+        <span class="search-control">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-4-4"></path>
+          </svg>
+          <input
+            type="search"
+            class="search-input"
+            placeholder="Search PO number, supplier, receiving location..."
+            [value]="searchTerm()"
+            (input)="onSearch($event)"
+          />
+        </span>
+      </label>
+
+      <div class="filter-container">
+        <label class="filter-control">
+          <span class="control-label">Status</span>
+          <select class="filter-select" [value]="statusFilter()" (change)="onStatusChange($event)">
+            @for (option of statusOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="filter-control">
+          <span class="control-label">Supplier</span>
+          <select
+            class="filter-select supplier-filter"
+            [value]="supplierFilter()"
+            (change)="onSupplierChange($event)"
+          >
+            <option value="all">All Suppliers</option>
+            @for (supplier of supplierOptions(); track supplier.id) {
+              <option [value]="supplier.id">{{ supplier.name }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </div>
+
+    @if (filteredPurchaseOrders().length > 0) {
+      <div class="table-wrapper">
+        <table class="purchase-order-table">
+          <thead>
+            <tr>
+              <th scope="col">PO Number</th>
+              <th scope="col">Supplier</th>
+              <th scope="col">Receiving Location</th>
+              <th scope="col">Order Date</th>
+              <th scope="col">Expected Delivery</th>
+              <th scope="col">Items</th>
+              <th scope="col">Total</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (purchaseOrder of filteredPurchaseOrders(); track purchaseOrder.id) {
+              <tr>
+                <td>
+                  <button
+                    type="button"
+                    class="po-number"
+                    [attr.aria-label]="'View purchase order ' + purchaseOrder.poNumber"
+                    (click)="viewPurchaseOrder(purchaseOrder.id)"
+                  >
+                    {{ purchaseOrder.poNumber }}
+                  </button>
+                </td>
+                <td>
+                  <div class="entity-cell">
+                    <span class="entity-avatar" aria-hidden="true">
+                      {{ purchaseOrder.supplierName.charAt(0).toUpperCase() }}
+                    </span>
+                    <strong>{{ purchaseOrder.supplierName }}</strong>
+                  </div>
+                </td>
+                <td>
+                  <div class="receiving-location">
+                    <span class="receiving-location-name">
+                      {{ purchaseOrder.receivingLocationName }}
+                    </span>
+                    <span
+                      class="location-type"
+                      [class]="'location-type location-type-' + purchaseOrder.receivingLocationType"
+                    >
+                      {{ locationTypeLabel(purchaseOrder.receivingLocationType) }}
+                    </span>
+                  </div>
+                </td>
+                <td>{{ purchaseOrder.orderDate | date: 'dd MMM yyyy' }}</td>
+                <td>
+                  @if (purchaseOrder.expectedDeliveryDate) {
+                    {{ purchaseOrder.expectedDeliveryDate | date: 'dd MMM yyyy' }}
+                  } @else {
+                    <span class="empty-value">—</span>
+                  }
+                </td>
+                <td>
+                  {{ purchaseOrder.items.length }}
+                  {{ purchaseOrder.items.length === 1 ? 'Item' : 'Items' }}
+                </td>
+                <td>
+                  <strong class="total-amount">
+                    {{ formatCurrency(purchaseOrder.totalAmount) }}
+                  </strong>
+                </td>
+                <td>
+                  <span class="po-status" [class]="'po-status po-status-' + purchaseOrder.status">
+                    {{ statusLabel(purchaseOrder.status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="table-action"
+                      title="View purchase order"
+                      [attr.aria-label]="'View ' + purchaseOrder.poNumber"
+                      (click)="viewPurchaseOrder(purchaseOrder.id)"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <span>View</span>
+                    </button>
+
+                    @if (purchaseOrder.status === 'draft') {
+                      <button
+                        type="button"
+                        class="table-action"
+                        title="Edit purchase order"
+                        [attr.aria-label]="'Edit ' + purchaseOrder.poNumber"
+                        (click)="editPurchaseOrder(purchaseOrder.id)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"
+                          ></path>
+                        </svg>
+                        <span>Edit</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="table-action action-submit"
+                        title="Submit purchase order"
+                        [attr.aria-label]="'Submit ' + purchaseOrder.poNumber"
+                        (click)="submitPurchaseOrder(purchaseOrder)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M5 12h14M14 7l5 5-5 5"></path>
+                        </svg>
+                        <span>Submit</span>
+                      </button>
+                    }
+
+                    @if (canCancel(purchaseOrder)) {
+                      <button
+                        type="button"
+                        class="table-action action-cancel"
+                        title="Cancel purchase order"
+                        [attr.aria-label]="'Cancel ' + purchaseOrder.poNumber"
+                        (click)="cancelPurchaseOrder(purchaseOrder)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <circle cx="12" cy="12" r="9"></circle>
+                          <path d="m9 9 6 6M15 9l-6 6"></path>
+                        </svg>
+                        <span>Cancel</span>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h4"></path>
+          </svg>
+        </span>
+
+        @if (purchaseOrders().length === 0) {
+          <h2>No purchase orders yet</h2>
+          <p>Create your first purchase order to start ordering stock from suppliers.</p>
+          <button type="button" class="primary-btn" (click)="createPurchaseOrder()">
+            + Create Purchase Order
+          </button>
+        } @else {
+          <h2>No matching purchase orders</h2>
+          <p>Try changing your search or filters.</p>
+          <button type="button" class="secondary-btn" (click)="clearFilters()">
+            Clear Filters
+          </button>
+        }
+      </div>
+    }
+  </section>
+</main>

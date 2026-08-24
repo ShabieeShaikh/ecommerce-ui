@@ -6,15 +6,15 @@
     <button class="primary-button" type="button" (click)="openCreate()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>Add {{ section() === 'categories' ? 'Category' : section() === 'attributes' ? 'Attribute' : 'Brand' }}</button>
   </header>
 
-  <section class="summary-grid" aria-label="Catalog summary">
-    <article><span class="summary-icon purple"><svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"></path></svg></span><div><small>Total {{ section() }}</small><strong>{{ totalCount() }}</strong><em>Catalog records</em></div></article>
-    <article><span class="summary-icon green"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></svg></span><div><small>Active</small><strong>{{ activeCount() }}</strong><em>Available to products</em></div></article>
+  <section class="summary-grid ds-metric-grid" aria-label="Catalog summary">
+    <article class="ds-metric-card ds-tone-purple"><span class="summary-icon purple ds-metric-icon"><svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"></path></svg></span><div class="ds-metric-body"><small class="ds-metric-label">Total {{ section() }}</small><strong class="ds-metric-value">{{ totalCount() }}</strong><em class="ds-metric-helper">Catalog records</em></div></article>
+    <article class="ds-metric-card ds-tone-green"><span class="summary-icon green ds-metric-icon"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></svg></span><div class="ds-metric-body"><small class="ds-metric-label">Active</small><strong class="ds-metric-value">{{ activeCount() }}</strong><em class="ds-metric-helper">Available to products</em></div></article>
     @if(section() === 'categories'){
-      <article><span class="summary-icon blue"><svg viewBox="0 0 24 24"><path d="M4 5h6v5H4zM14 14h6v5h-6zM7 10v4h10"></path></svg></span><div><small>Subcategories</small><strong>{{ subcategoryTotal() }}</strong><em>Child categories</em></div></article>
+      <article class="ds-metric-card ds-tone-blue"><span class="summary-icon blue ds-metric-icon"><svg viewBox="0 0 24 24"><path d="M4 5h6v5H4zM14 14h6v5h-6zM7 10v4h10"></path></svg></span><div class="ds-metric-body"><small class="ds-metric-label">Subcategories</small><strong class="ds-metric-value">{{ subcategoryTotal() }}</strong><em class="ds-metric-helper">Child categories</em></div></article>
     } @else if(section() === 'attributes'){
-      <article><span class="summary-icon orange"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"></path></svg></span><div><small>Assignments</small><strong>{{ assignments().length }}</strong><em>Across all categories</em></div></article>
+      <article class="ds-metric-card ds-tone-orange"><span class="summary-icon orange ds-metric-icon"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"></path></svg></span><div class="ds-metric-body"><small class="ds-metric-label">Assignments</small><strong class="ds-metric-value">{{ assignments().length }}</strong><em class="ds-metric-helper">Across all categories</em></div></article>
     } @else {
-      <article><span class="summary-icon orange"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 8h8M8 12h6"></path></svg></span><div><small>Used Brands</small><strong>{{ brands().length }}</strong><em>Configured options</em></div></article>
+      <article class="ds-metric-card ds-tone-orange"><span class="summary-icon orange ds-metric-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 8h8M8 12h6"></path></svg></span><div class="ds-metric-body"><small class="ds-metric-label">Used Brands</small><strong class="ds-metric-value">{{ brands().length }}</strong><em class="ds-metric-helper">Configured options</em></div></article>
     }
   </section>
 

@@ -13,27 +13,49 @@
 
   @if (activeTab() === 'overview') {
     <section class="stock-workspace">
-      <div class="stock-stat-grid overview-stat-grid">
-        <article>
-          <span>Total Warehouses</span><strong>{{ overviewSummary().totalWarehouses }}</strong>
+      <div class="stock-stat-grid overview-stat-grid ds-metric-grid">
+        <article class="ds-metric-card ds-tone-purple">
+          <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+            ><svg viewBox="0 0 24 24">
+              <path d="M4 21V8l8-5 8 5v13M2 21h20M8 12h2M14 12h2M10 21v-4h4v4"></path></svg
+          ></span>
+          <span class="ds-metric-body"><span class="ds-metric-label">Total Warehouses</span><strong class="ds-metric-value">{{ overviewSummary().totalWarehouses }}</strong><small class="ds-metric-helper">Selected store locations</small></span>
         </article>
-        <article class="green">
-          <span>Active Warehouses</span><strong>{{ overviewSummary().activeWarehouses }}</strong>
+        <article class="green ds-metric-card ds-tone-green">
+          <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+            ><svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="m8 12 2.5 2.5L16 9"></path></svg
+          ></span>
+          <span class="ds-metric-body"><span class="ds-metric-label">Active Warehouses</span><strong class="ds-metric-value">{{ overviewSummary().activeWarehouses }}</strong><small class="ds-metric-helper">Available locations</small></span>
         </article>
-        <article class="blue">
-          <span>Total Warehouse Stock</span
-          ><strong>{{ overviewSummary().totalStock.toLocaleString() }}</strong>
+        <article class="blue ds-metric-card ds-tone-blue">
+          <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+            ><svg viewBox="0 0 24 24">
+              <path d="m12 2 9 5-9 5-9-5 9-5ZM3 7v10l9 5 9-5V7M12 12v10"></path></svg
+          ></span>
+          <span class="ds-metric-body"><span class="ds-metric-label">Total Warehouse Stock</span
+          ><strong class="ds-metric-value">{{ overviewSummary().totalStock.toLocaleString() }}</strong><small class="ds-metric-helper">Physical units</small></span>
         </article>
-        <article class="green">
-          <span>Received Stock</span
-          ><strong>{{ overviewSummary().incoming.toLocaleString() }}</strong>
+        <article class="green ds-metric-card ds-tone-green">
+          <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+            ><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"></path></svg
+          ></span>
+          <span class="ds-metric-body"><span class="ds-metric-label">Received Stock</span
+          ><strong class="ds-metric-value">{{ overviewSummary().incoming.toLocaleString() }}</strong><small class="ds-metric-helper">Incoming movement</small></span>
         </article>
-        <article class="orange">
-          <span>Outgoing Stock</span
-          ><strong>{{ overviewSummary().outgoing.toLocaleString() }}</strong>
+        <article class="orange ds-metric-card ds-tone-orange">
+          <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+            ><svg viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"></path></svg
+          ></span>
+          <span class="ds-metric-body"><span class="ds-metric-label">Outgoing Stock</span
+          ><strong class="ds-metric-value">{{ overviewSummary().outgoing.toLocaleString() }}</strong><small class="ds-metric-helper">Transferred units</small></span>
         </article>
-        <article class="orange">
-          <span>Low Stock Items</span><strong>{{ overviewSummary().lowStock }}</strong>
+        <article class="orange ds-metric-card ds-tone-orange">
+          <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+            ><svg viewBox="0 0 24 24"><path d="M12 3 2 21h20L12 3ZM12 9v5M12 17h.01"></path></svg
+          ></span>
+          <span class="ds-metric-body"><span class="ds-metric-label">Low Stock Items</span><strong class="ds-metric-value">{{ overviewSummary().lowStock }}</strong><small class="ds-metric-helper">Needs attention</small></span>
         </article>
       </div>
       <section class="workspace-panel reports-panel">
@@ -583,20 +605,35 @@
             }
           </select>
         </div>
-        <div class="stock-stat-grid">
-          <article>
-            <span>Total Products</span><strong>{{ stockSummary().products }}</strong>
+        <div class="stock-stat-grid ds-metric-grid">
+          <article class="ds-metric-card ds-tone-purple">
+            <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+              ><svg viewBox="0 0 24 24">
+                <path d="m12 2 9 5-9 5-9-5 9-5ZM3 7v10l9 5 9-5V7M12 12v10"></path></svg
+            ></span>
+            <span class="ds-metric-body"><span class="ds-metric-label">Total Products</span><strong class="ds-metric-value">{{ stockSummary().products }}</strong><small class="ds-metric-helper">Stocked product lines</small></span>
           </article>
-          <article class="blue">
-            <span>Total Quantity</span><strong>{{ stockSummary().total.toLocaleString() }}</strong>
+          <article class="blue ds-metric-card ds-tone-blue">
+            <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+              ><svg viewBox="0 0 24 24"><path d="M4 6h16v14H4zM8 6V3h8v3M8 11h8"></path></svg
+            ></span>
+            <span class="ds-metric-body"><span class="ds-metric-label">Total Quantity</span><strong class="ds-metric-value">{{ stockSummary().total.toLocaleString() }}</strong><small class="ds-metric-helper">Physical warehouse units</small></span>
           </article>
-          <article class="orange">
-            <span>Reserved Quantity</span
-            ><strong>{{ stockSummary().reserved.toLocaleString() }}</strong>
+          <article class="orange ds-metric-card ds-tone-orange">
+            <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+              ><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6zM9 8h6M9 12h6M9 16h3"></path></svg
+            ></span>
+            <span class="ds-metric-body"><span class="ds-metric-label">Reserved Quantity</span
+            ><strong class="ds-metric-value">{{ stockSummary().reserved.toLocaleString() }}</strong><small class="ds-metric-helper">Committed stock units</small></span>
           </article>
-          <article class="green">
-            <span>Available Quantity</span
-            ><strong>{{ stockSummary().available.toLocaleString() }}</strong>
+          <article class="green ds-metric-card ds-tone-green">
+            <span class="stock-stat-icon ds-metric-icon" aria-hidden="true"
+              ><svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="m8 12 2.5 2.5L16 9"></path></svg
+            ></span>
+            <span class="ds-metric-body"><span class="ds-metric-label">Available Quantity</span
+            ><strong class="ds-metric-value">{{ stockSummary().available.toLocaleString() }}</strong><small class="ds-metric-helper">Ready-to-use stock</small></span>
           </article>
         </div>
         <div class="stock-layout">

@@ -26,6 +26,7 @@ import {
 import { AuthService } from './auth';
 import { BranchService } from './branch.service';
 import { LocalStorageService } from './local-storage.service';
+import { InventoryLocationService } from './inventory-location.service';
 import { ProductService } from './product.service';
 import { StoreService } from './store.service';
 import { WarehouseService } from './warehouse.service';
@@ -102,6 +103,7 @@ export class InventoryService {
   private readonly productService = inject(ProductService);
   private readonly branchService = inject(BranchService);
   private readonly warehouseService = inject(WarehouseService);
+  private readonly inventoryLocationService = inject(InventoryLocationService);
   private readonly authService = inject(AuthService);
 
   private readonly balancesSignal = signal<InventoryBalance[]>(this.loadBalances());
@@ -151,43 +153,7 @@ export class InventoryService {
   }
 
   getLocations(storeId: string, activeOnly = true): InventoryLocation[] {
-    const store = this.storeService.getStoreById(storeId);
-    if (!store) return [];
-    return [
-      {
-        key: 'store',
-        storeId,
-        type: 'store',
-        entityId: null,
-        name: 'Store Level',
-        code: 'STORE',
-        active: true,
-      },
-      ...this.branchService
-        .getByStore(storeId)
-        .filter((branch) => !activeOnly || branch.status === 'active')
-        .map((branch) => ({
-          key: `branch:${branch.id}`,
-          storeId,
-          type: 'branch' as const,
-          entityId: branch.id,
-          name: branch.name,
-          code: branch.code,
-          active: branch.status === 'active',
-        })),
-      ...this.warehouseService
-        .getWarehousesByStore(storeId)
-        .filter((warehouse) => !activeOnly || warehouse.status === 'active')
-        .map((warehouse) => ({
-          key: `warehouse:${warehouse.id}`,
-          storeId,
-          type: 'warehouse' as const,
-          entityId: warehouse.id,
-          name: warehouse.name,
-          code: warehouse.code,
-          active: warehouse.status === 'active',
-        })),
-    ];
+    return this.inventoryLocationService.getLocations(storeId, activeOnly);
   }
 
   getBalances(storeId: string): InventoryBalanceView[] {

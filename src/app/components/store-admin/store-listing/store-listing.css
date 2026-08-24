@@ -19,14 +19,14 @@
 .store-page-header h1 {
   color: var(--clr-text-primary);
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
 }
 
 .store-page-header p {
   margin-top: 5px;
   color: #667085;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -35,6 +35,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.row-actions {
+  gap: 7px;
+  white-space: nowrap;
 }
 
 .filter-btn,
@@ -47,7 +52,7 @@
   gap: 8px;
   padding: 0 16px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   transition: var(--tr-fast);
 }
 
@@ -89,12 +94,19 @@ svg {
   gap: 18px;
 }
 
-.summary-card,
-.stores-panel {
+.summary-card {
   background: #fff;
   border: 1px solid var(--clr-border);
   border-radius: 8px;
   box-shadow: 0 12px 34px rgba(17, 24, 39, 0.05);
+}
+
+.stores-panel {
+  background: #fff;
+  border: 1px solid #e8eaf0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .summary-card {
@@ -137,14 +149,14 @@ svg {
 
 .summary-text strong {
   color: #090D1F;
-  font-size: 23px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   line-height: 1;
 }
 
 .summary-text small {
   color: #667085;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -157,7 +169,7 @@ svg {
 
 .stores-panel {
   min-width: 0;
-  padding: 18px;
+  padding: 0;
 }
 
 .panel-header {
@@ -168,24 +180,25 @@ svg {
 }
 
 .panel-header {
-  margin-bottom: 18px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #edf0f5;
 }
 
 .panel-header h2 {
   color: #111827;
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .stores-search {
   position: relative;
-  width: min(100%, 330px);
+  width: min(100%, 460px);
 }
 
 .stores-search input {
   width: 100%;
-  border: 1px solid var(--clr-border);
-  border-radius: 8px;
+  border: 1px solid #dfe3ea;
+  border-radius: 10px;
   background: #fff;
   color: #111827;
   outline: none;
@@ -194,9 +207,9 @@ svg {
 }
 
 .stores-search input {
-  height: 38px;
+  height: 42px;
   padding: 0 42px 0 14px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .stores-search svg {
@@ -222,23 +235,25 @@ svg {
   border-collapse: collapse;
 }
 
+.stores-table thead {
+  background: #f8f9fc;
+}
+
 .stores-table th {
-  padding: 10px 14px;
-  color: #344054;
-  border-bottom: 1px solid var(--clr-border);
-  font-size: 11px;
-  font-weight: 800;
+  padding: 13px 16px;
+  color: #667085;
+  border-bottom: 1px solid #e8eaf0;
+  font-size: 12px;
+  font-weight: 600;
   text-align: left;
   white-space: nowrap;
 }
 
 .stores-table td {
-  height: 60px;
-  padding: 10px 14px;
-  color: #111827;
-  border-bottom: 1px solid var(--clr-border);
-  font-size: 12px;
-  font-weight: 600;
+  padding: 15px 16px;
+  color: #374151;
+  border-bottom: 1px solid #f0f1f4;
+  font-size: 14px;
   vertical-align: middle;
 }
 
@@ -248,7 +263,11 @@ svg {
 
 .stores-table tbody tr:hover,
 .stores-table tbody tr.selected {
-  background: rgba(124, 58, 237, 0.035);
+  background: #fafaff;
+}
+
+.stores-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .store-cell {
@@ -263,14 +282,14 @@ svg {
   place-items: center;
   color: #fff;
   background: var(--grad-brand);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .store-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  font-size: 9px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 12px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
   flex: 0 0 auto;
   overflow: hidden;
@@ -285,6 +304,9 @@ svg {
 
 .store-name {
   min-width: 0;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -296,23 +318,27 @@ svg {
 }
 
 .owner-cell strong {
-  font-size: 12px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .owner-cell small {
   color: #667085;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
 }
 
 .status-pill {
+  min-width: 68px;
+  justify-content: center;
   width: max-content;
   display: inline-flex;
   align-items: center;
   padding: 5px 10px;
-  border-radius: 7px;
-  font-size: 10.5px;
-  font-weight: 800;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .status-active {
@@ -321,8 +347,8 @@ svg {
 }
 
 .status-disabled {
-  color: #B42318;
-  background: rgba(239, 68, 68, 0.13);
+  color: #667085;
+  background: #f2f4f7;
 }
 
 .status-pending {
@@ -332,8 +358,8 @@ svg {
 
 .icon-action,
 .pagination button {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: inline-grid;
   place-items: center;
@@ -366,8 +392,9 @@ svg {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding-top: 18px;
-  color: #344054;
+  padding: 16px 20px;
+  border-top: 1px solid #edf0f5;
+  color: #475467;
   font-size: 12px;
   font-weight: 600;
 }
@@ -386,6 +413,19 @@ svg {
 .pagination button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.table-wrap::-webkit-scrollbar {
+  height: 7px;
+}
+
+.table-wrap::-webkit-scrollbar-track {
+  background: #f5f6f8;
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+  background: #d3d7df;
+  border-radius: 10px;
 }
 
 @media (max-width: 1320px) {
@@ -422,6 +462,11 @@ svg {
 
 @media (max-width: 560px) {
   .stores-panel {
+    border-radius: 12px;
+  }
+
+  .panel-header,
+  .table-footer {
     padding: 14px;
   }
 }

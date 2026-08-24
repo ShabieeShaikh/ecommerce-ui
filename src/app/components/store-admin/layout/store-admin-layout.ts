@@ -8,28 +8,29 @@ interface NavigationItem {
   label: string;
   route?: string;
   icon:
-  | 'dashboard'
-  | 'store'
-  | 'branch'
-  | 'products'
-  | 'catalog'
-  | 'attributes'
-  | 'brands'
-  | 'inventory'
-  | 'warehouse'
-  | 'receive'
-  | 'stock'
-  | 'transfer'
-  | 'adjustment'
-  | 'reports'
-  | 'managers'
-  | 'staff'
-  | 'purchasing'
-  | 'supplier'
-  | 'analytics'
-  | 'location'
-  | 'settings'
-  | 'profile';
+    | 'dashboard'
+    | 'store'
+    | 'branch'
+    | 'products'
+    | 'catalog'
+    | 'attributes'
+    | 'brands'
+    | 'inventory'
+    | 'warehouse'
+    | 'receive'
+    | 'stock'
+    | 'transfer'
+    | 'adjustment'
+    | 'reports'
+    | 'managers'
+    | 'staff'
+    | 'purchasing'
+    | 'supplier'
+    | 'purchase-order'
+    | 'analytics'
+    | 'location'
+    | 'settings'
+    | 'profile';
   exact?: boolean;
   children?: NavigationSubItem[];
 }
@@ -236,6 +237,12 @@ export class StoreAdminLayout {
               label: 'Suppliers',
               route: '/store-admin/purchasing/suppliers',
               icon: 'supplier',
+              exact: true,
+            },
+            {
+              label: 'Purchase Orders',
+              route: '/store-admin/purchasing/purchase-orders',
+              icon: 'purchase-order',
               exact: true,
             },
           ],

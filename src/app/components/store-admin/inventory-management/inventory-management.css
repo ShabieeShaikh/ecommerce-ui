@@ -56,20 +56,20 @@ textarea {
   display: block;
   margin-bottom: 4px;
   color: #6437e8;
-  font-size: 9px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
 }
 .page-header h1 {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.25;
 }
 .page-header p {
   max-width: 720px;
   margin-top: 5px;
   color: #667085;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.6;
 }
 .header-actions,
@@ -88,8 +88,8 @@ textarea {
   justify-content: center;
   gap: 7px;
   border-radius: 7px;
-  font-size: 9px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .primary-button {
   color: #fff;
@@ -112,7 +112,7 @@ textarea {
   padding: 10px 12px;
   border: 1px solid;
   border-radius: 7px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 }
 .feedback.error {
@@ -149,12 +149,12 @@ textarea {
 .summary-panel h2,
 .order-rules h2 {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
 }
 .panel-heading p {
   margin-top: 4px;
   color: #667085;
-  font-size: 8px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .inventory-page .panel-heading {
@@ -164,12 +164,12 @@ textarea {
   font-size: 18px;
 }
 .inventory-page .panel-heading p {
-  font-size: 12px !important;
+  font-size: 12px;
 }
 .text-button {
   color: #6437e8;
-  font-size: 8px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
 }
 .metric-grid {
@@ -249,20 +249,20 @@ textarea {
 .metric-card strong {
   color: #101828;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
 }
 .metric-card small,
 .metric-card p {
   color: #667085;
-  font-size: 7px;
+  font-size: 12px;
   font-weight: 600;
 }
 .overview-active .metric-card small,
 .overview-active .metric-card p {
-  font-size: 18px !important;
+  font-size: 18px;
 }
 .overview-active .metric-card > button {
-  font-size: 18px !important;
+  font-size: 18px;
 }
 .metric-card p,
 .metric-card .progress,
@@ -281,8 +281,8 @@ textarea {
   border: 1px solid currentColor;
   border-radius: 7px;
   color: inherit;
-  font-size: 8px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   text-align: left;
 }
 .metric-card > button span {
@@ -359,7 +359,7 @@ textarea {
 .limit-editor p {
   margin-top: 3px;
   color: #667085;
-  font-size: 8px;
+  font-size: 12px;
 }
 .overview-grid {
   min-width: 0;
@@ -404,7 +404,7 @@ textarea {
 }
 .donut small {
   color: #667085;
-  font-size: 7px;
+  font-size: 12px;
 }
 .legend {
   min-width: 0;
@@ -476,7 +476,7 @@ textarea {
 }
 .status-list strong {
   color: #475467;
-  font-size: 11px;
+  font-size: 12px;
   text-align: right;
 }
 .quick-actions {
@@ -519,12 +519,12 @@ textarea {
   gap: 2px;
 }
 .quick-actions strong {
-  font-size: 13px;
+  font-size: 14px;
 }
 .quick-actions small {
   overflow: hidden;
   color: #667085;
-  font-size: 12px !important;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -549,7 +549,7 @@ table {
   width: 100%;
   min-width: 760px;
   border-collapse: collapse;
-  font-size: 8px;
+  font-size: 12px;
 }
 th {
   height: 34px;
@@ -559,8 +559,8 @@ th {
   border-top: 1px solid #eaecf0;
   border-bottom: 1px solid #eaecf0;
   text-align: left;
-  font-size: 7px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
 }
 td {
@@ -573,13 +573,13 @@ td {
 td > strong {
   display: block;
   color: #101828;
-  font-size: 8px;
+  font-size: 12px;
 }
 td > small {
   display: block;
   margin-top: 3px;
   color: #667085;
-  font-size: 7px;
+  font-size: 12px;
 }
 td.negative,
 .negative {
@@ -592,8 +592,8 @@ td.negative,
   padding: 4px 6px;
   display: inline-flex;
   border-radius: 5px;
-  font-size: 7px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: capitalize;
   white-space: nowrap;
 }
@@ -662,23 +662,23 @@ td.negative,
 }
 .alert-row > span:first-of-type strong {
   overflow: hidden;
-  font-size: 8px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .alert-row small {
   color: #667085;
-  font-size: 7px;
+  font-size: 12px;
 }
 .alert-row > span:not(:first-of-type) strong {
-  font-size: 8px;
+  font-size: 12px;
 }
 .alert-row b {
   padding: 4px 6px;
   color: #b54708;
   background: #fffaeb;
   border-radius: 5px;
-  font-size: 6px;
+  font-size: 12px;
   white-space: nowrap;
 }
 .alert-row b.out {
@@ -703,7 +703,7 @@ td.negative,
 .empty-state p {
   max-width: 430px;
   color: #667085;
-  font-size: 8px;
+  font-size: 12px;
   line-height: 1.6;
 }
 .operation-layout {
@@ -733,8 +733,8 @@ td.negative,
   color: #6437e8;
   background: rgba(100, 55, 232, 0.07);
   border-radius: 5px;
-  font-size: 8px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
 }
 .availability-chip {
@@ -763,8 +763,8 @@ label {
   align-content: start;
   gap: 5px;
   color: #344054;
-  font-size: 8px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 label > span {
   color: #d92d20;
@@ -780,7 +780,7 @@ textarea {
   border: 1px solid #d7dde7;
   border-radius: 8px;
   outline: 0;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
 }
 textarea {
@@ -810,7 +810,7 @@ textarea:focus {
   display: grid;
   place-items: center;
   color: #667085;
-  font-size: 7px;
+  font-size: 12px;
 }
 .receipt-lines-heading {
   min-height: 65px;
@@ -823,12 +823,12 @@ textarea:focus {
 }
 .receipt-lines-heading h3 {
   color: #101828;
-  font-size: 11px;
+  font-size: 12px;
 }
 .receipt-lines-heading p {
   margin-top: 3px;
   color: #667085;
-  font-size: 8px;
+  font-size: 12px;
 }
 .receipt-line-actions {
   display: flex;
@@ -841,7 +841,7 @@ textarea:focus {
   background: #fff;
   border: 1px solid rgba(100, 55, 232, 0.28);
   border-radius: 6px;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
 }
 .receipt-lines-table table {
@@ -898,7 +898,7 @@ textarea:focus {
   color: #667085;
   background: #f8f6ff;
   border-top: 1px solid #eaecf0;
-  font-size: 8px;
+  font-size: 12px;
 }
 .receipt-totals strong {
   margin-left: 5px;
@@ -915,7 +915,7 @@ textarea:focus {
 .capacity-error {
   margin-top: 10px;
   color: #b42318;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.5;
 }
@@ -947,13 +947,13 @@ textarea:focus {
   justify-content: space-between;
   gap: 10px;
   color: #667085;
-  font-size: 8px;
+  font-size: 12px;
   border-bottom: 1px solid #f2f4f7;
 }
 .summary-panel dd,
 .order-rules dd {
   color: #101828;
-  font-weight: 800;
+  font-weight: 700;
   text-align: right;
 }
 .order-rules dd {
@@ -988,7 +988,7 @@ textarea:focus {
   align-items: center;
   gap: 20px;
   color: #475467;
-  font-size: 8px;
+  font-size: 12px;
 }
 .allocation-footer .primary-button {
   margin-left: auto;
@@ -1018,7 +1018,7 @@ textarea:focus {
 .route-visual strong {
   max-width: 100%;
   overflow: hidden;
-  font-size: 7px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1043,10 +1043,10 @@ textarea:focus {
 }
 .stock-readouts span {
   color: #667085;
-  font-size: 7px;
+  font-size: 12px;
 }
 .stock-readouts strong {
-  font-size: 15px;
+  font-size: 16px;
 }
 .stock-readouts .invalid strong {
   color: #d92d20;
@@ -1077,8 +1077,8 @@ textarea:focus {
   background: #fff;
   border: 1px solid #d7dde7;
   border-radius: 8px;
-  font-size: 7px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .report-types button.active {
   color: #fff;
@@ -1115,11 +1115,11 @@ textarea:focus {
 }
 .integration-stats span {
   color: #667085;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
 }
 .integration-stats strong {
-  font-size: 19px;
+  font-size: 20px;
 }
 .integration-flow,
 .order-flow {
@@ -1154,16 +1154,16 @@ textarea:focus {
   color: #6437e8;
 }
 .flow-steps strong {
-  font-size: 8px;
+  font-size: 12px;
 }
 .flow-steps small {
   color: #667085;
-  font-size: 7px;
+  font-size: 12px;
 }
 .flow-steps > i {
   color: #6437e8;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 700;
 }
 .order-flow .flow-steps > div {
   min-height: 75px;
@@ -1183,8 +1183,8 @@ textarea:focus {
   color: #6437e8;
   border: 1px solid rgba(100, 55, 232, 0.3);
   border-radius: 5px;
-  font-size: 7px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 }
 .row-actions button.danger {
   color: #b42318;

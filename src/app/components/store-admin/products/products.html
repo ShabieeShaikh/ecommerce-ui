@@ -10,18 +10,21 @@
     </button>
   </header>
 
-  <section class="summary-grid" aria-label="Product summary">
+  <section class="summary-grid ds-metric-grid" aria-label="Product summary">
     @for (item of stats(); track item.label) {
-      <article class="summary-card">
-        <span class="summary-icon" [class]="'summary-icon summary-icon--' + item.tone">
+      <article [class]="'summary-card ds-metric-card ds-tone-' + item.tone">
+        <span
+          class="summary-icon ds-metric-icon"
+          [class]="'summary-icon ds-metric-icon summary-icon--' + item.tone"
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 10h16M5 10l1-6h12l1 6M6 10v10h12V10M9 20v-6h6v6"></path>
           </svg>
         </span>
-        <span class="summary-text">
-          <span>{{ item.label }}</span>
-          <strong>{{ item.value }}</strong>
-          <small>{{ item.helper }}</small>
+        <span class="summary-text ds-metric-body">
+          <span class="ds-metric-label">{{ item.label }}</span>
+          <strong class="ds-metric-value">{{ item.value }}</strong>
+          <small class="ds-metric-helper">{{ item.helper }}</small>
         </span>
       </article>
     }

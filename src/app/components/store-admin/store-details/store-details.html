@@ -63,10 +63,14 @@
       </div>
     </section>
 
-    <section class="stats-grid" aria-label="Store summary">
+    <section class="stats-grid ds-metric-grid" aria-label="Store summary">
       @for (stat of stats(); track stat.label) {
-        <article class="stat-card">
-          <span class="stat-icon" [class]="'stat-icon stat-icon--' + stat.tone" aria-hidden="true">
+        <article [class]="'stat-card ds-metric-card ds-tone-' + stat.tone">
+          <span
+            class="stat-icon ds-metric-icon"
+            [class]="'stat-icon ds-metric-icon stat-icon--' + stat.tone"
+            aria-hidden="true"
+          >
             @switch (stat.icon) {
               @case ('branch') {
                 <svg viewBox="0 0 24 24">
@@ -92,9 +96,9 @@
               }
             }
           </span>
-          <span class="stat-copy">
-            <span>{{ stat.label }}</span>
-            <strong>{{ stat.value }}</strong>
+          <span class="stat-copy ds-metric-body">
+            <span class="ds-metric-label">{{ stat.label }}</span>
+            <strong class="ds-metric-value">{{ stat.value }}</strong>
           </span>
         </article>
       }

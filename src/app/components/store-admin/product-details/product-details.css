@@ -292,7 +292,7 @@ a {
 .product-summary h1 {
   margin-top: 15px;
   color: #101828;
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1.25;
   overflow-wrap: anywhere;
@@ -304,7 +304,7 @@ a {
   flex-wrap: wrap;
   gap: 10px;
   color: #667085;
-  font-size: 13px;
+  font-size: 14px;
 }
 .identity-line i {
   width: 1px;
@@ -321,12 +321,12 @@ a {
 }
 .price-line strong {
   color: #101828;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
 }
 .price-line del {
   color: #98a2b3;
-  font-size: 15px;
+  font-size: 16px;
 }
 .price-line > span {
   color: #d92d20;
@@ -343,7 +343,7 @@ a {
 .short-description > span,
 .tags > span {
   color: #667085;
-  font-size: 13px;
+  font-size: 14px;
 }
 .summary-specs dd {
   margin: 5px 0 0;
@@ -417,13 +417,13 @@ a {
 }
 .status-panel dt {
   color: #667085;
-  font-size: 13px;
+  font-size: 14px;
 }
 .status-panel dd {
   min-width: 0;
   margin: 0;
   color: #101828;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   text-align: right;
   overflow-wrap: anywhere;
@@ -461,7 +461,7 @@ a {
 }
 .key-value-list dt {
   color: #667085;
-  font-size: 13px;
+  font-size: 14px;
 }
 .key-value-list dd {
   min-width: 0;
@@ -470,7 +470,7 @@ a {
   align-items: center;
   gap: 7px;
   color: #101828;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   overflow-wrap: anywhere;
 }
@@ -511,7 +511,7 @@ a {
 }
 .stock-card header a {
   color: var(--clr-primary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
 }
@@ -551,7 +551,7 @@ td strong {
 td small {
   margin-top: 3px;
   color: #98a2b3;
-  font-size: 11px;
+  font-size: 12px;
 }
 .capitalize {
   text-transform: capitalize;
@@ -613,7 +613,7 @@ tfoot td {
 .variants-card header p {
   margin-top: 4px;
   color: #667085;
-  font-size: 13px;
+  font-size: 14px;
 }
 .variant-details-table-wrap {
   overflow-x: auto;
@@ -704,7 +704,7 @@ tfoot td {
 }
 .images-card header span {
   color: #667085;
-  font-size: 13px;
+  font-size: 14px;
 }
 .image-grid {
   margin-top: 12px;
@@ -777,7 +777,7 @@ tfoot td {
   border-radius: 999px;
   color: #fff;
   background: rgba(0, 0, 0, 0.48);
-  font-size: 13px;
+  font-size: 14px;
   transform: translateX(-50%);
 }
 @media (max-width: 1500px) {
@@ -853,7 +853,7 @@ tfoot td {
     min-height: 300px;
   }
   .product-summary h1 {
-    font-size: 25px;
+    font-size: 24px;
   }
   .status-panel dl {
     grid-template-columns: 1fr;

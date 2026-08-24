@@ -1,0 +1,196 @@
+<main class="view-supplier-page">
+  <header class="page-header">
+    <div class="page-heading">
+      <span class="page-eyebrow">Purchasing / Suppliers</span>
+      <h1>Supplier Details</h1>
+      <p>View supplier contact, address, and business information.</p>
+    </div>
+
+    <div class="header-actions">
+      @if (supplier(); as currentSupplier) {
+        <span
+          class="status-badge"
+          [class.status-active]="currentSupplier.status === 'active'"
+          [class.status-inactive]="currentSupplier.status === 'inactive'"
+          [attr.aria-label]="'Supplier status: ' + statusLabel(currentSupplier.status)"
+        >
+          {{ statusLabel(currentSupplier.status) }}
+        </span>
+      }
+
+      <button type="button" class="secondary-btn" (click)="backToSuppliers()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+        <span>Back to Suppliers</span>
+      </button>
+    </div>
+  </header>
+
+  @if (supplier(); as currentSupplier) {
+    <section class="overview-card" aria-labelledby="supplier-overview-title">
+      <div class="supplier-avatar" aria-hidden="true">{{ supplierInitial() }}</div>
+
+      <div class="supplier-identity">
+        <span class="supplier-code">{{ currentSupplier.supplierCode }}</span>
+        <h2 id="supplier-overview-title">{{ currentSupplier.name }}</h2>
+        <p>Supplier profile for the currently selected store.</p>
+      </div>
+
+      <dl class="overview-facts">
+        <div>
+          <dt>Contact Person</dt>
+          <dd>{{ displayValue(currentSupplier.contactPerson) }}</dd>
+        </div>
+        <div>
+          <dt>Phone</dt>
+          <dd>{{ displayValue(currentSupplier.phone) }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd>{{ displayValue(currentSupplier.email) }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <div class="details-grid">
+      <section class="detail-card" aria-labelledby="basic-information-title">
+        <header class="section-header">
+          <div>
+            <h2 id="basic-information-title">Basic Information</h2>
+            <p>General supplier profile details.</p>
+          </div>
+        </header>
+
+        <dl class="information-grid">
+          <div>
+            <dt>Supplier Code</dt>
+            <dd>{{ currentSupplier.supplierCode }}</dd>
+          </div>
+          <div>
+            <dt>Supplier Name</dt>
+            <dd>{{ currentSupplier.name }}</dd>
+          </div>
+          <div>
+            <dt>Contact Person</dt>
+            <dd>{{ displayValue(currentSupplier.contactPerson) }}</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>{{ statusLabel(currentSupplier.status) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="detail-card" aria-labelledby="contact-information-title">
+        <header class="section-header">
+          <div>
+            <h2 id="contact-information-title">Contact Information</h2>
+            <p>Primary communication details.</p>
+          </div>
+        </header>
+
+        <dl class="information-grid">
+          <div>
+            <dt>Phone</dt>
+            <dd>{{ displayValue(currentSupplier.phone) }}</dd>
+          </div>
+          <div>
+            <dt>Alternate Phone</dt>
+            <dd>{{ displayValue(currentSupplier.alternatePhone) }}</dd>
+          </div>
+          <div class="full-width">
+            <dt>Email</dt>
+            <dd>{{ displayValue(currentSupplier.email) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="detail-card" aria-labelledby="address-title">
+        <header class="section-header">
+          <div>
+            <h2 id="address-title">Address</h2>
+            <p>Supplier business location.</p>
+          </div>
+        </header>
+
+        <dl class="information-grid">
+          <div>
+            <dt>Country</dt>
+            <dd>{{ displayValue(currentSupplier.country) }}</dd>
+          </div>
+          <div>
+            <dt>State / Province</dt>
+            <dd>{{ displayValue(currentSupplier.state) }}</dd>
+          </div>
+          <div>
+            <dt>City</dt>
+            <dd>{{ displayValue(currentSupplier.city) }}</dd>
+          </div>
+          <div>
+            <dt>Postal Code</dt>
+            <dd>{{ displayValue(currentSupplier.postalCode) }}</dd>
+          </div>
+          <div class="full-width">
+            <dt>Street Address</dt>
+            <dd>{{ displayValue(currentSupplier.address) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="detail-card" aria-labelledby="business-details-title">
+        <header class="section-header">
+          <div>
+            <h2 id="business-details-title">Business Details</h2>
+            <p>Registration, payment, and record information.</p>
+          </div>
+        </header>
+
+        <dl class="information-grid">
+          <div>
+            <dt>Tax / Registration Number</dt>
+            <dd>{{ displayValue(currentSupplier.taxNumber) }}</dd>
+          </div>
+          <div>
+            <dt>Payment Terms</dt>
+            <dd>{{ displayValue(currentSupplier.paymentTerms) }}</dd>
+          </div>
+          <div>
+            <dt>Created Date</dt>
+            <dd>{{ currentSupplier.createdAt | date:'dd MMM yyyy, h:mm a' }}</dd>
+          </div>
+          <div>
+            <dt>Updated Date</dt>
+            <dd>
+              @if (currentSupplier.updatedAt) {
+                {{ currentSupplier.updatedAt | date:'dd MMM yyyy, h:mm a' }}
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="detail-card notes-card" aria-labelledby="notes-title">
+        <header class="section-header">
+          <div>
+            <h2 id="notes-title">Notes</h2>
+            <p>Additional supplier information.</p>
+          </div>
+        </header>
+
+        <p class="notes-content">{{ currentSupplier.notes?.trim() || 'No notes added.' }}</p>
+      </section>
+    </div>
+  } @else {
+    <section class="not-found-card" aria-labelledby="supplier-not-found-title">
+      <div class="not-found-icon" aria-hidden="true">S</div>
+      <h2 id="supplier-not-found-title">Supplier not found</h2>
+      <p>The supplier you are looking for may have been removed or is unavailable.</p>
+      <button type="button" class="primary-btn" (click)="backToSuppliers()">
+        Back to Suppliers
+      </button>
+    </section>
+  }
+</main>

@@ -135,7 +135,7 @@
 }
 
 .summary-label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   color: #6b7280;
 }
@@ -264,7 +264,7 @@
 .supplier-table td {
   padding: 15px 16px;
 
-  font-size: 13px;
+  font-size: 14px;
   color: #374151;
 
   vertical-align: middle;
@@ -309,7 +309,7 @@
   background: rgba(124, 58, 237, 0.1);
   color: #7c3aed;
 
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -318,7 +318,7 @@
 
   margin-bottom: 3px;
 
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 
   color: #111827;
@@ -368,7 +368,7 @@
 
 .contact-info small,
 .location-info small {
-  font-size: 11px;
+  font-size: 12px;
   color: #9ca3af;
 }
 
@@ -387,7 +387,7 @@
 
   border-radius: 999px;
 
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -405,59 +405,53 @@
    ACTIONS
 ========================= */
 
-.actions-column {
-  text-align: right !important;
-}
-
-.action-buttons {
+.row-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-
-  gap: 6px;
-
+  gap: 7px;
   white-space: nowrap;
 }
 
-.action-btn {
-  min-height: 32px;
-
-  padding: 0 10px;
-
-  border: 1px solid #e1e4ea;
-  border-radius: 7px;
-
+.icon-action {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #dfe3ea;
+  border-radius: 50%;
   background: #ffffff;
-
-  color: #475467;
-
-  font-size: 12px;
-  font-weight: 500;
-
+  color: #667085;
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
+  transition: var(--tr-fast);
 }
 
-.action-btn:hover {
-  border-color: #c7b8ff;
-  background: #f7f5ff;
-  color: #6d28d9;
+.icon-action svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.status-action:hover {
-  border-color: #fecaca;
-  background: #fff5f5;
-  color: #dc2626;
+.icon-action:hover {
+  color: #6437e8;
+  border-color: rgba(100, 55, 232, 0.35);
+  background: #f8f6ff;
 }
 
-.activate-action:hover {
-  border-color: #a7f3d0;
-  background: #ecfdf3;
+.icon-action.danger:hover {
+  color: #d92d20;
+  border-color: rgba(217, 45, 32, 0.3);
+  background: #fff5f4;
+}
+
+.icon-action.activate:hover {
   color: #047857;
+  border-color: rgba(4, 120, 87, 0.3);
+  background: #ecfdf3;
 }
 
 /* =========================
@@ -499,7 +493,7 @@
 .empty-state h3 {
   margin: 0 0 8px;
 
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
 
   color: #111827;
@@ -510,7 +504,7 @@
 
   margin: 0 0 18px;
 
-  font-size: 13px;
+  font-size: 14px;
   color: #6b7280;
 
   line-height: 1.6;
@@ -619,11 +613,11 @@
   }
 
   .page-header h1 {
-    font-size: 21px;
+    font-size: 22px;
   }
 
   .page-header p {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .page-header .primary-btn {

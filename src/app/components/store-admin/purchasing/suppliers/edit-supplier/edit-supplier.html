@@ -1,0 +1,291 @@
+<main class="supplier-form-page">
+  <header class="page-header">
+    <div class="page-heading">
+      <span class="page-eyebrow">Purchasing / Suppliers</span>
+      <h1>Edit Supplier</h1>
+      <p>Update supplier contact, address, and business information.</p>
+    </div>
+
+    @if (supplier()) {
+      <button type="button" class="secondary-btn" (click)="cancel()">Cancel</button>
+    }
+  </header>
+
+  @if (supplier()) {
+    <form class="supplier-form" [formGroup]="supplierForm" (ngSubmit)="submitSupplier()">
+      <section class="form-card" aria-labelledby="basic-information-title">
+        <header class="section-header">
+          <div>
+            <h2 id="basic-information-title">Basic Information</h2>
+            <p>Update the supplier's general information.</p>
+          </div>
+        </header>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="supplierCode"> Supplier Code <span class="required">*</span> </label>
+            <input
+              id="supplierCode"
+              type="text"
+              formControlName="supplierCode"
+              placeholder="e.g. SUP-001"
+              autocomplete="off"
+            />
+
+            @if (hasError('supplierCode', 'required')) {
+              <span class="field-error">Supplier code is required.</span>
+            }
+            @if (hasError('supplierCode', 'maxlength')) {
+              <span class="field-error"> Supplier code cannot exceed 30 characters. </span>
+            }
+            @if (hasError('supplierCode', 'supplierCodeExists')) {
+              <span class="field-error">
+                A supplier with this code already exists for the selected store.
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="name"> Supplier Name <span class="required">*</span> </label>
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              placeholder="Enter supplier name"
+              autocomplete="organization"
+            />
+
+            @if (hasError('name', 'required')) {
+              <span class="field-error">Supplier name is required.</span>
+            }
+            @if (hasError('name', 'minlength')) {
+              <span class="field-error"> Supplier name must contain at least 2 characters. </span>
+            }
+            @if (hasError('name', 'maxlength')) {
+              <span class="field-error"> Supplier name cannot exceed 100 characters. </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="contactPerson">Contact Person</label>
+            <input
+              id="contactPerson"
+              type="text"
+              formControlName="contactPerson"
+              placeholder="Enter contact person name"
+              autocomplete="name"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" formControlName="status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-card" aria-labelledby="contact-information-title">
+        <header class="section-header">
+          <div>
+            <h2 id="contact-information-title">Contact Information</h2>
+            <p>Update phone and email details for this supplier.</p>
+          </div>
+        </header>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="phone"> Phone Number <span class="required">*</span> </label>
+            <input
+              id="phone"
+              type="tel"
+              formControlName="phone"
+              placeholder="e.g. 03001234567"
+              autocomplete="tel"
+            />
+
+            @if (hasError('phone', 'required')) {
+              <span class="field-error">Phone number is required.</span>
+            }
+            @if (hasError('phone', 'maxlength')) {
+              <span class="field-error"> Phone number cannot exceed 20 characters. </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="alternatePhone">Alternate Phone</label>
+            <input
+              id="alternatePhone"
+              type="tel"
+              formControlName="alternatePhone"
+              placeholder="Enter alternate number"
+              autocomplete="tel"
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="email">Email Address</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="supplier@example.com"
+              autocomplete="email"
+            />
+
+            @if (hasError('email', 'email')) {
+              <span class="field-error"> Please enter a valid email address. </span>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="form-card" aria-labelledby="address-title">
+        <header class="section-header">
+          <div>
+            <h2 id="address-title">Address</h2>
+            <p>Update the supplier's business location.</p>
+          </div>
+        </header>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="country">Country</label>
+            <select
+              id="country"
+              formControlName="country"
+              (change)="onCountryChange()"
+              [attr.aria-busy]="isLoadingCountries()"
+            >
+              <option value="">
+                {{ isLoadingCountries() ? 'Loading countries...' : 'Select country' }}
+              </option>
+              @for (country of countries(); track country.name) {
+                <option [value]="country.name">{{ country.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="state">State / Province</label>
+            <select
+              id="state"
+              formControlName="state"
+              (change)="onStateChange()"
+              [attr.aria-disabled]="!supplierForm.controls.country.value || states().length === 0"
+            >
+              <option value="">
+                {{ states().length ? 'Select state or province' : 'No states available' }}
+              </option>
+              @for (state of states(); track state.name) {
+                <option [value]="state.name">{{ state.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="city">City</label>
+            <select id="city" formControlName="city" [attr.aria-busy]="isLoadingCities()">
+              <option value="">
+                {{ isLoadingCities() ? 'Loading cities...' : 'Select city' }}
+              </option>
+              @for (city of cities(); track city) {
+                <option [value]="city">{{ city }}</option>
+              }
+            </select>
+          </div>
+
+          @if (locationError()) {
+            <div class="form-group">
+              <small class="location-error">{{ locationError() }}</small>
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="postalCode">Postal Code</label>
+            <input
+              id="postalCode"
+              type="text"
+              formControlName="postalCode"
+              placeholder="Enter postal code"
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="address">Street Address</label>
+            <textarea
+              id="address"
+              formControlName="address"
+              rows="3"
+              placeholder="Enter complete business address"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-card" aria-labelledby="business-details-title">
+        <header class="section-header">
+          <div>
+            <h2 id="business-details-title">Business Details</h2>
+            <p>Update optional purchasing and payment information.</p>
+          </div>
+        </header>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="taxNumber">Tax / Registration Number</label>
+            <input
+              id="taxNumber"
+              type="text"
+              formControlName="taxNumber"
+              placeholder="Enter tax or registration number"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="paymentTerms">Payment Terms</label>
+            <input
+              id="paymentTerms"
+              type="text"
+              formControlName="paymentTerms"
+              placeholder="e.g. 30 Days"
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="notes">Notes</label>
+            <textarea
+              id="notes"
+              formControlName="notes"
+              rows="4"
+              placeholder="Add any additional information about this supplier"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button type="button" class="secondary-btn" (click)="cancel()">Cancel</button>
+        <button type="submit" class="primary-btn" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="button-spinner" aria-hidden="true"></span>
+            Updating Supplier...
+          } @else {
+            Update Supplier
+          }
+        </button>
+      </div>
+    </form>
+  } @else {
+    <section class="not-found-card" aria-labelledby="supplier-not-found-title">
+      <div class="not-found-icon" aria-hidden="true">S</div>
+      <h2 id="supplier-not-found-title">Supplier not found</h2>
+      <p>The supplier you are looking for may have been removed or is unavailable.</p>
+      <button type="button" class="primary-btn" (click)="backToSuppliers()">
+        Back to Suppliers
+      </button>
+    </section>
+  }
+</main>

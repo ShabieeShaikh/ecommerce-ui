@@ -12,7 +12,7 @@
     overflow: hidden;
     background: var(--clr-surface);
     color: var(--clr-text-primary);
-    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+    font-family: var(--font-family-ui);
 }
 
 .auth-form-panel {
@@ -75,7 +75,7 @@
 .auth-heading h1 {
     margin: 0 0 8px;
     color: var(--clr-text-primary);
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
     letter-spacing: 0;
     line-height: 1.2;
@@ -96,7 +96,7 @@ form { display: grid; gap: 18px; }
 
 .field-group label {
     color: var(--clr-text-primary);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
 }
 
@@ -214,7 +214,7 @@ form { display: grid; gap: 18px; }
 .auth-switch {
     margin: 28px 0 0;
     color: var(--clr-text-secondary);
-    font-size: 13px;
+    font-size: 14px;
     text-align: center;
 }
 
@@ -243,7 +243,7 @@ form { display: grid; gap: 18px; }
     outline: none;
     background: var(--clr-surface);
     color: var(--clr-text-primary);
-    font: 600 20px/1 'Poppins', 'Inter', system-ui, sans-serif;
+    font: 600 20px/1 var(--font-family-ui);
     text-align: center;
     transition: border-color var(--tr-fast), box-shadow var(--tr-fast);
 }
@@ -258,7 +258,7 @@ form { display: grid; gap: 18px; }
     width: 100%;
     margin-top: 24px;
     color: var(--clr-text-secondary);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .back-link svg { width: 17px; height: 17px; }
@@ -297,14 +297,14 @@ form { display: grid; gap: 18px; }
 
 .brand-panel-content { position: relative; z-index: 1; max-width: 390px; padding: 32px; text-align: center; }
 
-.brand-lockup { justify-content: center; color: #fff; font-size: clamp(30px, 3vw, 42px); }
+.brand-lockup { justify-content: center; color: #fff; font-size: 28px; }
 .brand-lockup-icon { width: 54px; height: 54px; border-radius: 14px; background: var(--grad-brand); }
 .brand-lockup-icon svg { width: 29px; height: 29px; }
 
 .brand-panel-content p {
     margin: 20px 0 0;
     color: rgba(255, 255, 255, .72);
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.65;
 }
 

@@ -44,7 +44,7 @@ svg {
 }
 .page-header h1 {
   margin-top: 10px;
-  font-size: 26px;
+  font-size: 24px;
 }
 .page-header p {
   margin-top: 6px;
@@ -113,7 +113,7 @@ svg {
   font-style: normal;
 }
 .summary-grid strong {
-  font-size: 21px;
+  font-size: 22px;
 }
 .surface {
   overflow: hidden;
@@ -157,7 +157,7 @@ svg {
   place-items: center;
   color: #6437e8;
   background: #f0ecff;
-  font-weight: 800;
+  font-weight: 700;
 }
 .subcategory-grid a div {
   display: grid;

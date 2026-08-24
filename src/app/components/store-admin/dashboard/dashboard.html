@@ -1,317 +1,343 @@
-<div class="dashboard-page">
-  <header class="dashboard-header">
-    <div>
-      <h1>Welcome back, John!</h1>
-      <p>Here is what is happening with {{ selectedStore().name }} today.</p>
+<main class="dashboard-page">
+  <header class="dashboard-hero">
+    <div class="hero-copy">
+      <span class="hero-eyebrow">
+        <span class="live-dot" aria-hidden="true"></span>
+        Live store overview
+      </span>
+      <h1>{{ selectedStore().name }}</h1>
+      <p>Performance, customers, and operations—focused in one clear workspace.</p>
     </div>
 
     <div class="header-actions">
       <label class="date-select">
         <span class="date-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+            <rect x="3" y="4" width="18" height="17" rx="3"></rect>
             <path d="M16 2v4M8 2v4M3 10h18"></path>
           </svg>
         </span>
-        <span>{{ dashboard().dateRangeLabel }}</span>
-        <select aria-label="Date range" [value]="selectedPeriod()" (change)="changePeriod($event)">
-          <option>This Week</option>
-          <option>Last Week</option>
-          <option>This Month</option>
+        <span class="date-copy">
+          <small>Reporting period</small>
+          <strong>{{ periodDateLabel() }}</strong>
+        </span>
+        <select
+          aria-label="Dashboard reporting period"
+          [value]="selectedPeriod()"
+          (change)="changePeriod($event)"
+        >
+          <option value="Daily">Today</option>
+          <option value="Weekly">This Week</option>
+          <option value="Monthly">This Year</option>
         </select>
         <span class="select-caret" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"></path></svg>
         </span>
       </label>
 
       <button class="export-btn" type="button" (click)="exportReport()">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <path d="M7 10l5 5 5-5"></path>
-          <path d="M12 15V3"></path>
+          <path d="M12 3v12M7 10l5 5 5-5"></path>
+          <path d="M5 21h14a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2"></path>
         </svg>
-        <span>Export Report</span>
+        <span>Export report</span>
       </button>
     </div>
   </header>
 
-  <!-- <section class="kpi-grid" aria-label="Store metrics">
+  <section class="kpi-grid ds-metric-grid" aria-label="Store metrics">
     @for (card of dashboard().kpis; track card.id) {
-    <article class="metric-card">
-      <div class="metric-icon" [class]="'metric-icon metric-icon--' + card.tone">
-        @switch (card.icon) {
-        @case ('revenue') {
-        <svg viewBox="0 0 24 24">
-          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-        </svg>
-        }
-        @case ('orders') {
-        <svg viewBox="0 0 24 24">
-          <path d="M6 2h12l2 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8l2-6Z"></path>
-          <path d="M4 8h16M9 12a3 3 0 0 0 6 0"></path>
-        </svg>
-        }
-        @case ('customers') {
-        <svg viewBox="0 0 24 24">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M22 21v-2a4 4 0 0 0-3-3.8M16 3.2a4 4 0 0 1 0 7.6"></path>
-        </svg>
-        }
-        @case ('cart') {
-        <svg viewBox="0 0 24 24">
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 6H6"></path>
-        </svg>
-        }
-        @case ('products') {
-        <svg viewBox="0 0 24 24">
-          <path d="m21 8-9-5-9 5 9 5 9-5Z"></path>
-          <path d="M3 8v8l9 5 9-5V8"></path>
-          <path d="M12 13v8"></path>
-        </svg>
-        }
-        }
-      </div>
-      <div class="metric-body">
-        <span class="metric-label">{{ card.label }}</span>
-        <strong class="metric-value">{{ card.value }}</strong>
-        <span class="metric-change" [class.metric-down]="card.trend === 'down'">
-          {{ card.trend === 'down' ? '' : '+' }}{{ card.change }}%
-        </span>
-        <span class="metric-compare">{{ dashboard().previousRangeLabel }}</span>
-      </div>
-    </article>
+      <article [class]="'metric-card ds-metric-card tone-' + card.tone + ' ds-tone-' + card.tone">
+        <div class="metric-topline ds-metric-topline">
+          <span class="metric-icon ds-metric-icon" aria-hidden="true">
+            @switch (card.icon) {
+              @case ('revenue') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              }
+              @case ('orders') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M6 2h12l2 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8l2-6Z"></path>
+                  <path d="M4 8h16M9 12a3 3 0 0 0 6 0"></path>
+                </svg>
+              }
+              @case ('customers') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.8M16 3.2a4 4 0 0 1 0 7.6"></path>
+                </svg>
+              }
+              @case ('cart') {
+                <svg viewBox="0 0 24 24">
+                  <circle cx="9" cy="20" r="1"></circle>
+                  <circle cx="19" cy="20" r="1"></circle>
+                  <path d="M3 3h2l2.7 11.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"></path>
+                </svg>
+              }
+              @case ('products') {
+                <svg viewBox="0 0 24 24">
+                  <path d="m12 2 9 5-9 5-9-5 9-5Z"></path>
+                  <path d="M3 7v10l9 5 9-5V7M12 12v10"></path>
+                </svg>
+              }
+            }
+          </span>
+
+          <span
+            class="metric-change ds-metric-trend"
+            [class.metric-down]="card.trend === 'down'"
+            [class.ds-metric-trend--down]="card.trend === 'down'"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path
+                [attr.d]="card.trend === 'down' ? 'M12 4 4 12M7 12H4V9' : 'M4 12 12 4M9 4h3v3'"
+              ></path>
+            </svg>
+            {{ card.trend === 'down' ? '' : '+' }}{{ card.change }}%
+          </span>
+        </div>
+
+        <div class="metric-body ds-metric-body">
+          <span class="metric-label ds-metric-label">{{ card.label }}</span>
+          <strong class="metric-value ds-metric-value">{{ card.value }}</strong>
+          <span class="metric-compare ds-metric-helper">{{ dashboard().previousRangeLabel }}</span>
+        </div>
+      </article>
     }
-  </section> -->
+  </section>
 
-  <section class="kpi-grid" aria-label="Store metrics">
-  @for (card of dashboard().kpis; track card.id) {
-
-    <article [class]="'metric-card tone-' + card.tone">
-
-      <div class="metric-icon">
-        @switch (card.icon) {
-
-          @case ('revenue') {
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-          }
-
-          @case ('orders') {
-            <svg viewBox="0 0 24 24">
-              <path d="M6 2h12l2 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8l2-6Z"></path>
-              <path d="M4 8h16M9 12a3 3 0 0 0 6 0"></path>
-            </svg>
-          }
-
-          @case ('customers') {
-            <svg viewBox="0 0 24 24">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M22 21v-2a4 4 0 0 0-3-3.8M16 3.2a4 4 0 0 1 0 7.6"></path>
-            </svg>
-          }
-
-          @case ('cart') {
-            <svg viewBox="0 0 24 24">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 6H6"></path>
-            </svg>
-          }
-
-          @case ('products') {
-            <svg viewBox="0 0 24 24">
-              <path d="m21 8-9-5-9 5 9 5 9-5Z"></path>
-              <path d="M3 8v8l9 5 9-5V8"></path>
-              <path d="M12 13v8"></path>
-            </svg>
-          }
-
-        }
-      </div>
-
-      <div class="metric-body">
-        <span class="metric-label">
-          {{ card.label }}
-        </span>
-
-        <strong class="metric-value">
-          {{ card.value }}
-        </strong>
-      </div>
-
-      <div class="metric-footer">
-        <span
-          class="metric-change"
-          [class.metric-down]="card.trend === 'down'"
-        >
-          {{ card.trend === 'down' ? '' : '+' }}{{ card.change }}%
-        </span>
-
-        <span class="metric-compare">
-          {{ dashboard().previousRangeLabel }}
-        </span>
-      </div>
-
-    </article>
-
-  }
-</section>
-
-  <section class="chart-grid">
+  <section class="chart-grid" aria-label="Sales insights">
     <article class="panel revenue-panel">
-      <div class="panel-header">
-        <h2>Revenue Overview</h2>
-        <select class="panel-select" [value]="selectedPeriod()" (change)="changePeriod($event)"
-          aria-label="Revenue period">
-          <option>This Week</option>
-          <option>Last Week</option>
-          <option>This Month</option>
+      <header class="panel-header">
+        <div class="panel-title">
+          <span class="panel-eyebrow">Revenue</span>
+          <h2>Revenue overview</h2>
+          <p>Sales movement across the selected period.</p>
+        </div>
+        <select
+          class="panel-select"
+          [value]="selectedPeriod()"
+          (change)="changePeriod($event)"
+          aria-label="Revenue period"
+        >
+          <option value="Daily">Today</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Yearly</option>
         </select>
-      </div>
+      </header>
 
       <div class="revenue-chart">
         <div class="axis-labels" aria-hidden="true">
           @for (tick of chartYTicks(); track tick) {
-          <span>{{ formatCompactCurrency(tick) }}</span>
+            <span>{{ formatCompactCurrency(tick) }}</span>
           }
         </div>
-        <svg class="line-chart" viewBox="0 0 560 190" preserveAspectRatio="none" aria-label="Revenue line chart">
+
+        <svg
+          class="line-chart"
+          viewBox="0 0 560 190"
+          preserveAspectRatio="none"
+          aria-label="Revenue line chart"
+        >
           <defs>
             <linearGradient id="revenueArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#C026D3" stop-opacity="0.24"></stop>
-              <stop offset="100%" stop-color="#C026D3" stop-opacity="0"></stop>
+              <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"></stop>
+              <stop offset="100%" stop-color="#2563eb" stop-opacity="0"></stop>
+            </linearGradient>
+            <linearGradient id="revenueStroke" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#8b5cf6"></stop>
+              <stop offset="100%" stop-color="#2563eb"></stop>
             </linearGradient>
           </defs>
-          <path class="chart-area" [attr.d]="revenueAreaPath(dashboard().revenueOverview)"></path>
-          <path class="chart-line" [attr.d]="revenuePath(dashboard().revenueOverview)"></path>
-          @for (point of dashboard().revenueOverview; track point.label; let index = $index) {
-          <circle class="chart-dot" [attr.cx]="(index / (dashboard().revenueOverview.length - 1)) * 560"
-            [attr.cy]="190 - ((point.value - 0) / 8000) * 190" r="4"></circle>
+
+          <path class="chart-area" [attr.d]="revenueAreaPath(revenuePoints())"></path>
+          <path class="chart-line" [attr.d]="revenuePath(revenuePoints())"></path>
+
+          @for (point of revenuePoints(); track point.label; let index = $index) {
+            <g
+              class="chart-point"
+              tabindex="0"
+              role="img"
+              [attr.aria-label]="point.label + ': ' + formatCurrency(point.value)"
+              (mouseenter)="hoveredRevenueIndex.set(index)"
+              (mouseleave)="hoveredRevenueIndex.set(null)"
+              (focus)="hoveredRevenueIndex.set(index)"
+              (blur)="hoveredRevenueIndex.set(null)"
+            >
+              <line
+                class="chart-hover-line"
+                [class.active]="hoveredRevenueIndex() === index"
+                [attr.x1]="pointX(index, revenuePoints().length)"
+                [attr.x2]="pointX(index, revenuePoints().length)"
+                y1="0"
+                y2="190"
+              ></line>
+              <circle
+                class="chart-dot"
+                [class.active]="hoveredRevenueIndex() === index"
+                [attr.cx]="pointX(index, revenuePoints().length)"
+                [attr.cy]="pointY(point.value)"
+                r="4"
+              ></circle>
+              <rect
+                class="chart-hit-area"
+                [attr.x]="pointX(index, revenuePoints().length) - 16"
+                y="0"
+                width="32"
+                height="190"
+              ></rect>
+
+              @if (hoveredRevenueIndex() === index) {
+                <g
+                  class="chart-tooltip"
+                  [attr.transform]="
+                    'translate(' +
+                    tooltipX(index, revenuePoints().length) +
+                    ' ' +
+                    tooltipY(point.value) +
+                    ')'
+                  "
+                >
+                  <rect width="98" height="38" rx="11"></rect>
+                  <text class="tooltip-label" x="49" y="14">{{ point.label }}</text>
+                  <text class="tooltip-value" x="49" y="29">
+                    {{ formatCompactCurrency(point.value) }}
+                  </text>
+                </g>
+              }
+            </g>
           }
         </svg>
-        <div class="x-labels">
-          @for (point of dashboard().revenueOverview; track point.label) {
-          <span>{{ point.label }}</span>
+
+        <div class="x-labels" aria-hidden="true">
+          @for (point of revenuePoints(); track point.label) {
+            <span>{{ point.label }}</span>
           }
         </div>
       </div>
     </article>
 
     <article class="panel category-panel">
-      <div class="panel-header">
-        <h2>Sales by Category</h2>
-        <select class="panel-select" [value]="selectedPeriod()" (change)="changePeriod($event)"
-          aria-label="Category period">
-          <option>This Week</option>
-          <option>Last Week</option>
-          <option>This Month</option>
-        </select>
-      </div>
+      <header class="panel-header">
+        <div class="panel-title">
+          <span class="panel-eyebrow">Mix</span>
+          <h2>Sales by category</h2>
+          <p>Revenue contribution by catalog group.</p>
+        </div>
+      </header>
 
       <div class="category-content">
-        <div class="donut" [style.background]="donutBackground(dashboard().salesByCategory)"
-          aria-label="Sales by category donut chart">
+        <div
+          class="donut"
+          [style.background]="donutBackground(dashboard().salesByCategory)"
+          aria-label="Sales by category donut chart"
+        >
           <div class="donut-center">
-            <span>Total</span>
+            <span>Total sales</span>
             <strong>{{ formatCurrency(totalCategorySales()) }}</strong>
           </div>
         </div>
 
         <div class="category-list">
           @for (category of dashboard().salesByCategory; track category.name) {
-          <div class="category-row">
-            <span class="category-dot" [style.background]="category.color"></span>
-            <span class="category-name">{{ category.name }}</span>
-            <strong>{{ formatCurrency(category.amount) }}</strong>
-            <span class="category-share">({{ category.percentage }}%)</span>
-          </div>
+            <div class="category-row">
+              <span class="category-dot" [style.background]="category.color"></span>
+              <span class="category-name">{{ category.name }}</span>
+              <strong>{{ formatCurrency(category.amount) }}</strong>
+              <span class="category-share">{{ category.percentage }}%</span>
+            </div>
           }
         </div>
       </div>
     </article>
   </section>
 
-  <section class="bottom-grid">
+  <section class="bottom-grid" aria-label="Store activity">
     <article class="panel table-panel">
-      <div class="panel-header">
-        <h2>Top Selling Products</h2>
-        <button class="ghost-btn" type="button">View All</button>
-      </div>
+      <header class="panel-header compact">
+        <div class="panel-title">
+          <span class="panel-eyebrow">Catalog</span>
+          <h2>Top selling products</h2>
+        </div>
+        <button class="ghost-btn" type="button">View all</button>
+      </header>
+
       <div class="table-list product-table">
-        <div class="table-head">
-          <span>Product</span>
-          <span>Sold</span>
-          <span>Revenue</span>
-        </div>
+        <div class="table-head"><span>Product</span><span>Sold</span><span>Revenue</span></div>
         @for (product of dashboard().topProducts; track product.id) {
-        <div class="table-row">
-          <span class="product-cell">
-            <span class="product-thumb" [style.background]="product.imageTone">{{ product.name.charAt(0) }}</span>
-            <span>{{ product.name }}</span>
-          </span>
-          <span>{{ product.sold }}</span>
-          <span>{{ formatCurrency(product.revenue) }}</span>
-        </div>
+          <div class="table-row">
+            <span class="product-cell">
+              <span class="product-thumb" [style.background]="product.imageTone">
+                {{ product.name.charAt(0) }}
+              </span>
+              <span>{{ product.name }}</span>
+            </span>
+            <span>{{ product.sold }}</span>
+            <strong>{{ formatCurrency(product.revenue) }}</strong>
+          </div>
         }
       </div>
     </article>
 
     <article class="panel table-panel">
-      <div class="panel-header">
-        <h2>Recent Orders</h2>
-        <button class="ghost-btn" type="button">View All</button>
-      </div>
+      <header class="panel-header compact">
+        <div class="panel-title">
+          <span class="panel-eyebrow">Orders</span>
+          <h2>Recent activity</h2>
+        </div>
+        <button class="ghost-btn" type="button">View all</button>
+      </header>
+
       <div class="table-list orders-table">
         <div class="table-head">
-          <span>Order ID</span>
-          <span>Customer</span>
-          <span>Amount</span>
-          <span>Status</span>
+          <span>Order</span><span>Customer</span><span>Amount</span><span>Status</span>
         </div>
         @for (order of dashboard().recentOrders; track order.id) {
-        <div class="table-row">
-          <span>{{ order.id }}</span>
-          <span>{{ order.customer }}</span>
-          <span>{{ formatCurrency(order.amount) }}</span>
-          <span class="order-status" [class]="'order-status status-' + order.status.toLowerCase()">{{ order.status
-            }}</span>
-        </div>
+          <div class="table-row">
+            <strong>{{ order.id }}</strong>
+            <span>{{ order.customer }}</span>
+            <span>{{ formatCurrency(order.amount) }}</span>
+            <span [class]="'order-status status-' + order.status.toLowerCase()">
+              {{ order.status }}
+            </span>
+          </div>
         }
       </div>
     </article>
 
     <article class="panel performance-panel">
-      <div class="panel-header">
-        <h2>Store Performance</h2>
-        <select class="panel-select" [value]="selectedPeriod()" (change)="changePeriod($event)"
-          aria-label="Performance period">
-          <option>This Week</option>
-          <option>Last Week</option>
-          <option>This Month</option>
-        </select>
-      </div>
+      <header class="panel-header compact">
+        <div class="panel-title">
+          <span class="panel-eyebrow">Engagement</span>
+          <h2>Store performance</h2>
+        </div>
+      </header>
+
       <div class="performance-list">
         @for (metric of dashboard().performance; track metric.id) {
-        <div class="performance-row">
-          <span class="performance-icon" [class]="'performance-icon performance-icon--' + metric.tone"></span>
-          <span class="performance-name">{{ metric.label }}</span>
-          <svg class="mini-chart" viewBox="0 0 104 26" preserveAspectRatio="none" aria-hidden="true">
-            <path [attr.d]="performancePath(metric)"></path>
-          </svg>
-          <strong>{{ metric.value }}</strong>
-          <span class="metric-change" [class.metric-down]="metric.trend === 'down'">
-            {{ metric.trend === 'down' ? '' : '+' }}{{ metric.change }}%
-          </span>
-        </div>
+          <div class="performance-row">
+            <span
+              [class]="'performance-icon performance-icon--' + metric.tone"
+              aria-hidden="true"
+            ></span>
+            <span class="performance-name">{{ metric.label }}</span>
+            <svg
+              class="mini-chart"
+              viewBox="0 0 104 26"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path [attr.d]="performancePath(metric)"></path>
+            </svg>
+            <strong>{{ metric.value }}</strong>
+            <span class="metric-change" [class.metric-down]="metric.trend === 'down'">
+              {{ metric.trend === 'down' ? '' : '+' }}{{ metric.change }}%
+            </span>
+          </div>
         }
       </div>
     </article>
   </section>
-</div>
+</main>

@@ -42,10 +42,18 @@
    GLOBAL STYLES — DigiShop Admin Design System
    ============================================================ */
 
-
 /* ── CSS Reset ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 18px; -webkit-font-smoothing: antialiased; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
 body {
   min-width: 0;
   min-height: 100%;
@@ -53,20 +61,36 @@ body {
   background: var(--clr-bg);
   font-family: 'Poppins', system-ui, sans-serif;
   font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
 }
-a { text-decoration: none; color: inherit; }
-button { border: none; cursor: pointer; background: none; font-family: inherit; }
-input, select, textarea { font-family: inherit; }
-img { max-width: 100%; display: block; }
-ul, ol { list-style: none; }
-
-/* Keep readable interface text consistent across component-scoped styles. */
-:where(p, a, label, li, td, th, dt, dd, small),
-:where(button, input, select, textarea, [contenteditable='true']) {
-  font-size: 16px !important;
+a {
+  text-decoration: none;
+  color: inherit;
+}
+button {
+  border: none;
+  cursor: pointer;
+  background: none;
+  font-family: inherit;
+}
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+ul,
+ol {
+  list-style: none;
 }
 
-html, body, app-root {
+html,
+body,
+app-root {
   width: 100%;
   height: 100%;
 }
@@ -83,64 +107,94 @@ app-root {
   --form-control-height: 44px;
   --form-label-gap: 8px;
 
+  /* Typography — based on the Supplier Management visual scale */
+  --font-family-ui: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-micro: 12px;
+  --font-size-table-head: 13px;
+  --font-size-body-sm: 14px;
+  --font-size-body: 16px;
+  --font-size-title-sm: 18px;
+  --font-size-title-md: 20px;
+  --font-size-title-lg: 28px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Shared application surfaces — derived from the main dashboard */
+  --ui-content-max: 1880px;
+  --ui-page-gap: 22px;
+  --ui-card-radius: 22px;
+  --ui-card-radius-mobile: 18px;
+  --ui-card-padding: 22px;
+  --ui-card-bg: rgba(255, 255, 255, 0.78);
+  --ui-card-border: rgba(255, 255, 255, 0.9);
+  --ui-card-shadow: 0 18px 44px rgba(31, 24, 55, 0.065), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+  --ui-card-shadow-hover:
+    0 22px 48px rgba(31, 24, 55, 0.095), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+  --ui-summary-height: 170px;
+  --ui-control-radius: 12px;
+  --ui-table-head-bg: #f8f9fc;
+  --ui-table-row-hover: rgba(124, 58, 237, 0.035);
+
   /* Brand */
-  --clr-primary:       #7C3AED;
-  --clr-primary-dark:  #6D28D9;
-  --clr-indigo:        #4F46E5;
-  --clr-blue:          #2563EB;
-  --clr-blue-light:    #3B82F6;
-  --grad-brand:        linear-gradient(135deg, #7C3AED 0%, #4F46E5 55%, #2563EB 100%);
-  --grad-brand-soft:   linear-gradient(135deg, rgba(124,58,237,.12), rgba(79,70,229,.12));
+  --clr-primary: #7c3aed;
+  --clr-primary-dark: #6d28d9;
+  --clr-indigo: #4f46e5;
+  --clr-blue: #2563eb;
+  --clr-blue-light: #3b82f6;
+  --grad-brand: linear-gradient(135deg, #7c3aed 0%, #4f46e5 55%, #2563eb 100%);
+  --grad-brand-soft: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(79, 70, 229, 0.12));
 
   /* Neutrals */
-  --clr-bg:            #F3F4F8;
-  --clr-surface:       #FFFFFF;
-  --clr-border:        #E5E7EB;
-  --clr-border-soft:   rgba(0,0,0,.06);
+  --clr-bg: #f3f4f8;
+  --clr-surface: #ffffff;
+  --clr-border: #e5e7eb;
+  --clr-border-soft: rgba(0, 0, 0, 0.06);
 
   /* Sidebar */
-  --clr-sidebar-bg:    #0D0B1F;
-  --clr-sidebar-text:  rgba(255,255,255,.55);
-  --clr-sidebar-hover: rgba(255,255,255,.06);
-  --clr-sidebar-sep:   rgba(255,255,255,.07);
+  --clr-sidebar-bg: #0d0b1f;
+  --clr-sidebar-text: rgba(255, 255, 255, 0.55);
+  --clr-sidebar-hover: rgba(255, 255, 255, 0.06);
+  --clr-sidebar-sep: rgba(255, 255, 255, 0.07);
 
   /* Text */
-  --clr-text-primary:  #111827;
-  --clr-text-secondary:#4B5563;
-  --clr-text-muted:    #9CA3AF;
+  --clr-text-primary: #111827;
+  --clr-text-secondary: #4b5563;
+  --clr-text-muted: #9ca3af;
 
   /* Status */
-  --clr-success:       #10B981;
-  --clr-success-bg:    rgba(16,185,129,.1);
-  --clr-warning:       #F59E0B;
-  --clr-warning-bg:    rgba(245,158,11,.1);
-  --clr-danger:        #EF4444;
-  --clr-danger-bg:     rgba(239,68,68,.1);
-  --clr-info:          #06B6D4;
-  --clr-info-bg:       rgba(6,182,212,.1);
+  --clr-success: #10b981;
+  --clr-success-bg: rgba(16, 185, 129, 0.1);
+  --clr-warning: #f59e0b;
+  --clr-warning-bg: rgba(245, 158, 11, 0.1);
+  --clr-danger: #ef4444;
+  --clr-danger-bg: rgba(239, 68, 68, 0.1);
+  --clr-info: #06b6d4;
+  --clr-info-bg: rgba(6, 182, 212, 0.1);
 
   /* Shadows */
-  --shadow-xs:   0 1px 2px rgba(0,0,0,.06);
-  --shadow-sm:   0 2px 8px rgba(0,0,0,.07);
-  --shadow-md:   0 4px 16px rgba(0,0,0,.08);
-  --shadow-lg:   0 8px 32px rgba(0,0,0,.10);
-  --shadow-xl:   0 16px 48px rgba(0,0,0,.12);
-  --shadow-brand:0 6px 24px rgba(124,58,237,.28);
-  --shadow-card-hover: 0 12px 40px rgba(0,0,0,.13);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+  --shadow-brand: 0 6px 24px rgba(124, 58, 237, 0.28);
+  --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.13);
 
   /* Radius */
-  --r-xs:  4px;
-  --r-sm:  8px;
-  --r-md:  12px;
-  --r-lg:  16px;
-  --r-xl:  20px;
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
   --r-2xl: 24px;
-  --r-full:9999px;
+  --r-full: 9999px;
 
   /* Layout */
-  --sidebar-w:  260px;
+  --sidebar-w: 260px;
   --sidebar-collapsed-w: 70px;
-  --topbar-h:   64px;
+  --topbar-h: 64px;
 
   /* Transitions */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -150,17 +204,773 @@ app-root {
 }
 
 /* ============================================================
+   SHARED TYPOGRAPHY
+   Component styles may control spacing and color; this layer keeps
+   type size and weight consistent across screens.
+   ============================================================ */
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-family-ui);
+}
+
+:where(h1, .page-title, .page-header h1, .auth-heading h1, .register-heading h1) {
+  font-size: var(--font-size-title-lg) !important;
+  font-weight: var(--font-weight-bold) !important;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+:where(h2) {
+  font-size: var(--font-size-title-md) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  line-height: 1.35;
+}
+
+:where(h3, .section-title, .section-heading, .panel-title, .card-title, .card-heading) {
+  font-size: var(--font-size-title-sm) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  line-height: 1.4;
+}
+
+:where(h4, h5, h6) {
+  font-size: var(--font-size-body) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  line-height: 1.4;
+}
+
+:where(p, li, dt, dd, blockquote) {
+  font-size: var(--font-size-body) !important;
+  font-weight: var(--font-weight-regular) !important;
+}
+
+:where(label, legend) {
+  font-size: var(--font-size-body-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+}
+
+:where(button, [role='button'], .btn, [class$='-btn']) {
+  font-size: var(--font-size-body) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+:where(input, select, textarea, [contenteditable='true']) {
+  font-size: var(--font-size-body) !important;
+  font-weight: var(--font-weight-regular) !important;
+}
+
+:where(table th) {
+  font-size: var(--font-size-table-head) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  line-height: 1.4;
+}
+
+:where(table td) {
+  font-size: var(--font-size-body-sm) !important;
+  font-weight: var(--font-weight-regular) !important;
+  line-height: 1.5;
+}
+
+:where(small, caption, .meta, .helper-text, .field-hint, .form-hint, .error-message, .field-error) {
+  font-size: var(--font-size-micro) !important;
+  font-weight: var(--font-weight-regular) !important;
+}
+
+:where(strong, b) {
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+:where(.page-subtitle, .subtitle, .page-header p) {
+  font-size: var(--font-size-body) !important;
+  font-weight: var(--font-weight-regular) !important;
+}
+
+:where(.summary-label, .metric-label, .kpi-label, .stat-label) {
+  font-size: var(--font-size-body-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+}
+
+:where(.summary-value, .metric-value, .kpi-value, .stat-value, .count-value) {
+  font-size: var(--font-size-title-lg) !important;
+  font-weight: var(--font-weight-bold) !important;
+  line-height: 1.2;
+}
+
+:where(
+  .status,
+  .status-badge,
+  .type-badge,
+  .active-count,
+  .order-status,
+  .badge,
+  [class$='-badge']
+) {
+  font-size: var(--font-size-micro) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+:where(code, .supplier-code, .code-badge, .reference-code) {
+  font-size: var(--font-size-table-head) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+@media (max-width: 768px) {
+  :where(h1, .page-title, .page-header h1, .auth-heading h1, .register-heading h1) {
+    font-size: 24px !important;
+  }
+
+  :where(.summary-value, .metric-value, .kpi-value, .stat-value, .count-value) {
+    font-size: 24px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :where(h1, .page-title, .page-header h1, .auth-heading h1, .register-heading h1) {
+    font-size: 21px !important;
+  }
+
+  :where(.summary-value, .metric-value, .kpi-value, .stat-value, .count-value) {
+    font-size: 22px !important;
+  }
+}
+
+/* Match the dashboard metric-card responsive behavior. */
+@media (max-width: 720px) {
+  .page-content
+    :is(
+      .inventory-page .metric-grid > .metric-card,
+      .warehouse-page .stock-stat-grid > article,
+      .supplier-page .summary-grid > .summary-card
+    ) {
+    border-radius: 18px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .page-content
+    :is(
+      .inventory-page .metric-grid,
+      .warehouse-page .stock-stat-grid,
+      .supplier-page .summary-grid
+    ) {
+    grid-template-columns: 1fr !important;
+    gap: 11px !important;
+  }
+
+  .page-content
+    :is(
+      .inventory-page .metric-grid > .metric-card,
+      .warehouse-page .stock-stat-grid > article,
+      .supplier-page .summary-grid > .summary-card
+    ) {
+    min-height: 144px !important;
+    padding: 16px !important;
+  }
+}
+
+/* ============================================================
+   SHARED CONTENT SURFACES AND DATA GRIDS
+   Dashboard cards are the visual source. Authentication and the
+   admin shell remain intentionally outside this content scope.
+   ============================================================ */
+
+.page-content {
+  font-family: var(--font-family-ui);
+  color: var(--clr-text-primary);
+}
+
+.page-content :where(.breadcrumb, .breadcrumbs, .lab-breadcrumb, .preview-breadcrumb) {
+  color: var(--clr-text-secondary);
+  font-size: var(--font-size-micro) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  line-height: 1.4;
+}
+
+.page-content :where([class$='-page']) {
+  width: min(100%, var(--ui-content-max));
+  margin-inline: auto;
+  padding: 0 !important;
+  row-gap: var(--ui-page-gap);
+}
+
+.page-content
+  :where(
+    .page-header,
+    .form-page-header,
+    .store-page-header,
+    .branches-header,
+    .editor-header,
+    .lab-header,
+    .products-header,
+    .profile-page > .page-heading,
+    .preview-header,
+    .warehouse-header
+  ) {
+  position: relative;
+  isolation: isolate;
+  min-height: 132px;
+  padding: 24px 26px !important;
+  align-items: center !important;
+  overflow: hidden;
+  border: 1px solid var(--ui-card-border) !important;
+  border-radius: 24px !important;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.7)),
+    linear-gradient(135deg, rgba(124, 58, 237, 0.09), rgba(37, 99, 235, 0.07)) !important;
+  box-shadow: var(--ui-card-shadow) !important;
+}
+
+.page-content
+  :where(
+    .page-header,
+    .form-page-header,
+    .store-page-header,
+    .branches-header,
+    .editor-header,
+    .lab-header,
+    .products-header,
+    .profile-page > .page-heading,
+    .preview-header,
+    .warehouse-header
+  )::after {
+  position: absolute;
+  z-index: -1;
+  top: -185px;
+  right: -105px;
+  width: 290px;
+  height: 290px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(124, 58, 237, 0.2), rgba(37, 99, 235, 0.1));
+  content: '';
+}
+
+.page-content
+  :where([class$='-page']:not(.dashboard-page))
+  :where(
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel '],
+    .panel,
+    .surface,
+    .summary-grid > article,
+    .stock-stat-grid > article,
+    .an-card,
+    .chart-card
+  ):not(.danger-card) {
+  border: 1px solid var(--ui-card-border) !important;
+  border-radius: var(--ui-card-radius) !important;
+  background: var(--ui-card-bg) !important;
+  box-shadow: var(--ui-card-shadow) !important;
+  backdrop-filter: blur(16px) saturate(135%);
+}
+
+.page-content
+  :where([class$='-page']:not(.dashboard-page))
+  :where([class$='-card'], [class*='-card '], .summary-grid > article):not(.danger-card) {
+  transition:
+    transform var(--tr-base),
+    border-color var(--tr-base),
+    box-shadow var(--tr-base);
+}
+
+.page-content
+  :where([class$='-page']:not(.dashboard-page))
+  :where([class$='-card'], [class*='-card '], .summary-grid > article):not(.danger-card):hover {
+  border-color: rgba(124, 58, 237, 0.14) !important;
+  box-shadow: var(--ui-card-shadow-hover) !important;
+}
+
+.page-content :where(.summary-grid) {
+  grid-auto-rows: 1fr;
+  gap: 16px !important;
+}
+
+/* Inventory, Warehouse, and Suppliers use the same page rhythm and
+   responsive summary-card geometry even though their local class names differ. */
+.page-content
+  :where(
+    .inventory-page,
+    .warehouse-page,
+    .supplier-page,
+    .supplier-form-page,
+    .view-supplier-page
+  ) {
+  display: grid;
+  gap: var(--ui-page-gap) !important;
+  font-family: var(--font-family-ui);
+}
+
+.page-content
+  :where(.supplier-page, .supplier-form-page, .view-supplier-page)
+  > :where(.page-header, .summary-grid) {
+  margin-bottom: 0 !important;
+}
+
+.page-content
+  :where(
+    .inventory-page .metric-grid,
+    .warehouse-page .stock-stat-grid,
+    .supplier-page .summary-grid
+  ) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-auto-rows: 1fr;
+  gap: 14px !important;
+}
+
+.page-content
+  :is(
+    .inventory-page .metric-grid > .metric-card,
+    .warehouse-page .stock-stat-grid > article,
+    .supplier-page .summary-grid > .summary-card
+  ) {
+  --tone: #7c3aed;
+  --tone-rgb: 124, 58, 237;
+  position: relative;
+  isolation: isolate;
+  min-height: var(--ui-summary-height) !important;
+  height: 100%;
+  padding: 18px !important;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.88) !important;
+  border-radius: 20px !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.7)),
+    linear-gradient(145deg, rgba(var(--tone-rgb), 0.08), transparent 68%) !important;
+  box-shadow:
+    0 16px 38px rgba(31, 24, 55, 0.065),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(14px) saturate(135%);
+  transition:
+    transform var(--tr-base),
+    border-color var(--tr-base),
+    box-shadow var(--tr-base);
+}
+
+.page-content
+  :is(
+    .inventory-page .metric-grid > .metric-card,
+    .warehouse-page .stock-stat-grid > article,
+    .supplier-page .summary-grid > .summary-card
+  )::before {
+  position: absolute !important;
+  z-index: -1 !important;
+  top: auto !important;
+  right: -65px !important;
+  bottom: -70px !important;
+  left: auto !important;
+  width: 130px !important;
+  height: 130px !important;
+  border-radius: 50% !important;
+  background: rgba(var(--tone-rgb), 0.09) !important;
+  content: '' !important;
+}
+
+.page-content .inventory-page .metric-grid > .metric-card::after {
+  content: none !important;
+}
+
+.page-content
+  :is(
+    .inventory-page .metric-grid > .metric-card,
+    .warehouse-page .stock-stat-grid > article,
+    .supplier-page .summary-grid > .summary-card
+  ):hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--tone-rgb), 0.16) !important;
+  box-shadow:
+    0 22px 48px rgba(31, 24, 55, 0.095),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
+}
+
+.page-content :is(.inventory-page .tone-blue, .warehouse-page .stock-stat-grid > article.blue) {
+  --tone: #2563eb;
+  --tone-rgb: 37, 99, 235;
+}
+
+.page-content
+  :is(
+    .inventory-page .tone-green,
+    .warehouse-page .stock-stat-grid > article.green,
+    .supplier-page .summary-card.tone-green
+  ) {
+  --tone: #059669;
+  --tone-rgb: 5, 150, 105;
+}
+
+.page-content
+  :is(
+    .inventory-page .tone-orange,
+    .inventory-page .tone-red,
+    .warehouse-page .stock-stat-grid > article.orange,
+    .supplier-page .summary-card.tone-orange
+  ) {
+  --tone: #ea580c;
+  --tone-rgb: 234, 88, 12;
+}
+
+.page-content .inventory-page .tone-teal {
+  --tone: #0f8b7e;
+  --tone-rgb: 15, 139, 126;
+}
+
+.page-content
+  :is(
+    .inventory-page .metric-icon,
+    .warehouse-page .stock-stat-icon,
+    .supplier-page .summary-icon
+  ) {
+  width: 42px !important;
+  height: 42px !important;
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px !important;
+  color: var(--tone) !important;
+  border: 1px solid rgba(var(--tone-rgb), 0.12) !important;
+  border-radius: 13px !important;
+  background: rgba(var(--tone-rgb), 0.1) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.page-content
+  :is(.inventory-page .metric-icon, .warehouse-page .stock-stat-icon, .supplier-page .summary-icon)
+  svg {
+  width: 21px !important;
+  height: 21px !important;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.page-content .warehouse-page .stock-stat-grid > article {
+  display: grid !important;
+  align-items: initial !important;
+  grid-template-rows: 42px minmax(0, 1fr) auto;
+  gap: 4px !important;
+}
+
+.page-content .supplier-page .summary-card {
+  display: grid !important;
+  align-content: space-between !important;
+  align-items: initial !important;
+  gap: 18px !important;
+}
+
+.page-content .warehouse-page .stock-stat-grid > article > span:not(.stock-stat-icon),
+.page-content .supplier-page .summary-content {
+  align-self: end !important;
+}
+
+.page-content .supplier-page .summary-content {
+  display: grid;
+  gap: 4px !important;
+}
+
+.page-content
+  :is(
+    .inventory-page .metric-card > div > span,
+    .warehouse-page .stock-stat-grid > article > span:not(.stock-stat-icon)
+  ) {
+  color: #687083 !important;
+  font-size: var(--font-size-body-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+}
+
+.page-content
+  :is(
+    .inventory-page .metric-card strong,
+    .warehouse-page .stock-stat-grid strong,
+    .supplier-page .summary-value
+  ) {
+  color: #101223 !important;
+  font-size: var(--font-size-title-lg) !important;
+  font-weight: var(--font-weight-bold) !important;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.page-content
+  :is(
+    .inventory-page .metric-card small,
+    .inventory-page .metric-card p,
+    .warehouse-page .stock-stat-grid small
+  ) {
+  color: #969cab !important;
+  font-size: var(--font-size-micro) !important;
+}
+
+.page-content .supplier-page .summary-label {
+  color: #687083 !important;
+}
+
+.page-content :where(.inventory-page, .warehouse-page) .panel-heading {
+  min-height: 72px;
+  padding: 16px 20px !important;
+}
+
+.page-content :where(.panel-heading p, .section-header p, .editor-heading p) {
+  font-size: var(--font-size-micro) !important;
+  font-weight: var(--font-weight-regular) !important;
+}
+
+.page-content
+  :where(
+    .inventory-page .overview-grid,
+    .inventory-page .activity-grid,
+    .warehouse-page .stock-workspace,
+    .warehouse-page .warehouse-list-layout,
+    .view-supplier-page .details-grid
+  ) {
+  gap: 16px !important;
+}
+
+.page-content :where(.summary-grid > .summary-card, .summary-grid > article) {
+  min-height: var(--ui-summary-height) !important;
+  height: 100%;
+  padding: var(--ui-card-padding) !important;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.page-content :where(.summary-grid > .summary-card, .summary-grid > article) .summary-icon {
+  width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 44px !important;
+  border-radius: 13px !important;
+}
+
+.page-content
+  :where(.summary-grid > .summary-card, .summary-grid > article)
+  :where(.summary-label, small) {
+  font-size: var(--font-size-body-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+}
+
+.page-content
+  :where(.summary-grid > .summary-card, .summary-grid > article)
+  :where(.summary-value, strong) {
+  font-size: var(--font-size-title-lg) !important;
+  font-weight: var(--font-weight-bold) !important;
+  line-height: 1.2;
+}
+
+.page-content :where(.summary-grid > .summary-card, .summary-grid > article) :where(em) {
+  color: var(--clr-text-muted);
+  font-size: var(--font-size-micro);
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+}
+
+.page-content
+  :where(
+    .brand-grid,
+    .info-grid,
+    .detail-grid,
+    .details-grid,
+    .settings-grid,
+    .zones-grid,
+    .management-grid
+  )
+  > :where([class$='-card'], [class*='-card ']) {
+  height: 100%;
+}
+
+.page-content :where([class$='-grid']) > :where([class$='-card'], [class*='-card ']) {
+  height: 100%;
+}
+
+.page-content
+  :where(
+    .toolbar,
+    .supplier-toolbar,
+    .branch-toolbar,
+    .product-toolbar,
+    .stock-toolbar,
+    .zones-toolbar
+  ) {
+  min-height: 68px;
+  padding: 12px 20px !important;
+  border-bottom: 1px solid rgba(116, 134, 174, 0.14) !important;
+  background: rgba(255, 255, 255, 0.48) !important;
+}
+
+.page-content
+  :where(
+    .toolbar,
+    .supplier-toolbar,
+    .branch-toolbar,
+    .product-toolbar,
+    .stock-toolbar,
+    .zones-toolbar
+  )
+  :where(input:not([type='checkbox']):not([type='radio']), select) {
+  min-height: 44px !important;
+  border-radius: var(--ui-control-radius) !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.page-content
+  :where(.table-wrap, .table-wrapper, .data-table-wrap, .line-table-wrap, [class$='-table-wrap']) {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.page-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.page-content table thead {
+  background: var(--ui-table-head-bg) !important;
+}
+
+.page-content table th {
+  height: 46px;
+  padding: 12px 16px !important;
+  color: #667085 !important;
+  border-bottom: 1px solid #e8eaf0 !important;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.page-content table td {
+  min-height: 58px;
+  padding: 14px 16px !important;
+  color: #374151;
+  border-bottom: 1px solid #eef0f4 !important;
+  vertical-align: middle;
+}
+
+.page-content table td > strong {
+  font-size: var(--font-size-body-sm) !important;
+}
+
+.page-content table tbody tr {
+  transition: background-color var(--tr-fast);
+}
+
+.page-content table tbody tr:hover {
+  background: var(--ui-table-row-hover) !important;
+}
+
+.page-content table tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+.page-content
+  form
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='file']), select, textarea) {
+  border-radius: 10px !important;
+}
+
+.page-content
+  :where(
+    .primary-btn,
+    .primary-button,
+    .submit-btn,
+    .submit-button,
+    .save-button,
+    .create-btn,
+    .add-product-btn,
+    .add-branch-btn
+  ) {
+  min-height: 44px;
+  border-radius: 12px !important;
+  background: var(--grad-brand) !important;
+  box-shadow: var(--shadow-brand) !important;
+}
+
+@media (max-width: 768px) {
+  .page-content
+    :where(
+      .page-header,
+      .form-page-header,
+      .store-page-header,
+      .branches-header,
+      .editor-header,
+      .lab-header,
+      .products-header,
+      .profile-page > .page-heading,
+      .preview-header,
+      .warehouse-header
+    ) {
+    min-height: 0;
+    padding: 21px !important;
+    border-radius: var(--ui-card-radius) !important;
+  }
+
+  .page-content
+    :where([class$='-page']:not(.dashboard-page))
+    :where(
+      [class$='-card'],
+      [class*='-card '],
+      [class$='-panel'],
+      [class*='-panel '],
+      .panel,
+      .surface,
+      .summary-grid > article
+    ) {
+    border-radius: var(--ui-card-radius-mobile) !important;
+  }
+
+  .page-content
+    :where(
+      .inventory-page .metric-grid,
+      .warehouse-page .stock-stat-grid,
+      .supplier-page .summary-grid
+    ) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-content
+    :where(
+      .summary-grid > .summary-card,
+      .summary-grid > article,
+      .inventory-page .metric-grid > .metric-card,
+      .warehouse-page .stock-stat-grid > article
+    ) {
+    min-height: var(--ui-summary-height) !important;
+    padding: 16px !important;
+  }
+
+  .page-content
+    :where(
+      .inventory-page .metric-grid,
+      .warehouse-page .stock-stat-grid,
+      .supplier-page .summary-grid
+    ) {
+    grid-template-columns: 1fr !important;
+  }
+
+  .page-content
+    :where(
+      .toolbar,
+      .supplier-toolbar,
+      .branch-toolbar,
+      .product-toolbar,
+      .stock-toolbar,
+      .zones-toolbar
+    ) {
+    padding: 12px 14px !important;
+  }
+}
+
+/* ============================================================
    SHARED FORM GEOMETRY
    Keeps titles, required markers, and controls aligned even when
    a component uses a wrapping label instead of a separate label.
    ============================================================ */
 
-:where(
-  .form-field > label,
-  .media-field > label,
-  .field-group > label,
-  .form-row > .form-label
-) {
+:where(.form-field > label, .media-field > label, .field-group > label, .form-row > .form-label) {
   display: inline-flex !important;
   width: max-content;
   max-width: 100%;
@@ -171,17 +981,62 @@ app-root {
   white-space: nowrap;
 }
 
-:where(form, .form-grid, .limit-editor, .editor-fields, .operation-fields, .adjustment-grid, .report-filters, .stacked-fields)
-  label:has(> input:not([type='checkbox']):not([type='radio']):not([type='file']), > select, > textarea, > .control, > .field-control, > .phone-control, > .plain-control, > .input-suffix) {
+:where(
+    form,
+    .form-grid,
+    .limit-editor,
+    .editor-fields,
+    .operation-fields,
+    .adjustment-grid,
+    .report-filters,
+    .stacked-fields
+  )
+  label:has(
+    > input:not([type='checkbox']):not([type='radio']):not([type='file']),
+    > select,
+    > textarea,
+    > .control,
+    > .field-control,
+    > .phone-control,
+    > .plain-control,
+    > .input-suffix
+  ) {
   display: block !important;
   min-width: 0;
   line-height: 1.35;
   white-space: nowrap;
 }
 
-:where(form, .form-grid, .limit-editor, .editor-fields, .operation-fields, .adjustment-grid, .report-filters, .stacked-fields)
-  label:has(> input:not([type='checkbox']):not([type='radio']):not([type='file']), > select, > textarea, > .control, > .field-control, > .phone-control, > .plain-control, > .input-suffix)
-  > :where(input, select, textarea, .control, .field-control, .phone-control, .plain-control, .input-suffix) {
+:where(
+    form,
+    .form-grid,
+    .limit-editor,
+    .editor-fields,
+    .operation-fields,
+    .adjustment-grid,
+    .report-filters,
+    .stacked-fields
+  )
+  label:has(
+    > input:not([type='checkbox']):not([type='radio']):not([type='file']),
+    > select,
+    > textarea,
+    > .control,
+    > .field-control,
+    > .phone-control,
+    > .plain-control,
+    > .input-suffix
+  )
+  > :where(
+    input,
+    select,
+    textarea,
+    .control,
+    .field-control,
+    .phone-control,
+    .plain-control,
+    .input-suffix
+  ) {
   display: flex;
   width: 100%;
   margin-top: var(--form-label-gap) !important;
@@ -198,7 +1053,10 @@ label > .required-marker {
 }
 
 :where(form, .editor-fields, .operation-fields, .adjustment-grid, .report-filters, .stacked-fields)
-  :where(input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.otp-input), select) {
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.otp-input),
+    select
+  ) {
   min-height: var(--form-control-height);
 }
 
@@ -207,7 +1065,17 @@ label > .required-marker {
   min-height: var(--form-control-height);
 }
 
-:where(.information-grid, .branding-grid, .field-grid, .pricing-grid, .form-grid, .editor-fields, .operation-fields, .adjustment-grid, .report-filters) {
+:where(
+  .information-grid,
+  .branding-grid,
+  .field-grid,
+  .pricing-grid,
+  .form-grid,
+  .editor-fields,
+  .operation-fields,
+  .adjustment-grid,
+  .report-filters
+) {
   align-items: start;
 }
 
@@ -234,7 +1102,9 @@ select {
     calc(100% - 17px) 50%,
     calc(100% - 12px) 50%;
   background-repeat: no-repeat;
-  background-size: 5px 5px, 5px 5px;
+  background-size:
+    5px 5px,
+    5px 5px;
   cursor: pointer;
   transition:
     border-color var(--tr-fast),
@@ -243,22 +1113,22 @@ select {
 }
 
 select:hover:not(:disabled) {
-  border-color: rgba(124, 58, 237, .5) !important;
-  background-color: #FDFCFF;
+  border-color: rgba(124, 58, 237, 0.5) !important;
+  background-color: #fdfcff;
 }
 
 select:focus-visible {
   border-color: var(--clr-primary) !important;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, .12) !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
 }
 
 select:disabled {
   color: var(--clr-text-muted);
-  background-color: #F8FAFC;
+  background-color: #f8fafc;
   background-image:
-    linear-gradient(45deg, transparent 50%, #98A2B3 50%),
-    linear-gradient(135deg, #98A2B3 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, #98a2b3 50%),
+    linear-gradient(135deg, #98a2b3 50%, transparent 50%);
   cursor: not-allowed;
   opacity: 1;
 }
@@ -266,6 +1136,48 @@ select:disabled {
 select option {
   color: var(--clr-text-primary);
   background: var(--clr-surface);
+}
+
+select option:is(:hover, :focus, :checked) {
+  color: #ffffff;
+  background: var(--clr-primary);
+  box-shadow: 0 0 0 100vmax var(--clr-primary) inset;
+}
+
+/* Opt supported browsers out of the OS-native popup so option hover can be themed. */
+@supports (appearance: base-select) {
+  select,
+  ::picker(select) {
+    appearance: base-select;
+  }
+
+  select {
+    align-items: center;
+    line-height: 1.25;
+  }
+
+  select::picker-icon {
+    display: none;
+  }
+
+  ::picker(select) {
+    margin-block-start: 6px;
+    padding: 4px;
+    border: 1px solid rgba(124, 58, 237, 0.28);
+    border-radius: 10px;
+    background: var(--clr-surface);
+    box-shadow: 0 12px 28px rgba(31, 20, 61, 0.16);
+  }
+
+  select option {
+    padding: 10px 12px;
+    border-radius: 7px;
+  }
+
+  select option:is(:hover, :focus) {
+    color: #ffffff;
+    background: var(--clr-primary);
+  }
 }
 
 :where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month']) {
@@ -280,66 +1192,418 @@ select option {
     background-color var(--tr-fast);
 }
 
-:where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month']):hover:not(:disabled) {
-  border-color: rgba(124, 58, 237, .5) !important;
-  background-color: #FDFCFF;
+:where(
+    input[type='date'],
+    input[type='time'],
+    input[type='datetime-local'],
+    input[type='month']
+  ):hover:not(:disabled) {
+  border-color: rgba(124, 58, 237, 0.5) !important;
+  background-color: #fdfcff;
 }
 
-:where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month']):focus-visible {
+:where(
+  input[type='date'],
+  input[type='time'],
+  input[type='datetime-local'],
+  input[type='month']
+):focus-visible {
   border-color: var(--clr-primary) !important;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, .12) !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
 }
 
-:where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month'])::-webkit-calendar-picker-indicator {
+:where(
+  input[type='date'],
+  input[type='time'],
+  input[type='datetime-local'],
+  input[type='month']
+)::-webkit-calendar-picker-indicator {
   width: 18px;
   height: 18px;
   padding: 4px;
   border-radius: 5px;
   cursor: pointer;
   filter: invert(31%) sepia(90%) saturate(2635%) hue-rotate(251deg) brightness(91%) contrast(91%);
-  opacity: .9;
+  opacity: 0.9;
 }
 
-:where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month'])::-webkit-calendar-picker-indicator:hover {
-  background-color: rgba(124, 58, 237, .1);
+:where(
+    input[type='date'],
+    input[type='time'],
+    input[type='datetime-local'],
+    input[type='month']
+  )::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(124, 58, 237, 0.1);
 }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
 
 /* ── Shared Utilities ── */
 .skeleton {
-  background: linear-gradient(90deg, #F0F0F0 25%, #E8E8E8 50%, #F0F0F0 75%);
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: var(--r-sm);
 }
 @keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(.96); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: .6; transform: scale(1.4); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.4);
+  }
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-.anim-fade  { animation: fadeIn var(--tr-slow) both; }
-.anim-slide { animation: slideInLeft var(--tr-slow) both; }
-.anim-scale { animation: scaleIn var(--tr-base) both; }
+.anim-fade {
+  animation: fadeIn var(--tr-slow) both;
+}
+.anim-slide {
+  animation: slideInLeft var(--tr-slow) both;
+}
+.anim-scale {
+  animation: scaleIn var(--tr-base) both;
+}
+
+/* ========================================================================== */
+/* Generic dashboard metric cards                                             */
+/* ========================================================================== */
+
+.page-content .ds-metric-grid {
+  display: grid !important;
+  grid-auto-rows: 1fr;
+  gap: 14px !important;
+}
+
+.page-content .ds-metric-card {
+  --ds-tone: #7c3aed;
+  --ds-tone-rgb: 124, 58, 237;
+  position: relative !important;
+  isolation: isolate;
+  display: grid !important;
+  align-content: space-between !important;
+  align-items: initial !important;
+  min-width: 0;
+  min-height: 170px !important;
+  height: 100% !important;
+  padding: 18px !important;
+  gap: 18px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.88) !important;
+  border-radius: 20px !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.7)),
+    linear-gradient(145deg, rgba(var(--ds-tone-rgb), 0.08), transparent 68%) !important;
+  box-shadow:
+    0 16px 38px rgba(31, 24, 55, 0.065),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(14px) saturate(135%);
+  transition:
+    transform var(--tr-base),
+    border-color var(--tr-base),
+    box-shadow var(--tr-base) !important;
+}
+
+.page-content .ds-metric-grid > .ds-metric-card {
+  grid-template-rows: none !important;
+  gap: 18px !important;
+}
+
+.page-content .ds-metric-card::before {
+  position: absolute !important;
+  z-index: -1 !important;
+  inset: auto -65px -70px auto !important;
+  width: 130px !important;
+  height: 130px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(var(--ds-tone-rgb), 0.09) !important;
+  content: '' !important;
+}
+
+.page-content .ds-metric-card::after {
+  content: none !important;
+}
+
+.page-content .ds-metric-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(var(--ds-tone-rgb), 0.16) !important;
+  box-shadow:
+    0 22px 48px rgba(31, 24, 55, 0.095),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
+}
+
+.page-content .ds-tone-neutral {
+  --ds-tone: #667085 !important;
+  --ds-tone-rgb: 102, 112, 133 !important;
+}
+
+.page-content :is(.ds-tone-purple, .ds-tone-violet) {
+  --ds-tone: #7c3aed !important;
+  --ds-tone-rgb: 124, 58, 237 !important;
+}
+
+.page-content :is(.ds-tone-blue, .ds-tone-indigo) {
+  --ds-tone: #2563eb !important;
+  --ds-tone-rgb: 37, 99, 235 !important;
+}
+
+.page-content :is(.ds-tone-cyan, .ds-tone-teal) {
+  --ds-tone: #0f8b7e !important;
+  --ds-tone-rgb: 15, 139, 126 !important;
+}
+
+.page-content .ds-tone-green {
+  --ds-tone: #059669 !important;
+  --ds-tone-rgb: 5, 150, 105 !important;
+}
+
+.page-content :is(.ds-tone-orange, .ds-tone-yellow) {
+  --ds-tone: #ea580c !important;
+  --ds-tone-rgb: 234, 88, 12 !important;
+}
+
+.page-content .ds-tone-red {
+  --ds-tone: #dc2626 !important;
+  --ds-tone-rgb: 220, 38, 38 !important;
+}
+
+.page-content .ds-metric-topline {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+.page-content .ds-metric-icon {
+  display: grid !important;
+  flex: 0 0 42px !important;
+  width: 42px !important;
+  height: 42px !important;
+  place-items: center !important;
+  border: 1px solid rgba(var(--ds-tone-rgb), 0.12) !important;
+  border-radius: 13px !important;
+  background: rgba(var(--ds-tone-rgb), 0.1) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  color: var(--ds-tone) !important;
+}
+
+.page-content .ds-metric-icon svg {
+  width: 21px !important;
+  height: 21px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.page-content .ds-metric-body {
+  align-self: end !important;
+  display: grid !important;
+  min-width: 0;
+  gap: 4px !important;
+}
+
+.page-content .ds-metric-label {
+  overflow: hidden;
+  color: #687083 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-content .ds-metric-value {
+  display: block;
+  overflow: hidden;
+  margin: 0 !important;
+  color: #101223 !important;
+  font-size: 28px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.04em !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-content .ds-metric-helper,
+.page-content .ds-metric-unit {
+  overflow: hidden;
+  margin: 0 !important;
+  color: #969cab !important;
+  font-size: 12px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-content .ds-metric-value-row {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  gap: 6px;
+}
+
+.page-content .ds-metric-trend {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: max-content;
+  min-height: 26px;
+  padding: 5px 8px !important;
+  gap: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.11) !important;
+  border-radius: 999px !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #047857 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+}
+
+.page-content .ds-metric-trend--down {
+  border-color: rgba(239, 68, 68, 0.11) !important;
+  background: rgba(239, 68, 68, 0.09) !important;
+  color: #b42318 !important;
+}
+
+.page-content .ds-metric-trend--neutral {
+  border-color: rgba(102, 112, 133, 0.12) !important;
+  background: rgba(102, 112, 133, 0.09) !important;
+  color: #475467 !important;
+}
+
+.page-content .ds-metric-progress {
+  display: block;
+  height: 5px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(var(--ds-tone-rgb), 0.1);
+}
+
+.page-content .ds-metric-progress > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ds-tone);
+}
+
+.page-content .ds-metric-action {
+  position: absolute !important;
+  top: 20px;
+  right: 18px;
+  width: max-content !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ds-tone) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+.page-content .ds-metric-skeleton {
+  min-height: 170px !important;
+  height: 100% !important;
+  border-radius: 20px !important;
+}
+
+@media (max-width: 720px) {
+  .page-content .ds-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .page-content .ds-metric-card {
+    border-radius: 18px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .page-content .ds-metric-grid {
+    grid-template-columns: 1fr !important;
+    gap: 11px !important;
+  }
+
+  .page-content .ds-metric-card {
+    min-height: 144px !important;
+    padding: 16px !important;
+  }
+
+  .page-content .ds-metric-skeleton {
+    min-height: 144px !important;
+    border-radius: 18px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-content .ds-metric-card {
+    transition: none !important;
+  }
+}

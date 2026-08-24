@@ -1,0 +1,112 @@
+.po-reference {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  padding: 10px 13px;
+  border: 1px solid #e4e0fb;
+  border-radius: 12px;
+  background: rgba(250, 249, 255, 0.96);
+  color: #667085;
+  font-size: 12px;
+}
+
+.po-reference strong {
+  color: #101828;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.po-reference em {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f2f4f7;
+  color: #475467;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.edit-state-card {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 620px;
+  margin: 52px auto;
+  padding: 42px 28px;
+  border: 1px solid #e4e7ec;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.07);
+  text-align: center;
+}
+
+.state-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 16px;
+  background: #f1edff;
+  color: #6437e8;
+}
+
+.state-icon-warning {
+  background: #fffaeb;
+  color: #b54708;
+}
+
+.state-icon svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.edit-state-card h2 {
+  margin: 4px 0 0;
+  color: #101828;
+  font-size: 22px;
+  font-weight: 750;
+}
+
+.edit-state-card p {
+  max-width: 470px;
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.state-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+@media (max-width: 520px) {
+  .po-reference {
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+  }
+
+  .edit-state-card {
+    margin: 24px 0;
+    padding: 32px 18px;
+  }
+
+  .state-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .state-actions button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,387 @@
+<main class="view-po-page">
+  <header class="page-header">
+    <div class="page-heading">
+      <span class="page-eyebrow">Purchasing / Purchase Orders</span>
+      <h1>Purchase Order Details</h1>
+      <p>Review supplier, destination, line-item, and receiving information.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="secondary-btn" (click)="backToPurchaseOrders()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+        Back to Purchase Orders
+      </button>
+
+      @if (purchaseOrder(); as currentPurchaseOrder) {
+        @if (currentPurchaseOrder.status === 'draft') {
+          <button
+            type="button"
+            class="secondary-btn edit-btn"
+            (click)="editPurchaseOrder(currentPurchaseOrder)"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"></path>
+            </svg>
+            Edit Draft
+          </button>
+
+          <button
+            type="button"
+            class="primary-btn"
+            (click)="submitPurchaseOrder(currentPurchaseOrder)"
+          >
+            Submit Order
+          </button>
+        }
+
+        @if (canCancel(currentPurchaseOrder)) {
+          <button
+            type="button"
+            class="danger-btn"
+            (click)="cancelPurchaseOrder(currentPurchaseOrder)"
+          >
+            Cancel Purchase Order
+          </button>
+        }
+      }
+    </div>
+  </header>
+
+  @if (purchaseOrder(); as currentPurchaseOrder) {
+    <section class="po-overview" aria-labelledby="po-overview-title">
+      <div class="po-identity">
+        <span class="document-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 3h9l3 3v15H6z"></path>
+            <path d="M15 3v4h4M9 11h6M9 15h6"></path>
+          </svg>
+        </span>
+        <div>
+          <span class="identity-label">Purchase Order</span>
+          <h2 id="po-overview-title">{{ currentPurchaseOrder.poNumber }}</h2>
+          <p>Created {{ currentPurchaseOrder.createdAt | date: 'dd MMM yyyy, h:mm a' }}</p>
+        </div>
+      </div>
+
+      <span
+        class="po-status"
+        [class]="'po-status po-status-' + currentPurchaseOrder.status"
+        [attr.aria-label]="'Purchase order status: ' + statusLabel(currentPurchaseOrder.status)"
+      >
+        {{ statusLabel(currentPurchaseOrder.status) }}
+      </span>
+    </section>
+
+    <div class="overview-grid">
+      <section class="detail-card" aria-labelledby="supplier-information-heading">
+        <header class="card-header">
+          <span class="card-icon tone-purple" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="8" r="4"></circle>
+              <path d="M4 21a8 8 0 0 1 16 0"></path>
+            </svg>
+          </span>
+          <div>
+            <h2 id="supplier-information-heading">Supplier Information</h2>
+            <p>Supplier snapshot and available contact details.</p>
+          </div>
+        </header>
+
+        <div class="entity-highlight">
+          <span class="entity-avatar" aria-hidden="true">
+            {{ currentPurchaseOrder.supplierName.charAt(0).toUpperCase() }}
+          </span>
+          <div>
+            <strong>{{ currentPurchaseOrder.supplierName }}</strong>
+            <span>Supplier ID: {{ currentPurchaseOrder.supplierId }}</span>
+          </div>
+        </div>
+
+        <dl class="information-grid">
+          <div>
+            <dt>Supplier Code</dt>
+            <dd>{{ displayValue(supplier()?.supplierCode) }}</dd>
+          </div>
+          <div>
+            <dt>Contact Person</dt>
+            <dd>{{ displayValue(supplier()?.contactPerson) }}</dd>
+          </div>
+          <div>
+            <dt>Phone</dt>
+            <dd>{{ displayValue(supplier()?.phone) }}</dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd>{{ displayValue(supplier()?.email) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="detail-card" aria-labelledby="receiving-location-heading">
+        <header class="card-header">
+          <span class="card-icon tone-blue" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 21s7-5 7-12a7 7 0 1 0-14 0c0 7 7 12 7 12Z"></path>
+              <circle cx="12" cy="9" r="2.5"></circle>
+            </svg>
+          </span>
+          <div>
+            <h2 id="receiving-location-heading">Receiving Location</h2>
+            <p>Intended destination when goods are received later.</p>
+          </div>
+        </header>
+
+        <div class="location-highlight">
+          <div>
+            <span class="identity-label">Destination</span>
+            <strong>{{ currentPurchaseOrder.receivingLocationName }}</strong>
+          </div>
+          <span
+            class="location-type"
+            [class]="'location-type location-type-' + currentPurchaseOrder.receivingLocationType"
+          >
+            {{ locationTypeLabel(currentPurchaseOrder.receivingLocationType) }}
+          </span>
+        </div>
+
+        <dl class="information-grid compact-information">
+          <div>
+            <dt>Location Type</dt>
+            <dd>{{ locationTypeLabel(currentPurchaseOrder.receivingLocationType) }}</dd>
+          </div>
+          <div>
+            <dt>Location Reference</dt>
+            <dd class="code-text">{{ currentPurchaseOrder.receivingLocationId }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section
+        class="detail-card order-information-card"
+        aria-labelledby="order-information-heading"
+      >
+        <header class="card-header">
+          <span class="card-icon tone-teal" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+              <path d="M16 3v4M8 3v4M3 10h18"></path>
+            </svg>
+          </span>
+          <div>
+            <h2 id="order-information-heading">Order Information</h2>
+            <p>Dates, status, and record information.</p>
+          </div>
+        </header>
+
+        <dl class="information-grid order-information-grid">
+          <div>
+            <dt>PO Number</dt>
+            <dd class="code-text">{{ currentPurchaseOrder.poNumber }}</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>{{ statusLabel(currentPurchaseOrder.status) }}</dd>
+          </div>
+          <div>
+            <dt>Order Date</dt>
+            <dd>{{ currentPurchaseOrder.orderDate | date: 'dd MMM yyyy' }}</dd>
+          </div>
+          <div>
+            <dt>Expected Delivery</dt>
+            <dd>
+              @if (currentPurchaseOrder.expectedDeliveryDate) {
+                {{ currentPurchaseOrder.expectedDeliveryDate | date: 'dd MMM yyyy' }}
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>Created Date</dt>
+            <dd>{{ currentPurchaseOrder.createdAt | date: 'dd MMM yyyy, h:mm a' }}</dd>
+          </div>
+          <div>
+            <dt>Updated Date</dt>
+            <dd>
+              @if (currentPurchaseOrder.updatedAt) {
+                {{ currentPurchaseOrder.updatedAt | date: 'dd MMM yyyy, h:mm a' }}
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section
+        class="detail-card receiving-summary-card"
+        aria-labelledby="receiving-summary-heading"
+      >
+        <header class="card-header">
+          <span class="card-icon tone-orange" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 7h12v10H3zM15 10h4l2 3v4h-6z"></path>
+              <circle cx="7" cy="18" r="2"></circle>
+              <circle cx="18" cy="18" r="2"></circle>
+            </svg>
+          </span>
+          <div>
+            <h2 id="receiving-summary-heading">Receiving Progress</h2>
+            <p>Progress derived from ordered and received quantities.</p>
+          </div>
+        </header>
+
+        <div class="quantity-summary">
+          <div>
+            <span>Ordered</span>
+            <strong>{{ totalOrderedQuantity() }}</strong>
+          </div>
+          <div>
+            <span>Received</span>
+            <strong>{{ totalReceivedQuantity() }}</strong>
+          </div>
+          <div>
+            <span>Remaining</span>
+            <strong>{{ totalRemainingQuantity() }}</strong>
+          </div>
+        </div>
+
+        <div
+          class="progress-track"
+          role="progressbar"
+          aria-label="Purchase order receiving progress"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="receivingProgress()"
+        >
+          <span [style.width.%]="receivingProgress()"></span>
+        </div>
+        <p class="progress-label">
+          {{ totalReceivedQuantity() }} of {{ totalOrderedQuantity() }} units received
+        </p>
+      </section>
+    </div>
+
+    <section class="items-card" aria-labelledby="purchase-items-heading">
+      <header class="section-header">
+        <div>
+          <h2 id="purchase-items-heading">Purchase Items</h2>
+          <p>Historical product snapshots and purchasing quantities.</p>
+        </div>
+        <span class="item-count">
+          {{ currentPurchaseOrder.items.length }}
+          {{ currentPurchaseOrder.items.length === 1 ? 'Item' : 'Items' }}
+        </span>
+      </header>
+
+      <div class="items-table-wrapper">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th scope="col">Product</th>
+              <th scope="col">Variant</th>
+              <th scope="col">SKU</th>
+              <th scope="col" class="number-column">Ordered Qty</th>
+              <th scope="col" class="number-column">Received Qty</th>
+              <th scope="col" class="number-column">Remaining Qty</th>
+              <th scope="col" class="money-column">Purchase Price</th>
+              <th scope="col" class="money-column">Line Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of currentPurchaseOrder.items; track item.id) {
+              <tr>
+                <td>
+                  <strong class="product-name">{{ item.productName }}</strong>
+                </td>
+                <td>{{ displayValue(item.variantName) }}</td>
+                <td>
+                  <span class="sku-code">{{ item.sku }}</span>
+                </td>
+                <td class="number-column">{{ item.quantity }}</td>
+                <td class="number-column received-quantity">{{ item.receivedQuantity }}</td>
+                <td class="number-column remaining-quantity">{{ remainingQuantity(item) }}</td>
+                <td class="money-column">{{ formatCurrency(item.purchasePrice) }}</td>
+                <td class="money-column line-total">{{ formatCurrency(item.lineTotal) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="bottom-grid">
+      <section class="detail-card notes-card" aria-labelledby="notes-heading">
+        <header class="card-header">
+          <span class="card-icon tone-purple" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"></path>
+            </svg>
+          </span>
+          <div>
+            <h2 id="notes-heading">Notes</h2>
+            <p>Additional purchasing instructions.</p>
+          </div>
+        </header>
+        <p class="notes-content">{{ currentPurchaseOrder.notes?.trim() || 'No notes added.' }}</p>
+      </section>
+
+      <section class="detail-card financial-card" aria-labelledby="financial-summary-heading">
+        <header class="card-header compact-header">
+          <span class="card-icon tone-green" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path
+                d="M15 8.5c-.7-.6-1.7-1-3-1-1.7 0-3 .9-3 2s1.3 2 3 2 3 .9 3 2-1.3 2-3 2c-1.3 0-2.4-.4-3-1M12 5v14"
+              ></path>
+            </svg>
+          </span>
+          <div>
+            <h2 id="financial-summary-heading">Order Summary</h2>
+            <p>Calculated Purchase Order totals.</p>
+          </div>
+        </header>
+
+        <dl class="financial-lines">
+          <div>
+            <dt>Subtotal</dt>
+            <dd>{{ formatCurrency(currentPurchaseOrder.subtotal) }}</dd>
+          </div>
+          <div>
+            <dt>Tax</dt>
+            <dd>{{ formatCurrency(currentPurchaseOrder.taxAmount) }}</dd>
+          </div>
+          <div>
+            <dt>Discount</dt>
+            <dd class="discount-value">
+              −{{ formatCurrency(currentPurchaseOrder.discountAmount) }}
+            </dd>
+          </div>
+          <div class="grand-total">
+            <dt>Grand Total</dt>
+            <dd>{{ formatCurrency(currentPurchaseOrder.totalAmount) }}</dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+  } @else {
+    <section class="not-found-card" aria-labelledby="purchase-order-not-found-heading">
+      <span class="not-found-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 3h9l3 3v15H6zM15 3v4h4"></path>
+          <path d="m9 12 6 6M15 12l-6 6"></path>
+        </svg>
+      </span>
+      <h2 id="purchase-order-not-found-heading">Purchase Order not found</h2>
+      <p>
+        The purchase order you are looking for may have been removed or is not available for the
+        currently selected store.
+      </p>
+      <button type="button" class="primary-btn" (click)="backToPurchaseOrders()">
+        Back to Purchase Orders
+      </button>
+    </section>
+  }
+</main>

@@ -27,10 +27,10 @@
   }
 
   @if (activeSection() === 'overview') {
-    <div class="metric-grid">
+    <div class="metric-grid ds-metric-grid">
       @for (metric of dashboard().metrics; track metric.label) {
-        <article [class]="'metric-card tone-' + metric.tone">
-          <span class="metric-icon">
+        <article [class]="'metric-card ds-metric-card tone-' + metric.tone + ' ds-tone-' + metric.tone">
+          <span class="metric-icon ds-metric-icon">
             @switch (metric.icon) {
               @case ('limit') {
                 <svg viewBox="0 0 24 24"><path d="M5 7h14v14H5zM8 7V4h3v3M16 7V4h3v3"></path></svg>
@@ -63,17 +63,17 @@
               }
             }
           </span>
-          <div>
-            <span>{{ metric.label }}</span
-            ><strong>{{ metric.value.toLocaleString() }}</strong
-            ><small>{{ metric.unit }}</small>
+          <div class="ds-metric-body">
+            <span class="ds-metric-label">{{ metric.label }}</span
+            ><strong class="ds-metric-value">{{ metric.value.toLocaleString() }}</strong
+            ><small class="ds-metric-unit">{{ metric.unit }}</small>
+            @if (metric.progress !== undefined) {
+              <span class="progress ds-metric-progress"><i [style.width.%]="metric.progress"></i></span>
+            }
+            <p class="ds-metric-helper">{{ metric.helper }}</p>
           </div>
-          @if (metric.progress !== undefined) {
-            <span class="progress"><i [style.width.%]="metric.progress"></i></span>
-          }
-          <p>{{ metric.helper }}</p>
           @if (metric.icon === 'limit') {
-            <button type="button" (click)="startLimitEdit()">Configure Limit <span>→</span></button>
+            <button class="ds-metric-action" type="button" (click)="startLimitEdit()">Configure Limit <span>→</span></button>
           }
         </article>
       }
@@ -1081,18 +1081,22 @@
   }
 
   @if (activeSection() === 'warehouse') {
-    <div class="integration-stats">
-      <article>
-        <span>Active Warehouses</span><strong>{{ warehouses().length }}</strong>
+    <div class="integration-stats ds-metric-grid">
+      <article class="ds-metric-card ds-tone-purple">
+        <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13M2 21h20M8 12h2M14 12h2"></path></svg></span>
+        <span class="ds-metric-body"><span class="ds-metric-label">Active Warehouses</span><strong class="ds-metric-value">{{ warehouses().length }}</strong><small class="ds-metric-helper">Receiving locations</small></span>
       </article>
-      <article>
-        <span>Warehouse Products</span><strong>{{ warehouseBalances().length }}</strong>
+      <article class="ds-metric-card ds-tone-blue">
+        <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 7v10l9 5 9-5V7M12 12v10"></path></svg></span>
+        <span class="ds-metric-body"><span class="ds-metric-label">Warehouse Products</span><strong class="ds-metric-value">{{ warehouseBalances().length }}</strong><small class="ds-metric-helper">Stocked product lines</small></span>
       </article>
-      <article>
-        <span>Warehouse Units</span><strong>{{ warehouseTotal().toLocaleString() }}</strong>
+      <article class="ds-metric-card ds-tone-green">
+        <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14v14H5zM8 7V4h3v3M16 7V4h3v3"></path></svg></span>
+        <span class="ds-metric-body"><span class="ds-metric-label">Warehouse Units</span><strong class="ds-metric-value">{{ warehouseTotal().toLocaleString() }}</strong><small class="ds-metric-helper">Physical warehouse stock</small></span>
       </article>
-      <article>
-        <span>Branch Units</span><strong>{{ branchTotal().toLocaleString() }}</strong>
+      <article class="ds-metric-card ds-tone-orange">
+        <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13M2 21h20M9 21v-5h6v5"></path></svg></span>
+        <span class="ds-metric-body"><span class="ds-metric-label">Branch Units</span><strong class="ds-metric-value">{{ branchTotal().toLocaleString() }}</strong><small class="ds-metric-helper">Allocated branch stock</small></span>
       </article>
     </div>
     <section class="surface integration-flow">

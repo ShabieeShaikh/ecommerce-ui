@@ -1,36 +1,120 @@
 <div class="settings-page">
+  <header class="page-header">
+    <div>
+      <h1>Settings</h1>
+      <p>Manage platform preferences, notifications, security, and billing.</p>
+    </div>
+  </header>
 
   <div class="settings-layout">
-
     <!-- Sidebar Nav -->
     <aside class="settings-nav">
       <h2 class="settings-nav-title">Settings</h2>
-      <button class="settings-nav-item" [class.active]="activeSection() === 'general'" (click)="setSection('general')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <button
+        class="settings-nav-item"
+        [class.active]="activeSection() === 'general'"
+        (click)="setSection('general')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+        </svg>
         General
       </button>
-      <button class="settings-nav-item" [class.active]="activeSection() === 'notifications'" (click)="setSection('notifications')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <button
+        class="settings-nav-item"
+        [class.active]="activeSection() === 'notifications'"
+        (click)="setSection('notifications')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
         Notifications
       </button>
-      <button class="settings-nav-item" [class.active]="activeSection() === 'security'" (click)="setSection('security')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <button
+        class="settings-nav-item"
+        [class.active]="activeSection() === 'security'"
+        (click)="setSection('security')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
         Security
       </button>
-      <button class="settings-nav-item" [class.active]="activeSection() === 'billing'" (click)="setSection('billing')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <button
+        class="settings-nav-item"
+        [class.active]="activeSection() === 'billing'"
+        (click)="setSection('billing')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
+        </svg>
         Billing & Plan
       </button>
       <div class="settings-nav-sep"></div>
-      <button class="settings-nav-item danger" [class.active]="activeSection() === 'danger'" (click)="setSection('danger')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <button
+        class="settings-nav-item danger"
+        [class.active]="activeSection() === 'danger'"
+        (click)="setSection('danger')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+          />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
         Danger Zone
       </button>
     </aside>
 
     <!-- Content -->
     <div class="settings-content">
-
       <!-- GENERAL -->
       @if (activeSection() === 'general') {
         <div class="settings-section">
@@ -41,7 +125,12 @@
           <div class="settings-card">
             <div class="form-row">
               <label class="form-label">Platform Name</label>
-              <input type="text" [(ngModel)]="generalForm.storeName" class="form-input" placeholder="Your platform name">
+              <input
+                type="text"
+                [(ngModel)]="generalForm.storeName"
+                class="form-input"
+                placeholder="Your platform name"
+              />
               <span class="form-hint">This appears in the browser tab and emails.</span>
             </div>
             <div class="form-row-2col">
@@ -91,7 +180,11 @@
             </div>
             <div class="form-actions">
               <button class="btn-primary" (click)="saveGeneral()" [disabled]="isSaving()">
-                @if (isSaving()) { Saving... } @else { Save Changes }
+                @if (isSaving()) {
+                  Saving...
+                } @else {
+                  Save Changes
+                }
               </button>
             </div>
           </div>
@@ -110,40 +203,48 @@
             <div class="toggle-row">
               <div class="toggle-info">
                 <span class="toggle-label">New Order Received</span>
-                <span class="toggle-desc">Get an email when any of your stores receives a new order</span>
+                <span class="toggle-desc"
+                  >Get an email when any of your stores receives a new order</span
+                >
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" [(ngModel)]="notifications.emailNewOrder">
+                <input type="checkbox" [(ngModel)]="notifications.emailNewOrder" />
                 <span class="toggle-slider"></span>
               </label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <span class="toggle-label">Low Stock Alert</span>
-                <span class="toggle-desc">Alert when a product falls below minimum stock level</span>
+                <span class="toggle-desc"
+                  >Alert when a product falls below minimum stock level</span
+                >
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" [(ngModel)]="notifications.emailLowStock">
+                <input type="checkbox" [(ngModel)]="notifications.emailLowStock" />
                 <span class="toggle-slider"></span>
               </label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <span class="toggle-label">New Store Created</span>
-                <span class="toggle-desc">Notify when a new store is created under your account</span>
+                <span class="toggle-desc"
+                  >Notify when a new store is created under your account</span
+                >
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" [(ngModel)]="notifications.emailNewStore">
+                <input type="checkbox" [(ngModel)]="notifications.emailNewStore" />
                 <span class="toggle-slider"></span>
               </label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <span class="toggle-label">Weekly Performance Report</span>
-                <span class="toggle-desc">Receive a weekly summary of your stores' performance</span>
+                <span class="toggle-desc"
+                  >Receive a weekly summary of your stores' performance</span
+                >
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" [(ngModel)]="notifications.emailWeeklyReport">
+                <input type="checkbox" [(ngModel)]="notifications.emailWeeklyReport" />
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -156,7 +257,7 @@
                 <span class="toggle-desc">Receive SMS for each new order</span>
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" [(ngModel)]="notifications.smsNewOrder">
+                <input type="checkbox" [(ngModel)]="notifications.smsNewOrder" />
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -166,13 +267,17 @@
                 <span class="toggle-desc">SMS alerts for critically low stock items</span>
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" [(ngModel)]="notifications.smsLowStock">
+                <input type="checkbox" [(ngModel)]="notifications.smsLowStock" />
                 <span class="toggle-slider"></span>
               </label>
             </div>
             <div class="form-actions">
               <button class="btn-primary" (click)="saveNotifications()" [disabled]="isSaving()">
-                @if (isSaving()) { Saving... } @else { Save Preferences }
+                @if (isSaving()) {
+                  Saving...
+                } @else {
+                  Save Preferences
+                }
               </button>
             </div>
           </div>
@@ -184,15 +289,19 @@
         <div class="settings-section">
           <div class="section-header">
             <h2 class="section-title">Security Settings</h2>
-            <p class="section-desc">Manage your password, two-factor authentication, and session settings.</p>
+            <p class="section-desc">
+              Manage your password, two-factor authentication, and session settings.
+            </p>
           </div>
           <div class="settings-card">
             <div class="security-item">
               <div class="security-item-info">
                 <span class="security-item-title">Password</span>
-                <span class="security-item-desc">Last changed 30 days ago. Use a strong, unique password.</span>
+                <span class="security-item-desc"
+                  >Last changed 30 days ago. Use a strong, unique password.</span
+                >
               </div>
-              <button class="btn-outline" (click)="showPasswordForm.update(v => !v)">
+              <button class="btn-outline" (click)="showPasswordForm.update((v) => !v)">
                 {{ showPasswordForm() ? 'Cancel' : 'Change Password' }}
               </button>
             </div>
@@ -200,19 +309,38 @@
               <div class="password-form">
                 <div class="form-row">
                   <label class="form-label">Current Password</label>
-                  <input type="password" [(ngModel)]="securityForm.currentPassword" class="form-input" placeholder="Enter current password">
+                  <input
+                    type="password"
+                    [(ngModel)]="securityForm.currentPassword"
+                    class="form-input"
+                    placeholder="Enter current password"
+                  />
                 </div>
                 <div class="form-row">
                   <label class="form-label">New Password</label>
-                  <input type="password" [(ngModel)]="securityForm.newPassword" class="form-input" placeholder="Min 8 characters">
+                  <input
+                    type="password"
+                    [(ngModel)]="securityForm.newPassword"
+                    class="form-input"
+                    placeholder="Min 8 characters"
+                  />
                 </div>
                 <div class="form-row">
                   <label class="form-label">Confirm New Password</label>
-                  <input type="password" [(ngModel)]="securityForm.confirmNewPassword" class="form-input" placeholder="Repeat new password">
+                  <input
+                    type="password"
+                    [(ngModel)]="securityForm.confirmNewPassword"
+                    class="form-input"
+                    placeholder="Repeat new password"
+                  />
                 </div>
                 <div class="form-actions">
                   <button class="btn-primary" (click)="savePassword()" [disabled]="isSaving()">
-                    @if (isSaving()) { Updating... } @else { Update Password }
+                    @if (isSaving()) {
+                      Updating...
+                    } @else {
+                      Update Password
+                    }
                   </button>
                 </div>
               </div>
@@ -221,10 +349,12 @@
             <div class="security-item">
               <div class="security-item-info">
                 <span class="security-item-title">Two-Factor Authentication</span>
-                <span class="security-item-desc">Add an extra layer of security using an authenticator app.</span>
+                <span class="security-item-desc"
+                  >Add an extra layer of security using an authenticator app.</span
+                >
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" [(ngModel)]="securityForm.twoFactor">
+                <input type="checkbox" [(ngModel)]="securityForm.twoFactor" />
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -238,7 +368,9 @@
                 <option value="120">2 hours</option>
                 <option value="480">8 hours</option>
               </select>
-              <span class="form-hint">You'll be automatically logged out after this period of inactivity.</span>
+              <span class="form-hint"
+                >You'll be automatically logged out after this period of inactivity.</span
+              >
             </div>
           </div>
         </div>
@@ -267,7 +399,18 @@
           <div class="settings-card">
             <h3 class="notif-group-title">Payment Method</h3>
             <div class="payment-card">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+              </svg>
               <div class="payment-info">
                 <span class="payment-label">Visa ending in 4242</span>
                 <span class="payment-exp">Expires 12/2027</span>
@@ -289,30 +432,50 @@
             <div class="danger-item">
               <div>
                 <span class="danger-item-title">Deactivate Account</span>
-                <span class="danger-item-desc">Temporarily deactivate your account. You can reactivate anytime.</span>
+                <span class="danger-item-desc"
+                  >Temporarily deactivate your account. You can reactivate anytime.</span
+                >
               </div>
-              <button class="btn-danger-outline" (click)="onDeactivate()">Deactivate Account</button>
+              <button class="btn-danger-outline" (click)="onDeactivate()">
+                Deactivate Account
+              </button>
             </div>
             <div class="danger-sep"></div>
             <div class="danger-item">
               <div>
                 <span class="danger-item-title">Delete All Stores</span>
-                <span class="danger-item-desc">Permanently remove all stores and their data. This cannot be undone.</span>
+                <span class="danger-item-desc"
+                  >Permanently remove all stores and their data. This cannot be undone.</span
+                >
               </div>
-              <button class="btn-danger" (click)="storeService.showToast('Action requires super admin approval.', 'warning')">Delete All Stores</button>
+              <button
+                class="btn-danger"
+                (click)="storeService.showToast('Action requires super admin approval.', 'warning')"
+              >
+                Delete All Stores
+              </button>
             </div>
             <div class="danger-sep"></div>
             <div class="danger-item">
               <div>
                 <span class="danger-item-title">Delete Account</span>
-                <span class="danger-item-desc">Permanently delete your account and all associated data. This cannot be undone.</span>
+                <span class="danger-item-desc"
+                  >Permanently delete your account and all associated data. This cannot be
+                  undone.</span
+                >
               </div>
-              <button class="btn-danger" (click)="storeService.showToast('Account deletion requires email confirmation.', 'warning')">Delete Account</button>
+              <button
+                class="btn-danger"
+                (click)="
+                  storeService.showToast('Account deletion requires email confirmation.', 'warning')
+                "
+              >
+                Delete Account
+              </button>
             </div>
           </div>
         </div>
       }
-
     </div>
   </div>
 </div>

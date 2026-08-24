@@ -16,7 +16,7 @@
 .register-heading h1 {
     margin: 0 0 8px;
     color: var(--clr-text-primary);
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
     letter-spacing: 0;
     line-height: 1.2;
@@ -32,7 +32,7 @@
 form { display: grid; gap: 15px; }
 .field-group { display: grid; gap: 7px; }
 
-.field-group label { color: var(--clr-text-primary); font-size: 13px; font-weight: 600; }
+.field-group label { color: var(--clr-text-primary); font-size: 14px; font-weight: 600; }
 .field-control { position: relative; }
 
 .field-control svg {
@@ -55,7 +55,7 @@ form { display: grid; gap: 15px; }
     outline: none;
     background: var(--clr-surface);
     color: var(--clr-text-primary);
-    font: 14px 'Poppins', 'Inter', system-ui, sans-serif;
+    font: 14px var(--font-family-ui);
     transition: border-color var(--tr-fast), box-shadow var(--tr-fast);
 }
 
@@ -72,7 +72,7 @@ form { display: grid; gap: 15px; }
     border-radius: var(--r-sm);
     background: var(--grad-brand);
     color: #fff;
-    font: 600 14px 'Poppins', 'Inter', system-ui, sans-serif;
+    font: 600 14px var(--font-family-ui);
     box-shadow: var(--shadow-brand);
     transition: transform var(--tr-fast), box-shadow var(--tr-fast);
 }
@@ -82,7 +82,7 @@ form { display: grid; gap: 15px; }
 .register-btn:focus-visible,
 .login-text button:focus-visible { outline: 3px solid rgba(124, 58, 237, .28); outline-offset: 3px; }
 
-.login-text { margin: 24px 0 0; color: var(--clr-text-secondary); font-size: 13px; text-align: center; }
+.login-text { margin: 24px 0 0; color: var(--clr-text-secondary); font-size: 14px; text-align: center; }
 .login-text button { padding: 0; color: var(--clr-primary); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
 @keyframes register-enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

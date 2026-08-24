@@ -16,6 +16,9 @@ import { ProductForm } from './components/store-admin/product-form/product-form'
 import { ManagerListing } from './components/store-admin/manager-listing/manager-listing';
 import { StoreDetails } from './components/store-admin/store-details/store-details';
 import { SupplierList } from './components/store-admin/purchasing/suppliers/supplier-list/supplier-list';
+import { AddSupplier } from './components/store-admin/purchasing/suppliers/add-supplier/add-supplier';
+import { EditSupplier } from './components/store-admin/purchasing/suppliers/edit-supplier/edit-supplier';
+import { ViewSupplier } from './components/store-admin/purchasing/suppliers/view-supplier/view-supplier';
 
 const loadWarehouseManagement = () =>
   import('./components/store-admin/warehouse-management/warehouse-management').then(
@@ -54,7 +57,47 @@ export const routes: Routes = [
       },
       {
         path: 'purchasing/suppliers',
-        component: SupplierList
+        component: SupplierList,
+      },
+      {
+        path: 'purchasing/suppliers/add',
+        component: AddSupplier,
+      },
+      {
+        path: 'purchasing/suppliers/:id/edit',
+        component: EditSupplier,
+      },
+      {
+        path: 'purchasing/suppliers/:id',
+        component: ViewSupplier,
+      },
+      {
+        path: 'purchasing/purchase-orders/add',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/purchase-orders/create-purchase-order/create-purchase-order').then(
+            (module) => module.CreatePurchaseOrder,
+          ),
+      },
+      {
+        path: 'purchasing/purchase-orders',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/purchase-orders/purchase-order-list/purchase-order-list').then(
+            (module) => module.PurchaseOrderList,
+          ),
+      },
+      {
+        path: 'purchasing/purchase-orders/:id/edit',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/purchase-orders/edit-purchase-order/edit-purchase-order').then(
+            (module) => module.EditPurchaseOrder,
+          ),
+      },
+      {
+        path: 'purchasing/purchase-orders/:id',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/purchase-orders/view-purchase-order/view-purchase-order').then(
+            (module) => module.ViewPurchaseOrder,
+          ),
       },
       {
         path: 'store-form-design-preview',

@@ -2,9 +2,9 @@
   <nav class="breadcrumb" aria-label="Breadcrumb"><span>Store Management</span><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg><strong>Managers</strong></nav>
   <header class="page-header"><div><h1>Managers</h1><p>Managers assigned through branches for {{ selectedStore().name }}.</p></div></header>
 
-  <section class="summary-grid" aria-label="Manager summary">
+  <section class="summary-grid ds-metric-grid" aria-label="Manager summary">
     @for (item of stats(); track item.label) {
-      <article class="summary-card"><span [class]="'summary-icon ' + item.tone"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2"></path></svg></span><span><small>{{ item.label }}</small><strong>{{ item.value }}</strong><em>{{ item.helper }}</em></span></article>
+      <article [class]="'summary-card ds-metric-card ds-tone-' + item.tone"><span [class]="'summary-icon ds-metric-icon ' + item.tone"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2"></path></svg></span><span class="ds-metric-body"><small class="ds-metric-label">{{ item.label }}</small><strong class="ds-metric-value">{{ item.value }}</strong><em class="ds-metric-helper">{{ item.helper }}</em></span></article>
     }
   </section>
 
