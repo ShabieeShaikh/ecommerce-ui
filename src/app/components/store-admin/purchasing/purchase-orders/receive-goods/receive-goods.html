@@ -1,0 +1,391 @@
+<main class="receive-goods-page">
+  <header class="page-header">
+    <div class="page-heading">
+      <span class="page-eyebrow">Purchasing / Purchase Orders / Receive Goods</span>
+      <h1>Receive Goods</h1>
+      @if (purchaseOrder(); as currentPurchaseOrder) {
+        <p>
+          <strong>{{ currentPurchaseOrder.poNumber }}</strong>
+          &middot; Receive items delivered against this purchase order.
+        </p>
+      } @else {
+        <p>Post delivered quantities against an existing purchase order.</p>
+      }
+    </div>
+
+    <button type="button" class="secondary-btn" (click)="backToPurchaseOrder()">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"></path>
+      </svg>
+      Back to Purchase Order
+    </button>
+  </header>
+
+  @if (!sourcePurchaseOrder()) {
+    <section class="state-card" aria-labelledby="po-not-found-heading">
+      <span class="state-icon state-icon-error" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 3h9l3 3v15H6zM15 3v4h4"></path>
+          <path d="m9 12 6 6M15 12l-6 6"></path>
+        </svg>
+      </span>
+      <h2 id="po-not-found-heading">Purchase Order not found</h2>
+      <p>The purchase order ID is invalid or the record is no longer available.</p>
+      <button type="button" class="primary-btn" (click)="backToPurchaseOrders()">
+        Back to Purchase Orders
+      </button>
+    </section>
+  } @else if (hasStoreMismatch()) {
+    <section class="state-card" aria-labelledby="store-mismatch-heading">
+      <span class="state-icon state-icon-warning" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3 2 21h20L12 3Z"></path>
+          <path d="M12 9v5M12 18h.01"></path>
+        </svg>
+      </span>
+      <h2 id="store-mismatch-heading">Purchase order cannot receive goods</h2>
+      <p>This purchase order does not belong to the currently selected store.</p>
+      <button type="button" class="primary-btn" (click)="backToPurchaseOrders()">
+        Back to Purchase Orders
+      </button>
+    </section>
+  } @else if (purchaseOrder(); as currentPurchaseOrder) {
+    @if (!canReceivePurchaseOrder()) {
+      <section class="state-card" aria-labelledby="cannot-receive-heading">
+        <span class="state-icon state-icon-warning" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 8v5M12 17h.01"></path>
+          </svg>
+        </span>
+        <h2 id="cannot-receive-heading">Purchase order cannot receive goods</h2>
+        <p>
+          {{ currentPurchaseOrder.poNumber }} is currently
+          <strong>{{ statusLabel(currentPurchaseOrder.status) }}</strong
+          >. Only Ordered or Partially Received purchase orders can receive goods.
+        </p>
+        <button type="button" class="primary-btn" (click)="backToPurchaseOrder()">
+          Back to Purchase Order
+        </button>
+      </section>
+    } @else {
+      <section class="po-overview" aria-label="Purchase order receiving context">
+        <div class="po-identity">
+          <span class="document-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 3h9l3 3v15H6z"></path>
+              <path d="M15 3v4h4M9 11h6M9 15h6"></path>
+            </svg>
+          </span>
+          <div>
+            <span class="identity-label">Purchase Order</span>
+            <h2>{{ currentPurchaseOrder.poNumber }}</h2>
+            <p>{{ currentPurchaseOrder.supplierName }}</p>
+          </div>
+        </div>
+        <span class="po-status" [class]="'po-status po-status-' + currentPurchaseOrder.status">
+          {{ statusLabel(currentPurchaseOrder.status) }}
+        </span>
+      </section>
+
+      <section class="context-grid" aria-label="Purchase order summary">
+        <article class="context-card">
+          <span>PO Number</span>
+          <strong>{{ currentPurchaseOrder.poNumber }}</strong>
+          <small>Order date {{ currentPurchaseOrder.orderDate | date: 'dd MMM yyyy' }}</small>
+        </article>
+        <article class="context-card">
+          <span>Supplier</span>
+          <strong>{{ currentPurchaseOrder.supplierName }}</strong>
+          <small>Supplier ID {{ currentPurchaseOrder.supplierId }}</small>
+        </article>
+        <article class="context-card">
+          <span>Receiving Location</span>
+          <strong>{{ currentPurchaseOrder.receivingLocationName }}</strong>
+          <small>{{ locationTypeLabel(currentPurchaseOrder.receivingLocationType) }}</small>
+        </article>
+        <article class="context-card">
+          <span>Expected Delivery</span>
+          <strong>
+            @if (currentPurchaseOrder.expectedDeliveryDate) {
+              {{ currentPurchaseOrder.expectedDeliveryDate | date: 'dd MMM yyyy' }}
+            } @else {
+              &mdash;
+            }
+          </strong>
+          <small>Physical receipt date is entered below</small>
+        </article>
+        <article class="context-card progress-context-card">
+          <span>Receiving Progress</span>
+          <strong>{{ totalPreviouslyReceived() }} / {{ totalOrderedQuantity() }} units</strong>
+          <div
+            class="mini-progress"
+            role="progressbar"
+            aria-label="Current purchase order receiving progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-valuenow]="
+              totalOrderedQuantity()
+                ? (totalPreviouslyReceived() / totalOrderedQuantity()) * 100
+                : 0
+            "
+          >
+            <span
+              [style.width.%]="
+                totalOrderedQuantity()
+                  ? (totalPreviouslyReceived() / totalOrderedQuantity()) * 100
+                  : 0
+              "
+            ></span>
+          </div>
+        </article>
+      </section>
+
+      <form [formGroup]="receiptForm" (ngSubmit)="postGoodsReceipt()" novalidate>
+        <div class="receiving-layout">
+          <section class="items-card" aria-labelledby="receiving-items-heading">
+            <header class="section-header">
+              <div>
+                <h2 id="receiving-items-heading">Receiving Items</h2>
+                <p>Enter only the quantities physically delivered today.</p>
+              </div>
+              <div class="table-actions">
+                <button type="button" class="secondary-btn compact-btn" (click)="clearQuantities()">
+                  Clear Quantities
+                </button>
+                <button
+                  type="button"
+                  class="secondary-btn compact-btn receive-all-btn"
+                  (click)="receiveAllRemaining()"
+                >
+                  Receive All Remaining
+                </button>
+              </div>
+            </header>
+
+            <div class="receiving-table-wrapper" formArrayName="items">
+              <table class="receiving-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Variant / SKU</th>
+                    <th scope="col">Ordered</th>
+                    <th scope="col">Previously Received</th>
+                    <th scope="col">Remaining</th>
+                    <th scope="col">Receive Now</th>
+                    <th scope="col">After Receipt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (
+                    group of items.controls;
+                    track group.controls.purchaseOrderItemId.value;
+                    let index = $index
+                  ) {
+                    @if (itemAt(index); as item) {
+                      <tr
+                        [formGroupName]="index"
+                        [class.completed-row]="remainingQuantity(item) === 0"
+                      >
+                        <td data-label="Product">
+                          <div class="product-cell">
+                            <strong>{{ item.productName }}</strong>
+                            <span
+                              class="item-state"
+                              [class]="'item-state item-state-' + itemStatus(item)"
+                            >
+                              {{ itemStatusLabel(item) }}
+                            </span>
+                          </div>
+                        </td>
+                        <td data-label="Variant / SKU">
+                          <div class="snapshot-cell">
+                            <span>{{ item.variantName?.trim() || '—' }}</span>
+                            <code>{{ item.sku }}</code>
+                          </div>
+                        </td>
+                        <td data-label="Ordered" class="quantity-cell">{{ item.quantity }}</td>
+                        <td data-label="Previously Received" class="quantity-cell received-value">
+                          {{ item.receivedQuantity }}
+                        </td>
+                        <td data-label="Remaining" class="quantity-cell remaining-value">
+                          {{ remainingQuantity(item) }}
+                        </td>
+                        <td data-label="Receive Now" class="receive-cell">
+                          @if (remainingQuantity(item) > 0) {
+                            <label class="sr-only" [for]="'receive-now-' + item.id">
+                              Receive now quantity for {{ item.productName }}
+                            </label>
+                            <div class="quantity-input-row">
+                              <input
+                                [id]="'receive-now-' + item.id"
+                                type="number"
+                                inputmode="numeric"
+                                min="0"
+                                [max]="remainingQuantity(item)"
+                                step="1"
+                                formControlName="receivedNowQuantity"
+                                (input)="submissionError.set('')"
+                              />
+                              <button
+                                type="button"
+                                class="line-fill-btn"
+                                (click)="receiveAllForItem(index)"
+                              >
+                                All
+                              </button>
+                            </div>
+                            @if (itemHasError(index, 'max')) {
+                              <span class="field-error">
+                                Cannot receive more than the remaining quantity ({{
+                                  remainingQuantity(item)
+                                }}).
+                              </span>
+                            } @else if (itemHasError(index, 'min')) {
+                              <span class="field-error">Quantity cannot be negative.</span>
+                            } @else if (itemHasError(index, 'wholeNumber')) {
+                              <span class="field-error">Enter a valid whole number.</span>
+                            }
+                          } @else {
+                            <span class="fully-received-mark">&#10003; Fully Received</span>
+                          }
+                        </td>
+                        <td data-label="After Receipt" class="after-cell">
+                          <strong
+                            >{{ afterReceiptForItem(index, item) }} / {{ item.quantity }}</strong
+                          >
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <aside class="receipt-sidebar">
+            <section class="summary-card" aria-labelledby="receipt-summary-heading">
+              <header class="summary-header">
+                <span class="summary-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"></path>
+                  </svg>
+                </span>
+                <div>
+                  <h2 id="receipt-summary-heading">Receiving Summary</h2>
+                  <p>Live totals for this GRN.</p>
+                </div>
+              </header>
+
+              <dl class="summary-lines">
+                <div>
+                  <dt>Items on PO</dt>
+                  <dd>{{ currentPurchaseOrder.items.length }}</dd>
+                </div>
+                <div>
+                  <dt>Items in this receipt</dt>
+                  <dd>{{ itemsInReceipt() }}</dd>
+                </div>
+                <div>
+                  <dt>Units remaining</dt>
+                  <dd>{{ totalRemainingQuantity() }}</dd>
+                </div>
+                <div class="receiving-now-line">
+                  <dt>Receiving now</dt>
+                  <dd>{{ receivingNowQuantity() }}</dd>
+                </div>
+                <div>
+                  <dt>Units after receipt</dt>
+                  <dd>{{ afterReceiptQuantity() }} / {{ totalOrderedQuantity() }}</dd>
+                </div>
+              </dl>
+
+              <div class="progress-summary">
+                <div>
+                  <span>After this receipt</span>
+                  <strong>{{ afterReceiptProgress() | number: '1.0-0' }}%</strong>
+                </div>
+                <div
+                  class="progress-track"
+                  role="progressbar"
+                  aria-label="Estimated progress after this receipt"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [attr.aria-valuenow]="afterReceiptProgress()"
+                >
+                  <span [style.width.%]="afterReceiptProgress()"></span>
+                </div>
+              </div>
+            </section>
+
+            <section class="receipt-details-card" aria-labelledby="receipt-details-heading">
+              <h2 id="receipt-details-heading">Receipt Details</h2>
+
+              <label class="field-label" for="received-date">Received Date <span>*</span></label>
+              <input
+                id="received-date"
+                class="form-control"
+                type="date"
+                formControlName="receivedDate"
+              />
+              @if (
+                receiptForm.controls.receivedDate.touched &&
+                receiptForm.controls.receivedDate.hasError('required')
+              ) {
+                <span class="field-error">Received date is required.</span>
+              }
+
+              <label class="field-label notes-label" for="receiving-notes">Receiving Notes</label>
+              <textarea
+                id="receiving-notes"
+                class="form-control notes-control"
+                rows="5"
+                formControlName="notes"
+                placeholder="Add delivery notes, packaging observations, or a delivery reference."
+              ></textarea>
+
+              <div class="destination-notice">
+                <span aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 21s7-5 7-12a7 7 0 1 0-14 0c0 7 7 12 7 12Z"></path>
+                    <circle cx="12" cy="9" r="2.5"></circle>
+                  </svg>
+                </span>
+                <div>
+                  <small>Stock will increase at</small>
+                  <strong>{{ currentPurchaseOrder.receivingLocationName }}</strong>
+                  <em>{{ locationTypeLabel(currentPurchaseOrder.receivingLocationType) }}</em>
+                </div>
+              </div>
+
+              @if (itemsInReceipt() === 0) {
+                <p class="form-message form-message-hint">
+                  Enter a quantity for at least one item to receive.
+                </p>
+              }
+
+              @if (submissionError()) {
+                <p class="form-message form-message-error" role="alert">
+                  {{ submissionError() }}
+                </p>
+              }
+
+              <button type="submit" class="primary-btn post-btn" [disabled]="!canSubmit()">
+                @if (isSubmitting()) {
+                  <span class="spinner" aria-hidden="true"></span>
+                  Posting Goods Receipt...
+                } @else {
+                  Post Goods Receipt
+                }
+              </button>
+              <p class="stock-warning">
+                Posting this receipt creates a GRN and increases Inventory. It cannot be edited or
+                deleted from this screen.
+              </p>
+            </section>
+          </aside>
+        </div>
+      </form>
+    }
+  }
+</main>

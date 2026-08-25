@@ -98,12 +98,15 @@ describe('PurchaseOrderList', () => {
     expect(component.filteredPurchaseOrders().map((order) => order.id)).toEqual(['po-ordered']);
   });
 
-  it('shows edit and submit only for draft orders and cancellation only when allowed', () => {
+  it('shows status-appropriate edit, submit, receive, and cancellation actions', () => {
     const { component, fixture } = createComponent();
     const element = fixture.nativeElement as HTMLElement;
 
     expect(element.querySelectorAll('button[title="Edit purchase order"]')).toHaveLength(1);
     expect(element.querySelectorAll('button[title="Submit purchase order"]')).toHaveLength(1);
+    expect(element.querySelectorAll('button[title="Receive goods"]')).toHaveLength(2);
+    expect(element.textContent).toContain('Receive Goods');
+    expect(element.textContent).toContain('Receive Remaining');
     expect(element.querySelectorAll('button[title="Cancel purchase order"]')).toHaveLength(2);
     expect(
       component.canCancel(component.purchaseOrders().find((order) => order.id === 'po-received')!),

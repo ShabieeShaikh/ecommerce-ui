@@ -231,6 +231,31 @@
                       <span>View</span>
                     </button>
 
+                    @if (
+                      purchaseOrder.status === 'ordered' ||
+                      purchaseOrder.status === 'partially_received'
+                    ) {
+                      <button
+                        type="button"
+                        class="table-action action-receive"
+                        title="Receive goods"
+                        [attr.aria-label]="'Receive goods for ' + purchaseOrder.poNumber"
+                        (click)="receiveGoods(purchaseOrder.id)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 3v12M7 10l5 5 5-5"></path>
+                          <path d="M5 21h14a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2"></path>
+                        </svg>
+                        <span>
+                          {{
+                            purchaseOrder.status === 'partially_received'
+                              ? 'Receive Remaining'
+                              : 'Receive Goods'
+                          }}
+                        </span>
+                      </button>
+                    }
+
                     @if (purchaseOrder.status === 'draft') {
                       <button
                         type="button"

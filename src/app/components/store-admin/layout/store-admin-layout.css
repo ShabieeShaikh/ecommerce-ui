@@ -8,6 +8,12 @@
   display: block;
 }
 
+:host-context(html[data-theme='dark']) {
+  --ink: #edf1ff;
+  --muted: #9ba7c2;
+  --line: rgba(148, 163, 184, 0.22);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -133,11 +139,14 @@ a {
 }
 .nav-group-label {
   display: block;
+  width: 100%;
   padding: 0 12px 8px;
+  box-sizing: border-box;
   color: rgba(205, 214, 249, 0.43);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
+  text-align: left;
   text-transform: uppercase;
 }
 .nav-tree,
@@ -205,6 +214,7 @@ a {
 }
 .nav-label {
   min-width: 0;
+  display: flex;
   flex: 1;
   overflow: hidden;
   font-size: 14px;
@@ -513,6 +523,68 @@ a {
 .topbar-btn-svg {
   width: 19px;
   height: 19px;
+}
+.theme-toggle-btn {
+  color: #6d5dfc;
+}
+
+:host-context(html[data-theme='dark']) .admin-shell {
+  background:
+    radial-gradient(circle at 88% 4%, rgba(124, 92, 255, 0.15), transparent 30rem), #0b1020;
+}
+
+:host-context(html[data-theme='dark']) .topbar {
+  border-color: rgba(148, 163, 184, 0.17);
+  background: rgba(18, 24, 43, 0.88);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.28),
+    inset 0 1px rgba(255, 255, 255, 0.05);
+}
+
+:host-context(html[data-theme='dark'])
+  :is(.store-chip, .user-menu, .topbar-icon-btn, .topbar-search, .mobile-nav-btn) {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgba(30, 38, 61, 0.82);
+  color: #d9e1f5;
+}
+
+:host-context(html[data-theme='dark'])
+  :is(
+    .store-chip:hover,
+    .store-chip.active,
+    .user-menu:hover,
+    .user-menu.active,
+    .topbar-icon-btn:hover,
+    .topbar-icon-btn.active,
+    .topbar-search:focus-within
+  ) {
+  border-color: rgba(139, 124, 255, 0.5);
+  background: #242d48;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
+}
+
+:host-context(html[data-theme='dark'])
+  :is(.store-dropdown, .search-results-dropdown, .notif-panel, .user-dropdown) {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgba(19, 25, 44, 0.98);
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.42);
+}
+
+:host-context(html[data-theme='dark'])
+  :is(.store-dropdown-item:hover, .store-dropdown-item.selected, .search-result-item:hover, .user-dd-item:hover) {
+  background: #252e49;
+}
+
+:host-context(html[data-theme='dark']) :is(.current-store-label, .dropdown-header) {
+  color: #909db8;
+}
+
+:host-context(html[data-theme='dark']) .search-clear-btn:hover {
+  background: #2b3552;
+}
+
+:host-context(html[data-theme='dark']) .notif-badge {
+  border-color: #12182b;
 }
 .notif-badge {
   position: absolute;

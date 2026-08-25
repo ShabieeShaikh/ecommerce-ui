@@ -94,3 +94,8 @@ export interface UpdatePurchaseOrderRequest {
   discountAmount: number;
   notes?: string;
 }
+
+export interface ApplyPurchaseOrderReceiptItem {
+  purchaseOrderItemId: PurchaseOrderItem['id'];
+  receivedNowQuantity: number;
+}

@@ -45,6 +45,28 @@
             Cancel Purchase Order
           </button>
         }
+
+        @if (
+          currentPurchaseOrder.status === 'ordered' ||
+          currentPurchaseOrder.status === 'partially_received'
+        ) {
+          <button
+            type="button"
+            class="primary-btn receive-btn"
+            (click)="receiveGoods(currentPurchaseOrder)"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 7h12v10H3zM15 10h4l2 3v4h-6z"></path>
+              <circle cx="7" cy="18" r="2"></circle>
+              <circle cx="18" cy="18" r="2"></circle>
+            </svg>
+            @if (currentPurchaseOrder.status === 'partially_received') {
+              Receive Remaining Goods
+            } @else {
+              Receive Goods
+            }
+          </button>
+        }
       }
     </div>
   </header>
@@ -310,6 +332,65 @@
           </tbody>
         </table>
       </div>
+    </section>
+
+    <section class="items-card receiving-history-card" aria-labelledby="receiving-history-heading">
+      <header class="section-header">
+        <div>
+          <h2 id="receiving-history-heading">Receiving History</h2>
+          <p>Posted Goods Receipts for this Purchase Order.</p>
+        </div>
+        <span class="item-count">
+          {{ receivingHistory().length }}
+          {{ receivingHistory().length === 1 ? 'Receipt' : 'Receipts' }}
+        </span>
+      </header>
+
+      @if (receivingHistory().length > 0) {
+        <div class="receipt-history-list">
+          @for (receipt of receivingHistory(); track receipt.id) {
+            <article class="receipt-history-row">
+              <span class="receipt-history-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"></path>
+                </svg>
+              </span>
+              <div class="receipt-history-identity">
+                <strong>{{ receipt.grnNumber }}</strong>
+                <span>{{ receipt.receivedDate | date: 'dd MMM yyyy' }}</span>
+              </div>
+              <div class="receipt-history-metric">
+                <span>Items</span>
+                <strong>{{ receipt.items.length }}</strong>
+              </div>
+              <div class="receipt-history-metric">
+                <span>Units received</span>
+                <strong>{{ receiptUnitCount(receipt.id) }}</strong>
+              </div>
+              <div class="receipt-history-location">
+                <span>Received at</span>
+                <strong>{{ receipt.receivingLocationName }}</strong>
+              </div>
+              <button
+                class="receipt-history-view"
+                type="button"
+                (click)="viewGoodsReceipt(receipt.id)"
+                [attr.aria-label]="'View ' + receipt.grnNumber"
+              >
+                View GRN
+              </button>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="receipt-history-empty">
+          <span aria-hidden="true">&#8595;</span>
+          <div>
+            <strong>No goods have been received yet.</strong>
+            <p>Posted GRNs will appear here as receiving progresses.</p>
+          </div>
+        </div>
+      }
     </section>
 
     <div class="bottom-grid">

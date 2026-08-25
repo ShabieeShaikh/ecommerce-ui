@@ -133,6 +133,10 @@ export class PurchaseOrderList {
     this.router.navigate(['/store-admin/purchasing/purchase-orders', id]);
   }
 
+  receiveGoods(id: PurchaseOrder['id']): void {
+    this.router.navigate(['/store-admin/purchasing/purchase-orders', id, 'receive']);
+  }
+
   editPurchaseOrder(id: PurchaseOrder['id']): void {
     this.router.navigate(['/store-admin/purchasing/purchase-orders', id, 'edit']);
   }

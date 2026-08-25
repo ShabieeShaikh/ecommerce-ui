@@ -562,6 +562,18 @@ select:focus-visible {
   color: #3538cd;
 }
 
+.action-receive {
+  border-color: #abefc6;
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.action-receive:hover {
+  border-color: #6ce9a6;
+  background: #d1fadf;
+  color: #05603a;
+}
+
 .action-cancel {
   border-color: #fecdca;
   color: #b42318;

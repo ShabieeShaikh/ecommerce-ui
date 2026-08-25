@@ -1,0 +1,185 @@
+<main class="goods-receipt-page">
+  <header class="page-header">
+    <div class="header-copy">
+      <span class="page-eyebrow">Purchasing</span>
+      <h1>Goods Receipts</h1>
+      <p>Review stock received against Purchase Orders.</p>
+    </div>
+    <span class="read-only-badge">Read-only history</span>
+  </header>
+
+  <section class="summary-grid ds-metric-grid" aria-label="Goods receipt summary">
+    <article class="summary-card tone-violet ds-metric-card ds-tone-violet">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h4"></path>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Total Receipts</span>
+        <strong class="summary-value ds-metric-value">{{ receipts().length }}</strong>
+        <span class="ds-metric-helper">All posted GRNs</span>
+      </div>
+    </article>
+    <article class="summary-card tone-blue ds-metric-card ds-tone-blue">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+          <path d="M16 3v4M8 3v4M3 10h18"></path>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Receipts This Month</span>
+        <strong class="summary-value ds-metric-value">{{ receiptsThisMonth() }}</strong>
+        <span class="ds-metric-helper">Current calendar month</span>
+      </div>
+    </article>
+    <article class="summary-card tone-green ds-metric-card ds-tone-green">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 7h16v13H4zM2 3h20v4H2zM9 11h6M9 15h6"></path>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Total Units Received</span>
+        <strong class="summary-value ds-metric-value">{{ totalUnitsReceived() }}</strong>
+        <span class="ds-metric-helper">Across all receipts</span>
+      </div>
+    </article>
+    <article class="summary-card tone-orange ds-metric-card ds-tone-orange">
+      <span class="summary-icon ds-metric-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"></path>
+        </svg>
+      </span>
+      <div class="summary-content ds-metric-body">
+        <span class="summary-label ds-metric-label">Distinct Purchase Orders</span>
+        <strong class="summary-value ds-metric-value">{{ distinctPurchaseOrders() }}</strong>
+        <span class="ds-metric-helper">Purchase Orders received</span>
+      </div>
+    </article>
+  </section>
+
+  <section class="receipt-card">
+    <div class="receipt-toolbar">
+      <label class="search-container">
+        <span class="control-label">Search</span>
+        <span class="search-control">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-4-4"></path>
+          </svg>
+          <input
+            class="search-input"
+            type="search"
+            placeholder="Search GRN, PO, supplier, product or SKU..."
+            [value]="searchTerm()"
+            (input)="setSearchTerm($event)"
+          />
+        </span>
+      </label>
+      <div class="filter-container">
+        <label class="filter-control">
+          <span class="control-label">Receiving Location</span>
+          <select
+            class="filter-select"
+            [value]="locationFilter()"
+            (change)="setLocationFilter($event)"
+          >
+            <option value="all">All Locations</option>
+            @for (location of locationOptions(); track location.id) {
+              <option [value]="location.id">
+                {{ location.name }} · {{ locationTypeLabel(location.type) }}
+              </option>
+            }
+          </select>
+        </label>
+        @if (searchTerm() || locationFilter() !== 'all') {
+          <button class="clear-button" type="button" (click)="clearFilters()">Clear</button>
+        }
+      </div>
+    </div>
+
+    @if (filteredReceipts().length > 0) {
+      <div class="receipt-table-wrap table-wrapper">
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th scope="col">GRN Number</th>
+              <th scope="col">Purchase Order</th>
+              <th scope="col">Supplier</th>
+              <th scope="col">Receiving Location</th>
+              <th scope="col">Received Date</th>
+              <th scope="col">Items</th>
+              <th scope="col">Units Received</th>
+              <th scope="col">Created At</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (receipt of filteredReceipts(); track receipt.id) {
+              <tr>
+                <td data-label="GRN Number">
+                  <strong class="grn-number">{{ receipt.grnNumber }}</strong>
+                </td>
+                <td data-label="Purchase Order">
+                  <button
+                    class="po-link"
+                    type="button"
+                    (click)="viewPurchaseOrder(receipt.purchaseOrderId)"
+                  >
+                    {{ receipt.poNumber }}
+                  </button>
+                </td>
+                <td data-label="Supplier">
+                  <strong class="supplier-name">{{ receipt.supplierName }}</strong>
+                </td>
+                <td data-label="Receiving Location">
+                  <span class="location-name">{{ receipt.receivingLocationName }}</span>
+                  <small>{{ locationTypeLabel(receipt.receivingLocationType) }}</small>
+                </td>
+                <td data-label="Received Date">{{ receipt.receivedDate | date: 'dd MMM yyyy' }}</td>
+                <td data-label="Items">
+                  {{ receipt.items.length }} {{ receipt.items.length === 1 ? 'item' : 'items' }}
+                </td>
+                <td data-label="Units Received">
+                  <strong class="unit-count">+{{ unitCount(receipt) }}</strong>
+                </td>
+                <td data-label="Created At">
+                  {{ receipt.createdAt | date: 'dd MMM yyyy, h:mm a' }}
+                </td>
+                <td data-label="Actions">
+                  <button
+                    class="view-button"
+                    type="button"
+                    (click)="viewReceipt(receipt.id)"
+                    [attr.aria-label]="'View ' + receipt.grnNumber"
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (receipts().length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon" aria-hidden="true">GRN</span>
+        <h2>No goods receipts yet</h2>
+        <p>
+          Goods receipts will appear here after stock is received against an Ordered Purchase Order.
+        </p>
+        <button class="primary-btn" type="button" (click)="viewPurchaseOrders()">
+          View Purchase Orders
+        </button>
+      </div>
+    } @else {
+      <div class="empty-state compact">
+        <h2>No matching goods receipts</h2>
+        <p>Try changing your search or receiving-location filter.</p>
+        <button class="clear-button" type="button" (click)="clearFilters()">Clear filters</button>
+      </div>
+    }
+  </section>
+</main>

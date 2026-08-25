@@ -57,6 +57,10 @@ export interface InventoryTransaction {
   destinationBeforeQuantity: number | null;
   destinationAfterQuantity: number | null;
   referenceNumber: string;
+  goodsReceiptId?: string;
+  purchaseOrderId?: string;
+  purchaseOrderNumber?: string;
+  supplierName?: string;
   reason: string;
   note: string;
   occurredAt: string;
@@ -76,6 +80,12 @@ export interface AddInventoryStockInput extends InventoryItemSelection {
   unitCost: number;
   supplierName: string;
   referenceNumber: string;
+  goodsReceiptId?: string;
+  purchaseOrderId?: string;
+  purchaseOrderNumber?: string;
+  transactionType?: Extract<InventoryTransactionType, 'add' | 'receive'>;
+  reason?: string;
+  note?: string;
   occurredAt: string;
   createdBy: string;
 }
@@ -91,6 +101,12 @@ export interface AddInventoryStockBatchInput {
   destinationLocationKey: string;
   supplierName: string;
   referenceNumber: string;
+  goodsReceiptId?: string;
+  purchaseOrderId?: string;
+  purchaseOrderNumber?: string;
+  transactionType?: Extract<InventoryTransactionType, 'add' | 'receive'>;
+  reason?: string;
+  note?: string;
   occurredAt: string;
   createdBy: string;
   lines: AddInventoryStockLine[];

@@ -79,6 +79,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'purchasing/goods-receipts',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/goods-receipts/goods-receipt-list/goods-receipt-list').then(
+            (module) => module.GoodsReceiptList,
+          ),
+      },
+      {
+        path: 'purchasing/goods-receipts/:id',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/goods-receipts/view-goods-receipt/view-goods-receipt').then(
+            (module) => module.ViewGoodsReceipt,
+          ),
+      },
+      {
         path: 'purchasing/purchase-orders',
         loadComponent: () =>
           import('./components/store-admin/purchasing/purchase-orders/purchase-order-list/purchase-order-list').then(
@@ -90,6 +104,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/store-admin/purchasing/purchase-orders/edit-purchase-order/edit-purchase-order').then(
             (module) => module.EditPurchaseOrder,
+          ),
+      },
+      {
+        path: 'purchasing/purchase-orders/:id/receive',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/purchase-orders/receive-goods/receive-goods').then(
+            (module) => module.ReceiveGoods,
           ),
       },
       {

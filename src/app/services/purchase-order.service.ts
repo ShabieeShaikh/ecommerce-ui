@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 
 import {
+  ApplyPurchaseOrderReceiptItem,
   CreatePurchaseOrderItemRequest,
   CreatePurchaseOrderRequest,
   PurchaseOrder,
@@ -158,6 +159,70 @@ export class PurchaseOrderService {
         purchaseOrder.id === id ? updated : purchaseOrder,
       ),
     );
+    return updated;
+  }
+
+  applyReceipt(
+    id: string,
+    receiptItems: ApplyPurchaseOrderReceiptItem[],
+    afterCommit?: (purchaseOrder: PurchaseOrder) => void,
+  ): PurchaseOrder {
+    const existing = this.getPurchaseOrderById(id);
+    if (!existing) throw new Error('Purchase order not found.');
+    if (existing.status !== 'ordered' && existing.status !== 'partially_received') {
+      throw new Error(
+        'Goods can only be received against an ordered or partially received purchase order.',
+      );
+    }
+    if (!receiptItems.length) throw new Error('A goods receipt must contain at least one item.');
+
+    const itemIds = new Set<string>();
+    const receivedByItemId = new Map<string, number>();
+    for (const receiptItem of receiptItems) {
+      if (itemIds.has(receiptItem.purchaseOrderItemId)) {
+        throw new Error('A purchase order item cannot be received more than once in one receipt.');
+      }
+      itemIds.add(receiptItem.purchaseOrderItemId);
+
+      const item = existing.items.find(
+        (candidate) => candidate.id === receiptItem.purchaseOrderItemId,
+      );
+      if (!item) throw new Error('The selected purchase order item could not be found.');
+      const receivedNowQuantity = this.positiveInteger(
+        receiptItem.receivedNowQuantity,
+        'Received quantity must be a whole number greater than zero.',
+      );
+      if (receivedNowQuantity > item.quantity - item.receivedQuantity) {
+        throw new Error(
+          `Received quantity for ${item.productName} exceeds the remaining quantity.`,
+        );
+      }
+      receivedByItemId.set(item.id, receivedNowQuantity);
+    }
+
+    const items = existing.items.map((item) => ({
+      ...item,
+      receivedQuantity: item.receivedQuantity + (receivedByItemId.get(item.id) ?? 0),
+    }));
+    const hasReceivedItems = items.some((item) => item.receivedQuantity > 0);
+    const isComplete = items.every((item) => item.receivedQuantity >= item.quantity);
+    const updated: PurchaseOrder = {
+      ...existing,
+      items,
+      status: isComplete ? 'received' : hasReceivedItems ? 'partially_received' : 'ordered',
+      updatedAt: new Date().toISOString(),
+    };
+    const previous = this.purchaseOrdersState();
+
+    this.commit(
+      previous.map((purchaseOrder) => (purchaseOrder.id === id ? updated : purchaseOrder)),
+    );
+    try {
+      afterCommit?.(updated);
+    } catch (error) {
+      this.commit(previous);
+      throw error;
+    }
     return updated;
   }
 

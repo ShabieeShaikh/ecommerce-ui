@@ -2,6 +2,7 @@ import { Component, HostListener, computed, inject, signal } from '@angular/core
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../services/auth';
 import { StoreService } from '../../../services/store.service';
+import { ThemeService } from '../../../services/theme.service';
 import { Store } from '../../../models/admin.models';
 
 interface NavigationItem {
@@ -58,6 +59,7 @@ export class StoreAdminLayout {
   readonly storeService = inject(StoreService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly themeService = inject(ThemeService);
 
   readonly sidebarCollapsed = signal(false);
   readonly mobileDrawerOpen = signal(false);
@@ -245,6 +247,12 @@ export class StoreAdminLayout {
               icon: 'purchase-order',
               exact: true,
             },
+            {
+              label: 'Goods Receipts',
+              route: '/store-admin/purchasing/goods-receipts',
+              icon: 'receive',
+              exact: true,
+            },
           ],
         },
         { label: 'Analytics', route: '/store-admin/analytics', icon: 'analytics' },
@@ -290,6 +298,16 @@ export class StoreAdminLayout {
 
   toggleDesktopSidebar(): void {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
+  }
+
+  isDarkMode(): boolean {
+    return this.themeService.isDark();
+  }
+
+  toggleTheme(event: Event): void {
+    event.stopPropagation();
+    this.themeService.toggle();
+    this.closePanels();
   }
 
   isNavigationTreeOpen(label: string): boolean {

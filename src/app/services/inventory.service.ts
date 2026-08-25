@@ -305,7 +305,10 @@ export class InventoryService {
                 : ('adjustment' as const),
           referenceNumber: transaction.referenceNumber,
           occurredAt: transaction.occurredAt,
-          supplierName: transaction.type === 'receive' ? transaction.note : undefined,
+          supplierName:
+            transaction.type === 'receive'
+              ? (transaction.supplierName ?? transaction.note)
+              : undefined,
           branchId: transaction.destinationLocationKey?.startsWith('branch:')
             ? transaction.destinationLocationKey.slice('branch:'.length)
             : undefined,
@@ -515,6 +518,12 @@ export class InventoryService {
       destinationLocationKey: input.destinationLocationKey,
       supplierName: input.supplierName,
       referenceNumber: input.referenceNumber,
+      goodsReceiptId: input.goodsReceiptId,
+      purchaseOrderId: input.purchaseOrderId,
+      purchaseOrderNumber: input.purchaseOrderNumber,
+      transactionType: input.transactionType,
+      reason: input.reason,
+      note: input.note,
       occurredAt: input.occurredAt,
       createdBy: input.createdBy,
       lines: [
@@ -528,7 +537,10 @@ export class InventoryService {
     })[0];
   }
 
-  addStockBatch(input: AddInventoryStockBatchInput): InventoryTransaction[] {
+  addStockBatch(
+    input: AddInventoryStockBatchInput,
+    afterCommit?: (transactions: InventoryTransaction[]) => void,
+  ): InventoryTransaction[] {
     const destination = this.requireLocation(input.storeId, input.destinationLocationKey);
     this.assertReference(input.storeId, input.referenceNumber);
     if (destination.type === 'warehouse' && !input.supplierName.trim()) {
@@ -600,7 +612,7 @@ export class InventoryService {
         storeId: input.storeId,
         productId: line.productId,
         variantId: line.variantId,
-        type: destination.type === 'warehouse' ? 'receive' : 'add',
+        type: input.transactionType ?? (destination.type === 'warehouse' ? 'receive' : 'add'),
         quantity: line.quantity,
         unitCost: line.unitCost,
         batchNumber: line.batchNumber?.trim() ?? '',
@@ -611,15 +623,23 @@ export class InventoryService {
         destinationBeforeQuantity: previousQuantity,
         destinationAfterQuantity: nextQuantity,
         referenceNumber,
-        reason: destination.type === 'warehouse' ? 'Warehouse receipt' : 'Stock added',
-        note: input.supplierName.trim(),
+        goodsReceiptId: input.goodsReceiptId,
+        purchaseOrderId: input.purchaseOrderId,
+        purchaseOrderNumber: input.purchaseOrderNumber,
+        supplierName: input.supplierName.trim(),
+        reason:
+          input.reason?.trim() ||
+          (destination.type === 'warehouse' ? 'Warehouse receipt' : 'Stock added'),
+        note: input.note?.trim() || input.supplierName.trim(),
         occurredAt: input.occurredAt,
         createdBy: input.createdBy,
         createdAt: timestamp,
       });
     });
 
-    this.commitStockReceipt(nextBalances, [...transactions, ...this.transactionsSignal()]);
+    this.commitStockReceipt(nextBalances, [...transactions, ...this.transactionsSignal()], () =>
+      afterCommit?.(transactions),
+    );
     return transactions;
   }
 
@@ -1376,6 +1396,7 @@ export class InventoryService {
   private commitStockReceipt(
     balances: InventoryBalance[],
     transactions: InventoryTransaction[],
+    afterCommit?: () => void,
   ): void {
     const previousBalances = this.balancesSignal();
     const previousTransactions = this.transactionsSignal();
@@ -1384,9 +1405,12 @@ export class InventoryService {
       this.storage.setItem(INVENTORY_TRANSACTIONS_KEY, transactions);
       this.balancesSignal.set(balances);
       this.transactionsSignal.set(transactions);
+      afterCommit?.();
     } catch (error) {
       this.storage.setItem(INVENTORY_BALANCES_KEY, previousBalances);
       this.storage.setItem(INVENTORY_TRANSACTIONS_KEY, previousTransactions);
+      this.balancesSignal.set(previousBalances);
+      this.transactionsSignal.set(previousTransactions);
       throw error;
     }
   }
@@ -1486,6 +1510,10 @@ export class InventoryService {
       destinationBeforeQuantity: transaction.destinationBeforeQuantity ?? null,
       destinationAfterQuantity: transaction.destinationAfterQuantity ?? null,
       referenceNumber: transaction.referenceNumber,
+      goodsReceiptId: transaction.goodsReceiptId,
+      purchaseOrderId: transaction.purchaseOrderId,
+      purchaseOrderNumber: transaction.purchaseOrderNumber,
+      supplierName: transaction.supplierName,
       reason: transaction.reason ?? '',
       note: transaction.note ?? '',
       occurredAt: transaction.occurredAt ?? transaction.createdAt ?? new Date().toISOString(),

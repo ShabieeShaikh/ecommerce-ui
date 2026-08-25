@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 import { InventoryLocationType } from '../../../../../models/inventory.models';
+import { GoodsReceiptService } from '../../../../../services/goods-receipt.service';
 import { PurchaseOrderService } from '../../../../../services/purchase-order.service';
 import { StoreService } from '../../../../../services/store.service';
 import { SupplierService } from '../../../../../services/supplier.service';
@@ -25,6 +26,7 @@ export class ViewPurchaseOrder {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly purchaseOrderService = inject(PurchaseOrderService);
+  private readonly goodsReceiptService = inject(GoodsReceiptService);
   private readonly storeService = inject(StoreService);
   private readonly supplierService = inject(SupplierService);
 
@@ -68,6 +70,13 @@ export class ViewPurchaseOrder {
     return ordered > 0 ? Math.min(100, (this.totalReceivedQuantity() / ordered) * 100) : 0;
   });
 
+  readonly receivingHistory = computed(() => {
+    const purchaseOrder = this.purchaseOrder();
+    return purchaseOrder
+      ? this.goodsReceiptService.getGoodsReceiptsByPurchaseOrder(purchaseOrder.id)
+      : [];
+  });
+
   backToPurchaseOrders(): void {
     void this.router.navigate(['/store-admin/purchasing/purchase-orders']);
   }
@@ -79,6 +88,29 @@ export class ViewPurchaseOrder {
       purchaseOrder.id,
       'edit',
     ]);
+  }
+
+  receiveGoods(purchaseOrder: PurchaseOrder): void {
+    if (purchaseOrder.status !== 'ordered' && purchaseOrder.status !== 'partially_received') {
+      return;
+    }
+    void this.router.navigate([
+      '/store-admin/purchasing/purchase-orders',
+      purchaseOrder.id,
+      'receive',
+    ]);
+  }
+
+  receiptUnitCount(receiptId: string): number {
+    return (
+      this.receivingHistory()
+        .find((receipt) => receipt.id === receiptId)
+        ?.items.reduce((total, item) => total + item.receivedNowQuantity, 0) ?? 0
+    );
+  }
+
+  viewGoodsReceipt(receiptId: string): void {
+    void this.router.navigate(['/store-admin/purchasing/goods-receipts', receiptId]);
   }
 
   async submitPurchaseOrder(purchaseOrder: PurchaseOrder): Promise<void> {

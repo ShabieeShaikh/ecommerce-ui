@@ -203,6 +203,35 @@ app-root {
   --tr-slow: 0.35s var(--ease);
 }
 
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --clr-primary: #a78bfa;
+  --clr-primary-dark: #c4b5fd;
+  --clr-indigo: #818cf8;
+  --clr-blue: #60a5fa;
+  --clr-blue-light: #93c5fd;
+  --clr-bg: #0b1020;
+  --clr-surface: #171d30;
+  --clr-border: #313a55;
+  --clr-border-soft: rgba(148, 163, 184, 0.16);
+  --clr-text-primary: #f2f5fc;
+  --clr-text-secondary: #c4cde0;
+  --clr-text-muted: #9da9c0;
+  --clr-text-body: #d6ddeb;
+  --ui-card-bg: rgba(23, 29, 48, 0.9);
+  --ui-card-border: rgba(148, 163, 184, 0.17);
+  --ui-card-shadow: 0 18px 46px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --ui-card-shadow-hover:
+    0 24px 54px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --ui-table-head-bg: #20283e;
+  --ui-table-row-hover: rgba(139, 92, 246, 0.1);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-sm: 0 2px 9px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 5px 18px rgba(0, 0, 0, 0.34);
+  --shadow-lg: 0 10px 34px rgba(0, 0, 0, 0.38);
+  --shadow-xl: 0 18px 52px rgba(0, 0, 0, 0.45);
+}
+
 /* ============================================================
    SHARED TYPOGRAPHY
    Component styles may control spacing and color; this layer keeps
@@ -1180,6 +1209,155 @@ select option:is(:hover, :focus, :checked) {
   }
 }
 
+/* ============================================================
+   DARK THEME
+   Root-scoped overrides complement the shared tokens above and
+   cover legacy component styles that still use literal colors.
+   ============================================================ */
+
+html[data-theme='dark'] :is(body, app-root) {
+  color: var(--clr-text-primary);
+  background: var(--clr-bg);
+}
+
+html[data-theme='dark'] .page-content {
+  color: var(--clr-text-primary);
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(
+    .page-header,
+    .form-page-header,
+    .store-page-header,
+    .branches-header,
+    .editor-header,
+    .lab-header,
+    .products-header,
+    .preview-header,
+    .warehouse-header,
+    .dashboard-hero
+  ) {
+  border-color: var(--ui-card-border) !important;
+  background:
+    linear-gradient(120deg, rgba(27, 34, 56, 0.97), rgba(20, 27, 47, 0.94)),
+    linear-gradient(135deg, rgba(124, 58, 237, 0.18), rgba(37, 99, 235, 0.12)) !important;
+  box-shadow: var(--ui-card-shadow) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(
+    .dashboard-page .metric-card,
+    .dashboard-page .panel,
+    .dashboard-page .activity-panel,
+    .dashboard-page .quick-action,
+    .dashboard-page .date-select,
+    [class$='-page']:not(.dashboard-page) [class$='-card'],
+    [class$='-page']:not(.dashboard-page) [class*='-card '],
+    [class$='-page']:not(.dashboard-page) [class$='-panel'],
+    [class$='-page']:not(.dashboard-page) [class*='-panel '],
+    [class$='-page']:not(.dashboard-page) .panel,
+    [class$='-page']:not(.dashboard-page) .surface
+  ):not(.danger-card):not(.toast-card) {
+  border-color: var(--ui-card-border) !important;
+  background: var(--ui-card-bg) !important;
+  box-shadow: var(--ui-card-shadow) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(
+    .toolbar,
+    .supplier-toolbar,
+    .branch-toolbar,
+    .product-toolbar,
+    .stock-toolbar,
+    .zones-toolbar,
+    .panel-heading,
+    .panel-header,
+    .section-header,
+    .card-header,
+    .modal-header,
+    .modal-footer
+  ) {
+  border-color: var(--clr-border-soft) !important;
+  background-color: rgba(27, 34, 56, 0.74) !important;
+}
+
+html[data-theme='dark'] .page-content :is(h1, h2, h3, h4, .title, .card-title, .panel-title) {
+  color: var(--clr-text-primary) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(.page-subtitle, .subtitle, .helper-text, .field-hint, .form-hint, .meta, .description) {
+  color: var(--clr-text-secondary) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(input:not([type='checkbox']):not([type='radio']), select, textarea, .control, .field-control) {
+  color: var(--clr-text-primary) !important;
+  border-color: var(--clr-border) !important;
+  background-color: #11182a !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(input:not([type='checkbox']):not([type='radio']), textarea)::placeholder {
+  color: var(--clr-text-muted) !important;
+}
+
+html[data-theme='dark'] .page-content :is(input, select, textarea):disabled {
+  color: #77849e !important;
+  background-color: #1c2337 !important;
+}
+
+html[data-theme='dark'] .page-content table {
+  color: var(--clr-text-primary);
+  background: transparent !important;
+}
+
+html[data-theme='dark'] .page-content table thead {
+  background: var(--ui-table-head-bg) !important;
+}
+
+html[data-theme='dark'] .page-content table th {
+  color: #aeb9cd !important;
+  border-color: var(--clr-border-soft) !important;
+}
+
+html[data-theme='dark'] .page-content table td {
+  color: #dce3f1 !important;
+  border-color: var(--clr-border-soft) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(.table-action, .secondary-btn, .secondary-button, .cancel-btn, .back-button, .ghost-btn) {
+  color: #cbd5e7 !important;
+  border-color: var(--clr-border) !important;
+  background: #1b2338 !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(.table-action, .secondary-btn, .secondary-button, .cancel-btn, .back-button, .ghost-btn):hover {
+  border-color: rgba(139, 124, 255, 0.55) !important;
+  background: #252e49 !important;
+}
+
+html[data-theme='dark'] :is(.swal2-popup, .swal2-modal) {
+  color: var(--clr-text-primary);
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+}
+
+html[data-theme='dark'] :is(.swal2-title, .swal2-html-container) {
+  color: var(--clr-text-primary) !important;
+}
+
 :where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month']) {
   color: var(--clr-text-primary);
   color-scheme: light;
@@ -1606,4 +1784,147 @@ select option:is(:hover, :focus, :checked) {
   .page-content .ds-metric-card {
     transition: none !important;
   }
+}
+
+/* Generic dark-mode text contrast. Keep semantic state colors independent. */
+html[data-theme='dark'] .page-content :where(p, li, dt, dd, blockquote, label, legend) {
+  color: var(--clr-text-body) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :where(h1, h2, h3, h4, h5, h6, strong, b, .page-title, .section-title, .section-heading) {
+  color: var(--clr-text-primary) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(
+    [class$='-title'],
+    [class$='-heading'],
+    [class$='-name'],
+    [class$='-value'],
+    [class$='-amount'],
+    [class$='-number'],
+    [class$='-code']
+  ):not([class*='status']):not([class*='badge']):not([class*='trend']):not(
+    [class*='danger']
+  ):not([class*='success']):not([class*='warning']) {
+  color: var(--clr-text-primary) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(
+    [class$='-label'],
+    [class$='-subtitle'],
+    [class$='-sub'],
+    [class$='-description'],
+    [class$='-helper'],
+    [class$='-hint'],
+    [class$='-meta'],
+    [class$='-copy'],
+    [class$='-date'],
+    [class$='-time'],
+    [class$='-text']
+  ):not([class*='status']):not([class*='badge']):not([class*='trend']):not(
+    [class*='danger']
+  ):not([class*='success']):not([class*='warning']):not(button *) {
+  color: var(--clr-text-secondary) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(small, caption, .muted, .empty-message, .empty-state p, .no-results, .search-empty) {
+  color: var(--clr-text-muted) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(.table-wrap, .table-wrapper, .data-table-wrap, .line-table-wrap, [class$='-table-wrap']) {
+  border-color: var(--clr-border-soft) !important;
+  background-color: var(--ui-card-bg) !important;
+}
+
+html[data-theme='dark'] .page-content table tbody tr {
+  color: var(--clr-text-body) !important;
+  background-color: transparent !important;
+}
+
+html[data-theme='dark'] .page-content table tbody tr:hover {
+  background-color: var(--ui-table-row-hover) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month']) {
+  color-scheme: dark !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is([class*='status'], [class*='badge'], [class*='trend'])
+  :is(strong, span) {
+  color: inherit !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(
+    [class*='status'][class*='active'],
+    [class*='status'][class*='received'],
+    [class*='status'][class*='completed'],
+    [class*='badge'][class*='active'],
+    [class*='trend'][class*='up'],
+    [class*='success']
+  ) {
+  color: #6ce9a6 !important;
+  border-color: rgba(108, 233, 166, 0.3) !important;
+  background-color: rgba(18, 183, 106, 0.14) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(
+    [class*='status'][class*='pending'],
+    [class*='status'][class*='draft'],
+    [class*='status'][class*='partial'],
+    [class*='badge'][class*='pending'],
+    [class*='warning']
+  ) {
+  color: #fec84b !important;
+  border-color: rgba(254, 200, 75, 0.3) !important;
+  background-color: rgba(247, 144, 9, 0.14) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(
+    [class*='status'][class*='cancel'],
+    [class*='status'][class*='inactive'],
+    [class*='badge'][class*='cancel'],
+    [class*='trend'][class*='down'],
+    [class*='danger'],
+    [class*='error']
+  ) {
+  color: #fda29b !important;
+  border-color: rgba(253, 162, 155, 0.3) !important;
+  background-color: rgba(240, 68, 56, 0.14) !important;
+}
+
+html[data-theme='dark']
+  .page-content
+  :is(
+    [class*='status'][class*='ordered'],
+    [class*='status'][class*='processing'],
+    [class*='badge'][class*='info'],
+    [class*='info']
+  ) {
+  color: #84adff !important;
+  border-color: rgba(132, 173, 255, 0.3) !important;
+  background-color: rgba(47, 128, 237, 0.14) !important;
+}
+
+html[data-theme='dark'] .page-content :is([class*='-link'], .breadcrumb a, .breadcrumbs a) {
+  color: #b9a8ff !important;
 }

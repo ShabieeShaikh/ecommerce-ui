@@ -5,6 +5,10 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./out-tsc/app",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
     "types": []
   },
   "include": [

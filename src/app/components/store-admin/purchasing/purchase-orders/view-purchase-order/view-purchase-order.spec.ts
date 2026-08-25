@@ -1,7 +1,9 @@
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
+import { GoodsReceipt } from '../../goods-receipts/models/goods-receipt.model';
 import { PurchaseOrderService } from '../../../../../services/purchase-order.service';
 import { StoreService } from '../../../../../services/store.service';
 import { Supplier } from '../../suppliers/models/supplier.model';
@@ -10,6 +12,7 @@ import { ViewPurchaseOrder } from './view-purchase-order';
 
 const PURCHASE_ORDER_STORAGE_KEY = 'digishop_purchase_orders';
 const SUPPLIER_STORAGE_KEY = 'digishop_suppliers';
+const GOODS_RECEIPT_STORAGE_KEY = 'digishop_goods_receipts_v1';
 const STOCK_STORAGE_KEYS = [
   'digishop_inventory_balances_v1',
   'digishop_inventory_transactions_v1',
@@ -139,6 +142,65 @@ describe('ViewPurchaseOrder', () => {
     ]);
   });
 
+  it('shows and navigates the Receive Goods action only for ordered POs', () => {
+    localStorage.setItem(
+      PURCHASE_ORDER_STORAGE_KEY,
+      JSON.stringify([purchaseOrderFixture({ status: 'ordered' })]),
+    );
+    const { component, fixture, router } = createComponent();
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    expect(buttonLabels(fixture)).toContain('Receive Goods');
+    component.receiveGoods(component.purchaseOrder()!);
+
+    expect(navigate).toHaveBeenCalledWith([
+      '/store-admin/purchasing/purchase-orders',
+      'po-draft',
+      'receive',
+    ]);
+  });
+
+  it('shows Receive Remaining Goods for partial POs and hides receiving after completion', () => {
+    localStorage.setItem(
+      PURCHASE_ORDER_STORAGE_KEY,
+      JSON.stringify([purchaseOrderFixture({ status: 'partially_received' })]),
+    );
+    const partial = createComponent();
+    expect(buttonLabels(partial.fixture)).toContain('Receive Remaining Goods');
+
+    TestBed.resetTestingModule();
+    localStorage.setItem(
+      PURCHASE_ORDER_STORAGE_KEY,
+      JSON.stringify([purchaseOrderFixture({ status: 'received' })]),
+    );
+    const received = createComponent();
+    expect(buttonLabels(received.fixture)).not.toContain('Receive Goods');
+    expect(buttonLabels(received.fixture)).not.toContain('Receive Remaining Goods');
+  });
+
+  it('shows persisted GRN receiving history and receipt quantities', () => {
+    const purchaseOrder = purchaseOrderFixture({ status: 'partially_received' });
+    localStorage.setItem(PURCHASE_ORDER_STORAGE_KEY, JSON.stringify([purchaseOrder]));
+    localStorage.setItem(
+      GOODS_RECEIPT_STORAGE_KEY,
+      JSON.stringify([goodsReceiptFixture(purchaseOrder)]),
+    );
+
+    const { component, fixture, router } = createComponent();
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const content = fixture.nativeElement.textContent as string;
+
+    expect(component.receivingHistory()).toHaveLength(1);
+    expect(content).toContain('Receiving History');
+    expect(content).toContain('GRN-20260824-0001');
+    expect(content).toContain('40');
+    expect(content).toContain('DigiShop Main Store');
+    expect(buttonLabels(fixture)).toContain('View GRN');
+
+    component.viewGoodsReceipt('grn-1');
+    expect(navigate).toHaveBeenCalledWith(['/store-admin/purchasing/goods-receipts', 'grn-1']);
+  });
+
   it('keeps Draft when submit is dismissed, then submits reactively and persists without stock changes', async () => {
     const { component, fixture, purchaseOrderService, storeService } = createComponent();
     const showToast = vi.spyOn(storeService, 'showToast');
@@ -209,6 +271,7 @@ function createComponent(id = 'po-draft'): {
   TestBed.configureTestingModule({
     imports: [ViewPurchaseOrder],
     providers: [
+      provideHttpClient(),
       provideRouter([]),
       {
         provide: ActivatedRoute,
@@ -288,6 +351,41 @@ function supplierFixture(overrides: Partial<Supplier> = {}): Supplier {
     status: 'active',
     createdAt: '2026-08-20T06:30:00.000Z',
     ...overrides,
+  };
+}
+
+function goodsReceiptFixture(purchaseOrder: PurchaseOrder): GoodsReceipt {
+  const item = purchaseOrder.items[0];
+  return {
+    id: 'goods-receipt-001',
+    grnNumber: 'GRN-20260824-0001',
+    purchaseOrderId: purchaseOrder.id,
+    poNumber: purchaseOrder.poNumber,
+    storeId: purchaseOrder.storeId,
+    supplierId: purchaseOrder.supplierId,
+    supplierName: purchaseOrder.supplierName,
+    receivingLocationId: purchaseOrder.receivingLocationId,
+    receivingLocationName: purchaseOrder.receivingLocationName,
+    receivingLocationType: purchaseOrder.receivingLocationType,
+    receivedDate: '2026-08-24',
+    items: [
+      {
+        id: 'goods-receipt-item-001',
+        purchaseOrderItemId: item.id,
+        inventoryTransactionId: 'inventory-transaction-001',
+        productId: item.productId,
+        variantId: item.variantId,
+        productName: item.productName,
+        variantName: item.variantName,
+        sku: item.sku,
+        orderedQuantity: item.quantity,
+        previouslyReceivedQuantity: 0,
+        receivedNowQuantity: 40,
+        totalReceivedQuantity: 40,
+        remainingQuantity: Math.max(0, item.quantity - 40),
+      },
+    ],
+    createdAt: '2026-08-24T08:00:00.000Z',
   };
 }
 

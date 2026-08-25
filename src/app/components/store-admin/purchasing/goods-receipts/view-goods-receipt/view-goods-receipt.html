@@ -1,0 +1,217 @@
+<main class="view-receipt-page">
+  @if (receipt(); as currentReceipt) {
+    <header class="page-header">
+      <div class="header-copy">
+        <button class="back-link" type="button" (click)="backToReceipts()">
+          ← Back to Goods Receipts
+        </button>
+        <span class="eyebrow">Goods Receipt Details</span>
+        <h1>{{ currentReceipt.grnNumber }}</h1>
+        <p>
+          Received against {{ currentReceipt.poNumber }} ·
+          {{ currentReceipt.receivedDate | date: 'dd MMM yyyy' }}
+        </p>
+      </div>
+      <button class="primary-btn" type="button" (click)="viewPurchaseOrder(currentReceipt)">
+        View Purchase Order
+      </button>
+    </header>
+
+    <section class="detail-card" aria-labelledby="receipt-information-heading">
+      <header class="section-header">
+        <div>
+          <span class="section-icon" aria-hidden="true">GRN</span>
+          <div>
+            <h2 id="receipt-information-heading">Receipt Information</h2>
+            <p>Historical details captured when stock was received.</p>
+          </div>
+        </div>
+        <span class="posted-badge">Posted · Read-only</span>
+      </header>
+      <dl class="information-grid">
+        <div>
+          <dt>GRN Number</dt>
+          <dd class="grn-number">{{ currentReceipt.grnNumber }}</dd>
+        </div>
+        <div>
+          <dt>PO Number</dt>
+          <dd>
+            <button class="po-link" type="button" (click)="viewPurchaseOrder(currentReceipt)">
+              {{ currentReceipt.poNumber }}
+            </button>
+          </dd>
+        </div>
+        <div>
+          <dt>Supplier</dt>
+          <dd>{{ currentReceipt.supplierName }}</dd>
+        </div>
+        <div>
+          <dt>Receiving Location</dt>
+          <dd>
+            {{ currentReceipt.receivingLocationName
+            }}<small>{{ locationTypeLabel(currentReceipt.receivingLocationType) }}</small>
+          </dd>
+        </div>
+        <div>
+          <dt>Received Date</dt>
+          <dd>{{ currentReceipt.receivedDate | date: 'dd MMM yyyy' }}</dd>
+        </div>
+        <div>
+          <dt>Created Date</dt>
+          <dd>{{ currentReceipt.createdAt | date: 'dd MMM yyyy, h:mm a' }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="detail-card" aria-labelledby="received-items-heading">
+      <header class="section-header">
+        <div>
+          <span class="section-icon tone-blue" aria-hidden="true">+</span>
+          <div>
+            <h2 id="received-items-heading">Received Items</h2>
+            <p>Quantity snapshots recorded by this Goods Receipt.</p>
+          </div>
+        </div>
+        <span class="count-badge"
+          >{{ currentReceipt.items.length }}
+          {{ currentReceipt.items.length === 1 ? 'Item' : 'Items' }}</span
+        >
+      </header>
+      <div class="items-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Product</th>
+              <th scope="col">Variant</th>
+              <th scope="col">SKU</th>
+              <th scope="col">Ordered Qty</th>
+              <th scope="col">Previously Received</th>
+              <th scope="col">Received This GRN</th>
+              <th scope="col">Total After GRN</th>
+              <th scope="col">Remaining</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of currentReceipt.items; track item.id) {
+              <tr>
+                <td data-label="Product">
+                  <strong class="product-name">{{ item.productName }}</strong>
+                </td>
+                <td data-label="Variant">{{ displayValue(item.variantName) }}</td>
+                <td data-label="SKU">
+                  <span class="sku-code">{{ item.sku }}</span>
+                </td>
+                <td data-label="Ordered Qty">{{ item.orderedQuantity }}</td>
+                <td data-label="Previously Received">{{ item.previouslyReceivedQuantity }}</td>
+                <td data-label="Received This GRN">
+                  <strong class="received-now">+{{ item.receivedNowQuantity }}</strong>
+                </td>
+                <td data-label="Total After GRN">
+                  <strong>{{ itemTotalLabel(item) }}</strong>
+                </td>
+                <td data-label="Remaining">
+                  <span [class.complete-value]="item.remainingQuantity === 0">{{
+                    item.remainingQuantity
+                  }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="bottom-grid">
+      <section class="detail-card summary-card" aria-labelledby="receipt-summary-heading">
+        <header class="section-header compact">
+          <div>
+            <span class="section-icon tone-green" aria-hidden="true">Σ</span>
+            <div>
+              <h2 id="receipt-summary-heading">Receipt Summary</h2>
+              <p>Totals for this GRN only.</p>
+            </div>
+          </div>
+        </header>
+        <dl class="summary-list">
+          <div>
+            <dt>Items Received</dt>
+            <dd>{{ currentReceipt.items.length }}</dd>
+          </div>
+          <div>
+            <dt>Units Received This GRN</dt>
+            <dd class="received-now">+{{ totalUnits() }}</dd>
+          </div>
+          <div>
+            <dt>Purchase Order</dt>
+            <dd>{{ currentReceipt.poNumber }}</dd>
+          </div>
+          <div>
+            <dt>Receiving Location</dt>
+            <dd>{{ currentReceipt.receivingLocationName }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="detail-card notes-card" aria-labelledby="receipt-notes-heading">
+        <header class="section-header compact">
+          <div>
+            <span class="section-icon tone-orange" aria-hidden="true">N</span>
+            <div>
+              <h2 id="receipt-notes-heading">Receiving Notes</h2>
+              <p>Notes captured when this GRN was posted.</p>
+            </div>
+          </div>
+        </header>
+        <p class="notes-content">
+          {{ currentReceipt.notes?.trim() || 'No receiving notes added.' }}
+        </p>
+      </section>
+    </div>
+
+    <section class="detail-card" aria-labelledby="inventory-movements-heading">
+      <header class="section-header">
+        <div>
+          <span class="section-icon tone-green" aria-hidden="true">↗</span>
+          <div>
+            <h2 id="inventory-movements-heading">Inventory Movements</h2>
+            <p>Inbound stock transactions linked directly to this GRN.</p>
+          </div>
+        </div>
+        <span class="count-badge"
+          >{{ inventoryMovements().length }}
+          {{ inventoryMovements().length === 1 ? 'Movement' : 'Movements' }}</span
+        >
+      </header>
+      @if (inventoryMovements().length > 0) {
+        <div class="movement-list">
+          @for (movement of inventoryMovements(); track movement.id) {
+            <article class="movement-row">
+              <span class="movement-quantity">+{{ movement.quantity }}</span>
+              <div>
+                <strong>{{ movementProductName(movement) }}</strong
+                ><span>{{ currentReceipt.receivingLocationName }} · Purchase Receipt</span>
+              </div>
+              <div class="movement-reference">
+                <strong>{{ movement.referenceNumber }}</strong
+                ><span>{{ movement.occurredAt | date: 'dd MMM yyyy' }}</span>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="movement-empty">
+          No reliably linked inventory movements were found for this receipt.
+        </div>
+      }
+    </section>
+  } @else {
+    <section class="not-found-card">
+      <span class="not-found-icon" aria-hidden="true">?</span>
+      <h1>Goods Receipt not found</h1>
+      <p>The receipt may not exist or may not belong to the currently selected store.</p>
+      <button class="primary-btn" type="button" (click)="backToReceipts()">
+        Back to Goods Receipts
+      </button>
+    </section>
+  }
+</main>
