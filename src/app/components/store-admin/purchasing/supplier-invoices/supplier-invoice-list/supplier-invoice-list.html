@@ -1,0 +1,51 @@
+<main class="invoice-page">
+  <header class="page-header">
+    <div><span class="eyebrow">Purchasing</span><h1>Supplier Invoices</h1><p>Manage supplier invoices linked to Purchase Orders.</p></div>
+    <button class="primary-btn" type="button" (click)="createInvoice()">Create Supplier Invoice</button>
+  </header>
+
+  <section class="summary-grid ds-metric-grid" aria-label="Supplier invoice summary">
+    <article class="ds-metric-card ds-tone-violet">
+      <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h4"></path></svg></span>
+      <div class="ds-metric-body"><span class="ds-metric-label">Total Invoices</span><strong class="ds-metric-value">{{ invoices().length }}</strong><span class="ds-metric-helper">Current store</span></div>
+    </article>
+    <article class="ds-metric-card ds-tone-blue">
+      <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h5M8 16h3"></path></svg></span>
+      <div class="ds-metric-body"><span class="ds-metric-label">Draft</span><strong class="ds-metric-value">{{ draftCount() }}</strong><span class="ds-metric-helper">Editable invoices</span></div>
+    </article>
+    <article class="ds-metric-card ds-tone-orange">
+      <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+      <div class="ds-metric-body"><span class="ds-metric-label">Pending Review</span><strong class="ds-metric-value">{{ pendingCount() }}</strong><span class="ds-metric-helper">Awaiting review</span></div>
+    </article>
+    <article class="ds-metric-card ds-tone-red">
+      <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM4 10h16M16 15h2"></path><circle cx="8" cy="5" r="2"></circle></svg></span>
+      <div class="ds-metric-body"><span class="ds-metric-label">Outstanding Balance</span><strong class="ds-metric-value money">{{ outstandingBalance() | currency: 'USD' }}</strong><span class="ds-metric-helper">Excludes cancelled</span></div>
+    </article>
+    <article class="ds-metric-card ds-tone-green">
+      <span class="ds-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 2.5 2.5L16 9"></path></svg></span>
+      <div class="ds-metric-body"><span class="ds-metric-label">Paid</span><strong class="ds-metric-value">{{ paidCount() }}</strong><span class="ds-metric-helper">Settled invoices</span></div>
+    </article>
+  </section>
+
+  <section class="list-card">
+    <div class="toolbar">
+      <label class="search"><span>Search</span><input type="search" placeholder="Invoice number, PO number or supplier..." [value]="searchTerm()" (input)="setSearch($event)" /></label>
+      <label><span>Status</span><select [value]="statusFilter()" (change)="setStatus($event)"><option value="all">All statuses</option><option value="draft">Draft</option><option value="pending_review">Pending Review</option><option value="approved">Approved</option><option value="partially_paid">Partially Paid</option><option value="paid">Paid</option><option value="cancelled">Cancelled</option></select></label>
+      <label><span>Match</span><select [value]="matchFilter()" (change)="setMatch($event)"><option value="all">All match statuses</option><option value="not_checked">Not Checked</option><option value="matched">Matched</option><option value="mismatch">Mismatch</option></select></label>
+      <label><span>Supplier</span><select [value]="supplierFilter()" (change)="setSupplier($event)"><option value="all">All suppliers</option>@for (supplier of suppliers(); track supplier[0]) {<option [value]="supplier[0]">{{ supplier[1] }}</option>}</select></label>
+      @if (searchTerm() || statusFilter() !== 'all' || matchFilter() !== 'all' || supplierFilter() !== 'all') {<button class="clear-btn" type="button" (click)="clearFilters()">Clear</button>}
+    </div>
+
+    @if (filteredInvoices().length) {
+      <div class="table-wrap"><table><thead><tr><th>Invoice Number</th><th>PO Number</th><th>Supplier</th><th>Invoice Date</th><th>Due Date</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Match Status</th><th>Actions</th></tr></thead><tbody>
+        @for (invoice of filteredInvoices(); track trackInvoice($index, invoice)) {
+          <tr><td data-label="Invoice Number"><strong class="invoice-number">{{ invoice.invoiceNumber }}</strong></td><td data-label="PO Number">{{ invoice.poNumber }}</td><td data-label="Supplier">{{ invoice.supplierName }}</td><td data-label="Invoice Date">{{ invoice.invoiceDate | date: 'dd MMM yyyy' }}</td><td data-label="Due Date">{{ invoice.dueDate ? (invoice.dueDate | date: 'dd MMM yyyy') : '—' }}</td><td data-label="Total">{{ invoice.totalAmount | currency: 'USD' }}</td><td data-label="Paid">{{ invoice.paidAmount | currency: 'USD' }}</td><td data-label="Balance"><strong>{{ invoice.balanceAmount | currency: 'USD' }}</strong></td><td data-label="Status"><span class="badge status-{{ invoice.status }}">{{ statusLabel(invoice.status) }}</span></td><td data-label="Match Status"><span class="badge match-{{ invoice.matchStatus }}">{{ matchLabel(invoice.matchStatus) }}</span></td><td data-label="Actions"><div class="actions"><button type="button" (click)="viewInvoice(invoice.id)">View</button>@if (invoice.status === 'draft') {<button type="button" (click)="editInvoice(invoice.id)">Edit</button>}</div></td></tr>
+        }
+      </tbody></table></div>
+    } @else if (!invoices().length) {
+      <div class="empty"><h2>No supplier invoices yet</h2><p>Create a supplier invoice against an eligible Purchase Order.</p><button class="primary-btn" type="button" (click)="createInvoice()">Create Supplier Invoice</button></div>
+    } @else {
+      <div class="empty"><h2>No invoices match your filters</h2><p>Try changing the search or filter values.</p><button class="clear-btn" type="button" (click)="clearFilters()">Clear filters</button></div>
+    }
+  </section>
+</main>

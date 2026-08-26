@@ -63,6 +63,21 @@ describe('GoodsReceiptList', () => {
     expect(localStorage.getItem('digishop_inventory_balances_v1')).toBe(balancesBefore);
     expect(localStorage.getItem('digishop_inventory_transactions_v1')).toBe(transactionsBefore);
   });
+
+  it('removes duplicate receipt identities while retaining separate partial GRNs for one PO', () => {
+    localStorage.setItem(RECEIPTS_KEY, JSON.stringify([
+      receiptFixture(),
+      receiptFixture(),
+      receiptFixture({ id: 'duplicate-number', createdAt: '2026-08-23T10:00:00.000Z' }),
+      receiptFixture({ id: 'grn-2', grnNumber: 'GRN-20260825-0002', receivedDate: '2026-08-25', createdAt: '2026-08-25T10:00:00.000Z' }),
+    ]));
+    const { component } = createComponent();
+    expect(component.receipts().map((receipt) => receipt.grnNumber)).toEqual([
+      'GRN-20260825-0002',
+      'GRN-20260824-0001',
+    ]);
+    expect(component.distinctPurchaseOrders()).toBe(1);
+  });
 });
 
 function createComponent(): {

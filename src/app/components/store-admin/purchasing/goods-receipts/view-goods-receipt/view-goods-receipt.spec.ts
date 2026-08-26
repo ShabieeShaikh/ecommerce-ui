@@ -1,8 +1,13 @@
 import { provideHttpClient } from '@angular/common/http';
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 
+import { GoodsReceiptService } from '../../../../../services/goods-receipt.service';
+import { InventoryService } from '../../../../../services/inventory.service';
+import { PurchaseReturnService } from '../../../../../services/purchase-return.service';
 import { StoreService } from '../../../../../services/store.service';
+import { PurchaseReturn } from '../../purchase-returns/models/purchase-return.model';
 import { GoodsReceipt } from '../models/goods-receipt.model';
 import { ViewGoodsReceipt } from './view-goods-receipt';
 
@@ -54,6 +59,27 @@ describe('ViewGoodsReceipt', () => {
 
     expect(component.receipt()).toBeUndefined();
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Goods Receipt not found');
+  });
+
+  it('shows return history separately and opens Create Return with the GRN preselected', () => {
+    TestBed.configureTestingModule({
+      imports: [ViewGoodsReceipt],
+      providers: [provideRouter([]),
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ id: 'grn-1' }) } } },
+        { provide: StoreService, useValue: { selectedStoreId: signal('store-001') } },
+        { provide: GoodsReceiptService, useValue: { getGoodsReceiptById: () => receiptFixture() } },
+        { provide: InventoryService, useValue: { getTransactionsByStore: () => [], getBalance: () => ({ availableQuantity: 30 }) } },
+        { provide: PurchaseReturnService, useValue: { getPurchaseReturnsByGoodsReceipt: () => [purchaseReturnFixture()], getRemainingReturnableQuantity: () => 25 } },
+      ],
+    });
+    const fixture = TestBed.createComponent(ViewGoodsReceipt); fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Purchase Return History');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('PR-20260825-0001');
+    expect(fixture.componentInstance.totalUnits()).toBe(30);
+    expect(fixture.componentInstance.totalReturned()).toBe(5);
+    const router = TestBed.inject(Router); const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.return-btn')?.click();
+    expect(navigate).toHaveBeenCalledWith(['/store-admin/purchasing/purchase-returns/add'], { queryParams: { goodsReceiptId: 'grn-1' } });
   });
 });
 
@@ -137,4 +163,8 @@ function transactionFixture(overrides: Record<string, unknown> = {}): Record<str
     createdAt: '2026-08-24T10:00:00.000Z',
     ...overrides,
   };
+}
+
+function purchaseReturnFixture(): PurchaseReturn {
+  return { id: 'return-1', returnNumber: 'PR-20260825-0001', storeId: 'store-001', supplierId: 101, supplierName: 'Tech Distribution Ltd.', purchaseOrderId: 'po-1', poNumber: 'PO-20260820-0001', goodsReceiptId: 'grn-1', grnNumber: 'GRN-20260824-0001', returnLocationId: 'warehouse:warehouse-001', returnLocationName: 'Main Warehouse', returnLocationType: 'warehouse', returnDate: '2026-08-25', reason: 'defective', items: [{ id: 'return-item-1', goodsReceiptItemId: 'grn-item-1', inventoryTransactionId: 'return-tx-1', purchaseOrderItemId: 'po-item-1', productId: 'product-1', variantId: null, productName: 'Phone', sku: 'PHONE-001', receivedQuantity: 30, previouslyReturnedQuantity: 0, returnNowQuantity: 5, totalReturnedQuantity: 5, remainingReturnableQuantity: 25 }], createdAt: '2026-08-25T10:00:00.000Z' };
 }

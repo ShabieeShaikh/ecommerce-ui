@@ -1,0 +1,61 @@
+<main class="invoice-form-page">
+  @if (canRender()) {
+    @if (!isEditMode || invoice()?.status === 'draft') {
+      <header class="page-header"><div><span class="eyebrow">Purchasing / Supplier Invoices</span><h1>{{ pageTitle() }}</h1><p>{{ pageSubtitle() }}</p></div></header>
+      @if (contextMessage()) {<div class="context-banner" role="status">{{ contextMessage() }}</div>}
+
+      @if (!isEditMode && !eligiblePurchaseOrders().length) {
+        <section class="empty-card"><h2>No eligible purchase orders available</h2><p>Supplier invoices can be created for Ordered, Partially Received, or Received purchase orders.</p><button class="primary-btn" type="button" (click)="viewPurchaseOrders()">View Purchase Orders</button></section>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="form-layout"><div class="form-main">
+            <section class="form-card"><div class="section-header"><h2>Purchase Order & Supplier</h2><p>Supplier identity is derived from the linked Purchase Order.</p></div>
+              @if (isEditMode) {
+                <div class="read-grid"><div><span>Purchase Order</span><strong>{{ invoice()?.poNumber }}</strong></div><div><span>Supplier</span><strong>{{ invoice()?.supplierName }}</strong></div></div>
+              } @else {
+                <label class="field"><span>Purchase Order <b>*</b></span><select formControlName="purchaseOrderId" (change)="onPurchaseOrderChange()"><option value="">Select an eligible Purchase Order</option>@for (order of eligiblePurchaseOrders(); track order.id) {<option [value]="order.id">{{ order.poNumber }} — {{ order.supplierName }} — {{ order.totalAmount | currency: 'USD' }}</option>}</select>@if (hasError(form.controls.purchaseOrderId, 'required')) {<small class="error">Select a Purchase Order.</small>}</label>
+                @if (selectedPurchaseOrder(); as order) {<div class="read-grid"><div><span>Supplier</span><strong>{{ order.supplierName }}</strong></div><div><span>PO Status</span><strong class="capitalize">{{ order.status.replace('_', ' ') }}</strong></div></div>}
+              }
+            </section>
+
+            <section class="form-card"><div class="section-header"><h2>Invoice Information</h2><p>Enter the external invoice reference and dates supplied by the vendor.</p></div>
+              <div class="field-grid"><label class="field"><span>Supplier Invoice Number <b>*</b></span><input type="text" formControlName="invoiceNumber" placeholder="e.g. INV-ABC-889" />@if (hasError(form.controls.invoiceNumber, 'required')) {<small class="error">Invoice number is required.</small>}</label><label class="field"><span>Invoice Date <b>*</b></span><input type="date" formControlName="invoiceDate" /></label><label class="field"><span>Due Date</span><input type="date" formControlName="dueDate" />@if (form.touched && form.hasError('dueBeforeInvoice')) {<small class="error">Due Date cannot be earlier than Invoice Date.</small>}</label></div>
+              <div class="state-row"><span>Status <strong>Draft</strong></span><span>Match Status <strong>Not Checked</strong></span></div>
+            </section>
+
+            @if (items.length) {
+              <section class="form-card items-card"><div class="section-header"><h2>Invoice Items</h2><p>Select only the PO lines included on this supplier invoice. Billed quantity and price remain editable.</p></div>
+                <div class="item-list" formArrayName="items">
+                  @for (group of items.controls; track group.controls.purchaseOrderItemId.value; let index = $index) {
+                    <fieldset class="item-row" [formGroupName]="index"><legend class="sr-only">Invoice item {{ index + 1 }}</legend>
+                      <label class="include"><input type="checkbox" formControlName="included" /><span>Include</span></label>
+                      <div class="product"><strong>{{ itemContext(index)?.productName || 'Purchase Order item' }}</strong><span>{{ display(itemContext(index)?.variantName) }} · {{ itemContext(index)?.sku }}</span></div>
+                      <div class="reference"><span>Ordered</span><strong>{{ itemContext(index)?.quantity ?? '—' }}</strong></div><div class="reference"><span>Received</span><strong>{{ itemContext(index)?.receivedQuantity ?? '—' }}</strong></div><div class="reference"><span>PO Cost</span><strong>{{ (itemContext(index)?.purchasePrice ?? 0) | currency: 'USD' }}</strong></div>
+                      <label class="mini-field"><span>Invoice Qty</span><input type="number" min="0.01" step="0.01" formControlName="invoicedQuantity" />@if (hasError(group.controls.invoicedQuantity, 'min')) {<small class="error">Must be greater than zero.</small>}</label>
+                      <label class="mini-field"><span>Invoice Unit Price</span><input type="number" min="0" step="0.01" formControlName="unitPrice" />@if (hasError(group.controls.unitPrice, 'min')) {<small class="error">Cannot be negative.</small>}</label>
+                      <div class="line-total"><span>Line Total</span><strong>{{ lineTotal(index) | currency: 'USD' }}</strong></div>
+                    </fieldset>
+                  }
+                </div>
+              </section>
+            }
+
+            <section class="form-card"><div class="section-header"><h2>Notes</h2><p>Optional commercial or review context.</p></div><label class="field"><span>Invoice Notes</span><textarea rows="4" formControlName="notes" placeholder="Add notes for this supplier invoice..."></textarea></label></section>
+          </div>
+
+          <aside class="summary-card"><h2>Financial Summary</h2><p>{{ includedCount() }} included {{ includedCount() === 1 ? 'item' : 'items' }}</p><dl><div><dt>Subtotal</dt><dd>{{ subtotal() | currency: 'USD' }}</dd></div></dl>
+            <label class="field"><span>Tax Amount</span><input type="number" min="0" step="0.01" formControlName="taxAmount" />@if (hasError(form.controls.taxAmount, 'min')) {<small class="error">Tax cannot be negative.</small>}</label>
+            <label class="field"><span>Discount Amount</span><input type="number" min="0" step="0.01" formControlName="discountAmount" />@if (hasError(form.controls.discountAmount, 'min')) {<small class="error">Discount cannot be negative.</small>}</label>
+            <div class="grand-total"><span>Grand Total</span><strong>{{ total() | currency: 'USD' }}</strong></div><dl><div><dt>Paid</dt><dd>{{ 0 | currency: 'USD' }}</dd></div><div><dt>Balance</dt><dd>{{ total() | currency: 'USD' }}</dd></div><div><dt>Match Status</dt><dd>Not Checked</dd></div></dl><p class="safety-note">Saving an invoice does not modify PO receiving quantities, Goods Receipts, or Inventory.</p>
+          </aside></div>
+          @if (submissionError()) {<div class="submission-error" role="alert">{{ submissionError() }}</div>}
+          <footer class="form-actions"><button class="secondary-btn" type="button" (click)="cancel()">Cancel</button><button class="primary-btn" type="submit" [disabled]="isSubmitting()">{{ isSubmitting() ? 'Saving...' : submitLabel() }}</button></footer>
+        </form>
+      }
+    } @else {
+      <section class="empty-card"><h1>Supplier invoice cannot be edited</h1><p>Only Draft supplier invoices can be modified.</p><button class="primary-btn" type="button" (click)="viewInvoice()">View Invoice</button></section>
+    }
+  } @else {
+    <section class="empty-card"><h1>Supplier Invoice not found</h1><p>The invoice may not exist or may not belong to the selected store.</p><button class="primary-btn" type="button" (click)="cancel()">Back to Supplier Invoices</button></section>
+  }
+</main>

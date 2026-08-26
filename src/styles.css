@@ -1358,6 +1358,11 @@ html[data-theme='dark'] :is(.swal2-title, .swal2-html-container) {
   color: var(--clr-text-primary) !important;
 }
 
+/* SweetAlert toasts share the active DigiShop brand color in both themes. */
+.swal2-timer-progress-bar {
+  background: var(--clr-primary) !important;
+}
+
 :where(input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month']) {
   color: var(--clr-text-primary);
   color-scheme: light;

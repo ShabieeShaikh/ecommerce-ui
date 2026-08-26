@@ -1,0 +1,79 @@
+<main class="view-page">
+  @if (payment(); as item) {
+    <header class="page-header">
+      <div>
+        <button class="back-link" type="button" (click)="back()">← Back to Supplier Payments</button
+        ><span class="eyebrow">Supplier Payment Details</span>
+        <h1>{{ item.paymentNumber }}</h1>
+        <p>{{ item.supplierName }} · {{ item.invoiceNumber }}</p>
+      </div>
+      <button class="primary-btn" type="button" (click)="viewInvoice()">
+        View Supplier Invoice
+      </button>
+    </header>
+    <section class="detail-card">
+      <header>
+        <div>
+          <h2>Payment Information</h2>
+          <p>Permanent financial record captured when the supplier payment was posted.</p>
+        </div>
+        <span class="posted-badge">Posted · Read-only</span>
+      </header>
+      <dl class="info-grid">
+        <div>
+          <dt>Payment Number</dt>
+          <dd class="payment-number">{{ item.paymentNumber }}</dd>
+        </div>
+        <div>
+          <dt>Supplier</dt>
+          <dd>{{ item.supplierName }}</dd>
+        </div>
+        <div>
+          <dt>Invoice Number</dt>
+          <dd>
+            <button class="invoice-link" type="button" (click)="viewInvoice()">
+              {{ item.invoiceNumber }}
+            </button>
+          </dd>
+        </div>
+        <div>
+          <dt>Payment Date</dt>
+          <dd>{{ item.paymentDate | date: 'dd MMM yyyy' }}</dd>
+        </div>
+        <div>
+          <dt>Payment Method</dt>
+          <dd>
+            <span class="method-badge">{{ methodLabel(item.paymentMethod) }}</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Amount</dt>
+          <dd class="amount">{{ item.amount | currency: 'USD' }}</dd>
+        </div>
+        <div>
+          <dt>Reference Number</dt>
+          <dd>{{ item.referenceNumber || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Created At</dt>
+          <dd>{{ item.createdAt | date: 'dd MMM yyyy, h:mm a' }}</dd>
+        </div>
+      </dl>
+    </section>
+    <section class="detail-card notes-card">
+      <header>
+        <div>
+          <h2>Payment Notes</h2>
+          <p>Additional context stored with this payment.</p>
+        </div>
+      </header>
+      <p>{{ item.notes?.trim() || 'No payment notes added.' }}</p>
+    </section>
+  } @else {
+    <section class="not-found">
+      <h1>Supplier Payment not found</h1>
+      <p>The payment may not exist or may not belong to the selected store.</p>
+      <button class="primary-btn" type="button" (click)="back()">Back to Supplier Payments</button>
+    </section>
+  }
+</main>

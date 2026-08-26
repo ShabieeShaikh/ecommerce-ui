@@ -1,0 +1,177 @@
+<main class="record-page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">Purchasing / Supplier Payments</span>
+      <h1>Record Supplier Payment</h1>
+      <p>Record a payment against an approved supplier invoice.</p>
+    </div>
+  </header>
+  @if (contextMessage()) {
+    <div class="context-banner" role="status">{{ contextMessage() }}</div>
+  }
+  @if (eligibleInvoices().length) {
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="form-layout">
+        <div class="form-main">
+          <section class="form-card">
+            <header>
+              <h2>Supplier Invoice</h2>
+              <p>Select the payable invoice. Supplier information is resolved automatically.</p>
+            </header>
+            <label class="field"
+              ><span>Supplier Invoice <b>*</b></span
+              ><select formControlName="supplierInvoiceId" [class.locked]="preselectionLocked()">
+                <option value="">Select an approved invoice</option>
+                @for (invoice of eligibleInvoices(); track invoice.id) {
+                  <option [value]="invoice.id">
+                    {{ invoice.invoiceNumber }} — {{ invoice.supplierName }} — Balance
+                    {{ invoice.balanceAmount | currency: 'USD' }}
+                  </option>
+                }
+              </select>
+              @if (hasError(form.controls.supplierInvoiceId, 'required')) {
+                <small class="error">Select an eligible invoice.</small>
+              }
+            </label>
+            @if (selectedInvoice(); as invoice) {
+              <div class="invoice-context">
+                <div>
+                  <span>Supplier</span><strong>{{ invoice.supplierName }}</strong>
+                </div>
+                <div>
+                  <span>Invoice</span><strong>{{ invoice.invoiceNumber }}</strong>
+                </div>
+                <div>
+                  <span>Invoice Total</span
+                  ><strong>{{ invoice.totalAmount | currency: 'USD' }}</strong>
+                </div>
+                <div>
+                  <span>Already Paid</span
+                  ><strong>{{ invoice.paidAmount | currency: 'USD' }}</strong>
+                </div>
+                <div class="outstanding">
+                  <span>Outstanding Balance</span
+                  ><strong>{{ invoice.balanceAmount | currency: 'USD' }}</strong>
+                </div>
+                <div>
+                  <span>Status</span><strong>{{ statusLabel(invoice.status) }}</strong>
+                </div>
+              </div>
+            }
+          </section>
+          <section class="form-card">
+            <header>
+              <h2>Payment Information</h2>
+              <p>Enter the details from the actual supplier payment.</p>
+            </header>
+            <div class="field-grid">
+              <label class="field"
+                ><span>Payment Date <b>*</b></span
+                ><input type="date" formControlName="paymentDate" /></label
+              ><label class="field"
+                ><span>Amount <b>*</b></span
+                ><input type="number" min="0.01" step="0.01" formControlName="amount" />
+                @if (hasError(form.controls.amount, 'min')) {
+                  <small class="error">Amount must be greater than zero.</small>
+                }
+                @if (amountExceedsBalance()) {
+                    <small class="error">
+                      Payment cannot exceed the outstanding balance of
+                      {{ selectedInvoice()?.balanceAmount ?? 0 | currency: 'USD' }}.
+                    </small>
+                }
+                @if (selectedInvoice()) {
+                  <button class="text-btn" type="button" (click)="payFullBalance()">
+                    Pay Full Balance
+                  </button>
+                }</label
+              ><label class="field"
+                ><span>Payment Method <b>*</b></span
+                ><select formControlName="paymentMethod">
+                  <option value="cash">Cash</option>
+                  <option value="bank_transfer">Bank Transfer</option>
+                  <option value="cheque">Cheque</option>
+                  <option value="other">Other</option>
+                </select></label
+              ><label class="field"
+                ><span>Reference Number</span
+                ><input
+                  type="text"
+                  formControlName="referenceNumber"
+                  placeholder="Bank transaction, cheque or receipt number"
+              /></label>
+            </div>
+            <label class="field notes"
+              ><span>Notes</span
+              ><textarea
+                rows="4"
+                formControlName="notes"
+                placeholder="Add optional payment notes..."
+              ></textarea>
+            </label>
+          </section>
+        </div>
+        <aside class="summary-card">
+          <h2>Payment Summary</h2>
+          <p>Review the invoice balance before recording.</p>
+          <dl>
+            <div>
+              <dt>Invoice Total</dt>
+              <dd>{{ selectedInvoice()?.totalAmount ?? 0 | currency: 'USD' }}</dd>
+            </div>
+            <div>
+              <dt>Already Paid</dt>
+              <dd>{{ selectedInvoice()?.paidAmount ?? 0 | currency: 'USD' }}</dd>
+            </div>
+            <div>
+              <dt>Outstanding Before</dt>
+              <dd>{{ selectedInvoice()?.balanceAmount ?? 0 | currency: 'USD' }}</dd>
+            </div>
+            <div class="payment-now">
+              <dt>Payment Now</dt>
+              <dd>{{ paymentNow() | currency: 'USD' }}</dd>
+            </div>
+            <div class="balance-after">
+              <dt>Outstanding After</dt>
+              <dd>{{ outstandingAfter() | currency: 'USD' }}</dd>
+            </div>
+          </dl>
+          @if (isFullPayment()) {
+            <div class="preview full">This payment will fully settle the invoice.</div>
+          } @else if (paymentNow() > 0 && !amountExceedsBalance()) {
+            <div class="preview partial">
+              Invoice will remain Partially Paid after this payment.
+            </div>
+          }
+          <p class="audit-note">
+            Recorded payments are permanent financial records and cannot be edited or deleted.
+          </p>
+        </aside>
+      </div>
+      @if (submissionError()) {
+        <div class="submission-error" role="alert">{{ submissionError() }}</div>
+      }
+      <footer class="form-actions">
+        <button class="secondary-btn" type="button" (click)="cancel()">Cancel</button
+        ><button
+          class="primary-btn"
+          type="submit"
+          [disabled]="isSubmitting() || form.invalid || amountExceedsBalance() || !selectedInvoice()"
+        >
+          {{ isSubmitting() ? 'Recording Payment...' : 'Record Payment' }}
+        </button>
+      </footer>
+    </form>
+  } @else {
+    <section class="empty-card">
+      <h2>No invoices available for payment</h2>
+      <p>
+        Supplier payments can be recorded against approved or partially paid invoices with an
+        outstanding balance.
+      </p>
+      <button class="primary-btn" type="button" (click)="viewInvoices()">
+        View Supplier Invoices
+      </button>
+    </section>
+  }
+</main>

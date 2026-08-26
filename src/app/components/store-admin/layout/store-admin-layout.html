@@ -218,6 +218,19 @@
                                   <path d="M9 7h6M9 11h6M9 15h4"></path>
                                 </svg>
                               }
+                              @case ('payment') {
+                                <svg viewBox="0 0 24 24">
+                                  <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+                                  <path d="M3 10h18M7 15h3"></path>
+                                </svg>
+                              }
+                              @case ('purchase-return') {
+                                <svg viewBox="0 0 24 24">
+                                  <path d="M9 7H5v-4"></path>
+                                  <path d="M5 7a8 8 0 1 1-1 8"></path>
+                                  <path d="m5 7 4-4"></path>
+                                </svg>
+                              }
                             }
                           </span>
                           <span>{{ child.label }}</span>
@@ -550,8 +563,7 @@
               </div>
               <div class="notif-panel-footer">
                 <a routerLink="/store-admin/dashboard" (click)="showNotifPanel.set(false)"
-                  >View all activity</a
-                >
+                  >View all activity</a>
               </div>
             </div>
           }
@@ -622,18 +634,4 @@
     </main>
   </div>
 
-  <div class="toast-container" aria-live="polite" aria-atomic="true">
-    @for (toast of toasts(); track toast.id) {
-      <button
-        class="toast-card"
-        type="button"
-        [class]="'toast-card toast--' + toast.type"
-        (click)="removeToast(toast.id)"
-      >
-        <span class="toast-icon" [class]="'toast-icon toast-icon--' + toast.type"></span>
-        <span class="toast-msg">{{ toast.message }}</span>
-        <span class="toast-close" aria-hidden="true">&times;</span>
-      </button>
-    }
-  </div>
 </div>

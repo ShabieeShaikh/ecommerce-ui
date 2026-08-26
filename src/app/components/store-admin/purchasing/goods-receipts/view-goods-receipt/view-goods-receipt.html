@@ -12,9 +12,16 @@
           {{ currentReceipt.receivedDate | date: 'dd MMM yyyy' }}
         </p>
       </div>
-      <button class="primary-btn" type="button" (click)="viewPurchaseOrder(currentReceipt)">
-        View Purchase Order
-      </button>
+      <div class="header-actions">
+        @if (canReturnToSupplier()) {
+          <button class="return-btn" type="button" (click)="returnToSupplier(currentReceipt)">
+            Return to Supplier
+          </button>
+        }
+        <button class="primary-btn" type="button" (click)="viewPurchaseOrder(currentReceipt)">
+          View Purchase Order
+        </button>
+      </div>
     </header>
 
     <section class="detail-card" aria-labelledby="receipt-information-heading">
@@ -167,6 +174,33 @@
         </p>
       </section>
     </div>
+
+    <section class="detail-card" aria-labelledby="purchase-return-history-heading">
+      <header class="section-header">
+        <div>
+          <span class="section-icon tone-orange" aria-hidden="true">↩</span>
+          <div>
+            <h2 id="purchase-return-history-heading">Purchase Return History</h2>
+            <p>Stock returned later is shown separately; this GRN remains unchanged.</p>
+          </div>
+        </div>
+        <span class="count-badge">Total Returned: {{ totalReturned() }}</span>
+      </header>
+      @if (purchaseReturns().length) {
+        <div class="items-table-wrap">
+          <table class="return-history-table">
+            <thead><tr><th>Return Number</th><th>Return Date</th><th>Reason</th><th>Units Returned</th><th>Actions</th></tr></thead>
+            <tbody>
+              @for (item of purchaseReturns(); track item.id) {
+                <tr><td data-label="Return Number"><strong class="return-number">{{ item.returnNumber }}</strong></td><td data-label="Return Date">{{ item.returnDate | date: 'dd MMM yyyy' }}</td><td data-label="Reason">{{ returnReasonLabel(item.reason) }}</td><td data-label="Units Returned"><strong class="returned-units">−{{ returnedUnits(item) }}</strong></td><td data-label="Actions"><button class="po-link" type="button" (click)="viewPurchaseReturn(item.id)">View</button></td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="movement-empty">No purchase returns have been posted against this Goods Receipt.</div>
+      }
+    </section>
 
     <section class="detail-card" aria-labelledby="inventory-movements-heading">
       <header class="section-header">

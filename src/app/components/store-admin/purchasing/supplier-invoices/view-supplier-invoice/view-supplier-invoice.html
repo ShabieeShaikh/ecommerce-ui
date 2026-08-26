@@ -1,0 +1,356 @@
+<main class="view-page">
+  @if (invoice(); as item) {
+    <header class="page-header">
+      <div>
+        <button class="back-link" type="button" (click)="back()">← Back to Supplier Invoices</button
+        ><span class="eyebrow">Supplier Invoice Details</span>
+        <div class="title-row">
+          <h1>{{ item.invoiceNumber }}</h1>
+          <span class="badge status-{{ item.status }}">{{ statusLabel(item.status) }}</span>
+        </div>
+        <p>{{ item.supplierName }} · {{ item.poNumber }}</p>
+      </div>
+      <div class="header-actions">
+        <button class="secondary-btn" type="button" (click)="viewPurchaseOrder()">
+          View Purchase Order
+        </button>
+        @if (canRecordPayment(item.status, item.matchStatus, item.balanceAmount)) {
+          <button class="payment-btn" type="button" (click)="recordPayment()">
+            Record Payment
+          </button>
+        }
+        @if (item.status === 'paid') {
+          <span class="paid-in-full">Paid in Full</span>
+        }
+        @if (item.status === 'draft') {
+          <button class="secondary-btn" type="button" (click)="edit()">Edit Draft</button
+          >
+        }
+        @if (item.status === 'draft') {
+          <button
+            class="primary-btn"
+            type="button"
+            [disabled]="isWorking()"
+            (click)="submitForReview()"
+          >
+            Submit for Review
+          </button>
+        }
+        @if (item.status === 'pending_review' && item.matchStatus === 'matched') {
+          <button
+            class="approve-btn"
+            type="button"
+            [disabled]="isWorking()"
+            (click)="approveInvoice()"
+          >
+            Approve Invoice
+          </button>
+        }
+      </div>
+    </header>
+    @if (errorMessage()) {
+      <div class="error-banner" role="alert">{{ errorMessage() }}</div>
+    }
+    <section class="detail-card">
+      <header>
+        <h2>Invoice Information</h2>
+        <p>Commercial details captured for this supplier invoice.</p>
+      </header>
+      <dl class="info-grid">
+        <div>
+          <dt>Invoice Number</dt>
+          <dd>{{ item.invoiceNumber }}</dd>
+        </div>
+        <div>
+          <dt>Supplier</dt>
+          <dd>{{ item.supplierName }}</dd>
+        </div>
+        <div>
+          <dt>PO Number</dt>
+          <dd>
+            <button class="inline-link" type="button" (click)="viewPurchaseOrder()">
+              {{ item.poNumber }}
+            </button>
+          </dd>
+        </div>
+        <div>
+          <dt>Invoice Date</dt>
+          <dd>{{ item.invoiceDate | date: 'dd MMM yyyy' }}</dd>
+        </div>
+        <div>
+          <dt>Due Date</dt>
+          <dd>{{ item.dueDate ? (item.dueDate | date: 'dd MMM yyyy') : '—' }}</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>
+            <span class="badge status-{{ item.status }}">{{ statusLabel(item.status) }}</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Match Status</dt>
+          <dd>
+            <span class="badge match-{{ item.matchStatus }}">{{
+              matchLabel(item.matchStatus)
+            }}</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Created Date</dt>
+          <dd>{{ item.createdAt | date: 'dd MMM yyyy, h:mm a' }}</dd>
+        </div>
+        <div>
+          <dt>Updated Date</dt>
+          <dd>{{ item.updatedAt ? (item.updatedAt | date: 'dd MMM yyyy, h:mm a') : '—' }}</dd>
+        </div>
+      </dl>
+    </section>
+    <section class="detail-card match-card" aria-labelledby="three-way-match-heading">
+      <header class="match-header">
+        <div>
+          <span class="eyebrow">Purchase Order · Goods Receipts · Invoice</span>
+          <h2 id="three-way-match-heading">Three-Way Match</h2>
+          <p>Compares received and previously invoiced quantities with PO and invoice prices.</p>
+        </div>
+        <div class="match-action">
+          <span class="match-status-large match-{{ item.matchStatus }}">{{
+            matchLabel(item.matchStatus)
+          }}</span>
+          @if (item.matchCheckedAt) {
+            <small>Last checked {{ item.matchCheckedAt | date: 'dd MMM yyyy, h:mm a' }}</small>
+          }
+          @if (item.status === 'pending_review') {
+            <button class="primary-btn" type="button" [disabled]="isWorking()" (click)="runMatch()">
+              {{ item.matchStatus === 'mismatch' ? 'Recheck Match' : 'Run Three-Way Match' }}
+            </button>
+          }
+        </div>
+      </header>
+      @if (matchResult(); as result) {
+        <div class="table-wrap match-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Variant / SKU</th>
+                <th>PO Qty</th>
+                <th>Received</th>
+                <th>Previously Invoiced</th>
+                <th>Available</th>
+                <th>Current Invoice</th>
+                <th>PO Price</th>
+                <th>Invoice Price</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (comparison of result.itemResults; track comparison.purchaseOrderItemId) {
+                <tr>
+                  <td data-label="Product">
+                    <strong>{{ comparison.productName }}</strong>
+                  </td>
+                  <td data-label="Variant / SKU">
+                    {{ display(comparison.variantName) }}<small>{{ comparison.sku }}</small>
+                  </td>
+                  <td data-label="PO Qty">{{ comparison.orderedQuantity }}</td>
+                  <td data-label="Received">{{ comparison.receivedQuantity }}</td>
+                  <td data-label="Previously Invoiced">
+                    {{ comparison.previouslyInvoicedQuantity }}
+                  </td>
+                  <td data-label="Available">{{ comparison.availableToInvoice }}</td>
+                  <td data-label="Current Invoice">{{ comparison.invoicedQuantity }}</td>
+                  <td data-label="PO Price">
+                    {{ comparison.purchaseOrderUnitPrice | currency: 'USD' }}
+                  </td>
+                  <td data-label="Invoice Price">
+                    {{ comparison.invoiceUnitPrice | currency: 'USD' }}
+                  </td>
+                  <td data-label="Quantity">
+                    <span class="comparison-result" [class.pass]="comparison.quantityMatched">{{
+                      quantityMessage(comparison)
+                    }}</span>
+                  </td>
+                  <td data-label="Price">
+                    <span class="comparison-result" [class.pass]="comparison.priceMatched">{{
+                      priceMessage(comparison)
+                    }}</span>
+                  </td>
+                  <td data-label="Result">
+                    <strong
+                      [class.result-pass]="comparison.matched"
+                      [class.result-fail]="!comparison.matched"
+                      >{{ comparison.matched ? 'Matched' : 'Mismatch' }}</strong
+                    >
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="issues" [class.no-issues]="!result.issues.length">
+          <h3>Matching Issues</h3>
+          @if (result.issues.length) {
+            <ol>
+              @for (issue of result.issues; track $index) {
+                <li>{{ issue.message }}</li>
+              }
+            </ol>
+          } @else {
+            <p>No matching issues found.</p>
+          }
+        </div>
+      } @else {
+        <div class="match-empty">
+          <p>Three-way matching has not been performed yet.</p>
+          @if (item.status === 'draft') {
+            <small>Submit this Draft for review to run the authoritative match.</small>
+          }
+        </div>
+      }
+      @if (item.status === 'pending_review' && item.matchStatus === 'mismatch') {
+        <p class="approval-blocked">
+          Invoice cannot be approved until matching issues are resolved. Recheck after the relevant
+          Goods Receipt or invoice correction workflow is completed.
+        </p>
+      }
+    </section>
+    <section class="detail-card">
+      <header>
+        <h2>Invoice Items</h2>
+        <p>Supplier-billed values with read-only Purchase Order context.</p>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Variant</th>
+              <th>SKU</th>
+              <th>PO Ordered Qty</th>
+              <th>Received Qty</th>
+              <th>PO Purchase Price</th>
+              <th>Invoiced Qty</th>
+              <th>Invoice Unit Price</th>
+              <th>Line Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (line of item.items; track line.id) {
+              <tr>
+                <td data-label="Product">
+                  <strong>{{ line.productName }}</strong>
+                </td>
+                <td data-label="Variant">{{ display(line.variantName) }}</td>
+                <td data-label="SKU">{{ line.sku }}</td>
+                <td data-label="PO Ordered Qty">{{ poItem(line)?.quantity ?? '—' }}</td>
+                <td data-label="Received Qty">{{ poItem(line)?.receivedQuantity ?? '—' }}</td>
+                <td data-label="PO Purchase Price">
+                  {{ poItem(line) ? (poItem(line)!.purchasePrice | currency: 'USD') : '—' }}
+                </td>
+                <td data-label="Invoiced Qty">{{ line.invoicedQuantity }}</td>
+                <td data-label="Invoice Unit Price">{{ line.unitPrice | currency: 'USD' }}</td>
+                <td data-label="Line Total">
+                  <strong>{{ line.lineTotal | currency: 'USD' }}</strong>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <div class="bottom-grid">
+      <section class="detail-card">
+        <header>
+          <h2>Financial Summary</h2>
+          <p>Amounts reflect posted supplier payments.</p>
+        </header>
+        <dl class="summary-list">
+          <div>
+            <dt>Subtotal</dt>
+            <dd>{{ item.subtotal | currency: 'USD' }}</dd>
+          </div>
+          <div>
+            <dt>Tax</dt>
+            <dd>{{ item.taxAmount | currency: 'USD' }}</dd>
+          </div>
+          <div>
+            <dt>Discount</dt>
+            <dd>− {{ item.discountAmount | currency: 'USD' }}</dd>
+          </div>
+          <div class="total">
+            <dt>Total</dt>
+            <dd>{{ item.totalAmount | currency: 'USD' }}</dd>
+          </div>
+          <div>
+            <dt>Paid</dt>
+            <dd>{{ item.paidAmount | currency: 'USD' }}</dd>
+          </div>
+          <div class="balance">
+            <dt>Balance</dt>
+            <dd>{{ item.balanceAmount | currency: 'USD' }}</dd>
+          </div>
+          <div>
+            <dt>Payment Status</dt>
+            <dd><span class="badge status-{{ item.status }}">{{ statusLabel(item.status) }}</span></dd>
+          </div>
+        </dl>
+      </section>
+      <section class="detail-card">
+        <header>
+          <h2>Notes</h2>
+          <p>Commercial or review context recorded on this invoice.</p>
+        </header>
+        <p class="notes">{{ item.notes?.trim() || 'No notes added.' }}</p>
+      </section>
+    </div>
+    <section class="detail-card payment-history">
+      <header>
+        <div>
+          <h2>Payment History</h2>
+          <p>Immutable payments posted against this supplier invoice.</p>
+        </div>
+        <div class="payment-totals">
+          <span>History total <strong>{{ paymentHistoryTotal() | currency: 'USD' }}</strong></span>
+          <span>Outstanding <strong>{{ item.balanceAmount | currency: 'USD' }}</strong></span>
+        </div>
+      </header>
+      @if (paymentHistoryMismatch()) {
+        <div class="history-warning" role="alert">
+          Payment history total does not agree with the invoice paid amount. Review the stored
+          records; no values were changed.
+        </div>
+      }
+      @if (payments().length) {
+        <div class="table-wrap">
+          <table class="payment-table">
+            <thead>
+              <tr><th>Payment No.</th><th>Date</th><th>Method</th><th>Reference</th><th>Amount</th><th></th></tr>
+            </thead>
+            <tbody>
+              @for (payment of payments(); track payment.id) {
+                <tr>
+                  <td data-label="Payment No."><strong>{{ payment.paymentNumber }}</strong></td>
+                  <td data-label="Date">{{ payment.paymentDate | date: 'dd MMM yyyy' }}</td>
+                  <td data-label="Method">{{ paymentMethodLabel(payment.paymentMethod) }}</td>
+                  <td data-label="Reference">{{ payment.referenceNumber || '—' }}</td>
+                  <td data-label="Amount"><strong>{{ payment.amount | currency: 'USD' }}</strong></td>
+                  <td data-label="Action"><button class="inline-link" type="button" (click)="viewPayment(payment.id)">View</button></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="payment-empty">No payments have been recorded against this invoice yet.</div>
+      }
+    </section>
+  } @else {
+    <section class="not-found">
+      <h1>Supplier Invoice not found</h1>
+      <p>The invoice may not exist or may not belong to the selected store.</p>
+      <button class="primary-btn" type="button" (click)="back()">Back to Supplier Invoices</button>
+    </section>
+  }
+</main>

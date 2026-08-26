@@ -44,6 +44,7 @@ export interface SupplierInvoice {
   balanceAmount: number;
   status: SupplierInvoiceStatus;
   matchStatus: SupplierInvoiceMatchStatus;
+  matchCheckedAt?: string;
   notes?: string;
   createdAt: string;
   updatedAt?: string;

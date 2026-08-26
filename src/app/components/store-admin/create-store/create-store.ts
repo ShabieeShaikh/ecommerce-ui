@@ -366,13 +366,10 @@ export class CreateStore {
       } else {
         this.storeService.addStore(storeData, false);
       }
-      await Swal.fire({
-        title: this.isEditMode ? 'Store Updated' : 'Store Created',
-        text: `Store "${storeData.name}" ${this.isEditMode ? 'was updated' : 'was created'} successfully.`,
-        icon: 'success',
-        confirmButtonText: 'Continue',
-        confirmButtonColor: '#6437e8',
-      });
+      this.storeService.showToast(
+        `Store "${storeData.name}" ${this.isEditMode ? 'was updated' : 'was created'} successfully.`,
+        'success',
+      );
       await this.router.navigate(['/store-admin/stores']);
     } catch {
       this.isSaving.set(false);

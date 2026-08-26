@@ -338,6 +338,12 @@ tbody tr:hover {
   margin: 0;
   color: #667085;
 }
+.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.return-btn { min-height: 44px; padding: 0 16px; border: 0; border-radius: 11px; background: #b42318; color: #fff; font: inherit; font-weight: 750; cursor: pointer; }
+.return-number { color: #6437e8; }
+.returned-units { color: #b42318; }
+.return-history-table { min-width: 680px; }
+.return-btn:focus-visible { outline: 3px solid rgba(180,35,24,.22); outline-offset: 2px; }
 @media (max-width: 900px) {
   .information-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -348,6 +354,8 @@ tbody tr:hover {
     align-items: flex-start;
     flex-direction: column;
   }
+  .header-actions { width: 100%; }
+  .header-actions > * { flex: 1; }
   .section-header {
     align-items: flex-start;
     flex-direction: column;

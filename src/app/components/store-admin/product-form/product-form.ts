@@ -632,17 +632,10 @@ export class ProductForm {
         : mode === 'draft'
           ? 'saved as a draft'
           : 'created';
-      await Swal.fire({
-        title: this.isEditMode
-          ? 'Product Updated'
-          : mode === 'draft'
-            ? 'Draft Saved'
-            : 'Product Created',
-        text: `Product "${product.name}" was ${action} successfully.`,
-        icon: 'success',
-        confirmButtonText: 'Continue',
-        confirmButtonColor: '#6437e8',
-      });
+      this.storeService.showToast(
+        `Product "${product.name}" was ${action} successfully.`,
+        'success',
+      );
       await this.router.navigate(['/store-admin/products']);
     } catch (error) {
       this.isSaving.set(false);

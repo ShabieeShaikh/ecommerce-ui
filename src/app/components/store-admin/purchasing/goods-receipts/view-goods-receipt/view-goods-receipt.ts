@@ -5,6 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GoodsReceiptService } from '../../../../../services/goods-receipt.service';
 import { InventoryService } from '../../../../../services/inventory.service';
 import { StoreService } from '../../../../../services/store.service';
+import { PurchaseReturnService } from '../../../../../services/purchase-return.service';
+import { PurchaseReturnReason } from '../../purchase-returns/models/purchase-return.model';
 import {
   InventoryLocationType,
   InventoryTransaction,
@@ -24,6 +26,7 @@ export class ViewGoodsReceipt {
   private readonly goodsReceiptService = inject(GoodsReceiptService);
   private readonly inventoryService = inject(InventoryService);
   private readonly storeService = inject(StoreService);
+  private readonly returnService = inject(PurchaseReturnService);
 
   readonly receiptId = this.route.snapshot.paramMap.get('id')?.trim() || null;
 
@@ -38,7 +41,28 @@ export class ViewGoodsReceipt {
     if (!receipt) return [];
     return this.inventoryService
       .getTransactionsByStore(receipt.storeId)
-      .filter((transaction) => transaction.goodsReceiptId === receipt.id);
+      .filter((transaction) => transaction.goodsReceiptId === receipt.id && transaction.type === 'receive');
+  });
+
+  readonly purchaseReturns = computed(() => {
+    const receipt = this.receipt();
+    return receipt ? this.returnService.getPurchaseReturnsByGoodsReceipt(receipt.id) : [];
+  });
+
+  readonly totalReturned = computed(() => this.purchaseReturns().reduce(
+    (total, item) => total + item.items.reduce((sum, line) => sum + line.returnNowQuantity, 0), 0,
+  ));
+
+  readonly canReturnToSupplier = computed(() => {
+    const receipt = this.receipt();
+    if (!receipt) return false;
+    return receipt.items.some((item) => {
+      const returnable = this.returnService.getRemainingReturnableQuantity(receipt.id, item.id);
+      try {
+        const available = this.inventoryService.getBalance(receipt.storeId, item.productId, receipt.receivingLocationId, item.variantId === null ? null : String(item.variantId)).availableQuantity;
+        return returnable > 0 && available > 0;
+      } catch { return false; }
+    });
   });
 
   readonly totalUnits = computed(
@@ -52,6 +76,14 @@ export class ViewGoodsReceipt {
   viewPurchaseOrder(receipt: GoodsReceipt): void {
     void this.router.navigate(['/store-admin/purchasing/purchase-orders', receipt.purchaseOrderId]);
   }
+
+  returnToSupplier(receipt: GoodsReceipt): void {
+    if (this.canReturnToSupplier()) void this.router.navigate(['/store-admin/purchasing/purchase-returns/add'], { queryParams: { goodsReceiptId: receipt.id } });
+  }
+
+  viewPurchaseReturn(id: string): void { void this.router.navigate(['/store-admin/purchasing/purchase-returns', id]); }
+  returnReasonLabel(value: PurchaseReturnReason): string { return value.split('_').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' '); }
+  returnedUnits(item: { items: Array<{ returnNowQuantity: number }> }): number { return item.items.reduce((sum, line) => sum + line.returnNowQuantity, 0); }
 
   displayValue(value: string | undefined): string {
     return value?.trim() || '—';

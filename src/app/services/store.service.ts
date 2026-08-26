@@ -481,17 +481,12 @@ export class StoreService {
   }
 
   showToast(message: string, type: ToastNotification['type'] = 'info'): void {
-    const id = `toast-${Date.now()}`;
-    const newToast: ToastNotification = { id, message, type };
-    this.toastsSignal.update((toasts) => [...toasts, newToast]);
-
-    setTimeout(() => {
-      this.removeToast(id);
-    }, 4000);
+    const id = `alert-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    this.toastsSignal.update((alerts) => [...alerts, { id, message, type }]);
   }
 
   removeToast(id: string): void {
-    this.toastsSignal.update((toasts) => toasts.filter((t) => t.id !== id));
+    this.toastsSignal.update((alerts) => alerts.filter((alert) => alert.id !== id));
   }
 
   private loadStores(): Store[] {

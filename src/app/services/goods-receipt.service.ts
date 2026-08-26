@@ -41,7 +41,9 @@ export class GoodsReceiptService {
   readonly receipts = this.receiptsState.asReadonly();
 
   getGoodsReceiptsByStore(storeId: string): GoodsReceipt[] {
-    return this.newestFirst(this.receiptsState().filter((receipt) => receipt.storeId === storeId));
+    return this.newestFirst(
+      this.uniqueReceipts(this.receiptsState()).filter((receipt) => receipt.storeId === storeId),
+    );
   }
 
   getGoodsReceiptById(id: string): GoodsReceipt | undefined {
@@ -50,7 +52,9 @@ export class GoodsReceiptService {
 
   getGoodsReceiptsByPurchaseOrder(purchaseOrderId: string): GoodsReceipt[] {
     return this.newestFirst(
-      this.receiptsState().filter((receipt) => receipt.purchaseOrderId === purchaseOrderId),
+      this.uniqueReceipts(this.receiptsState()).filter(
+        (receipt) => receipt.purchaseOrderId === purchaseOrderId,
+      ),
     );
   }
 
@@ -270,11 +274,24 @@ export class GoodsReceiptService {
     try {
       const stored = this.storage.getItem<unknown>(GOODS_RECEIPTS_STORAGE_KEY);
       return Array.isArray(stored) && stored.every((receipt) => this.isGoodsReceipt(receipt))
-        ? stored
+        ? this.uniqueReceipts(stored)
         : [];
     } catch {
       return [];
     }
+  }
+
+  private uniqueReceipts(receipts: GoodsReceipt[]): GoodsReceipt[] {
+    const ids = new Set<string>();
+    const numbers = new Set<string>();
+    return this.newestFirst(receipts).filter((receipt) => {
+      const id = receipt.id.trim().toLowerCase();
+      const number = receipt.grnNumber.trim().toLowerCase();
+      if (ids.has(id) || numbers.has(number)) return false;
+      ids.add(id);
+      numbers.add(number);
+      return true;
+    });
   }
 
   private commit(receipts: GoodsReceipt[]): void {

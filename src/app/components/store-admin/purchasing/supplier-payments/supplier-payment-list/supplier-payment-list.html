@@ -1,0 +1,144 @@
+<main class="payment-page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">Purchasing</span>
+      <h1>Supplier Payments</h1>
+      <p>Review payments recorded against approved supplier invoices.</p>
+    </div>
+    <button class="primary-btn" type="button" (click)="recordPayment()">Record Payment</button>
+  </header>
+  <section class="summary-grid ds-metric-grid" aria-label="Supplier payment summary">
+    <article class="ds-metric-card ds-tone-violet">
+      <span class="ds-metric-icon" aria-hidden="true"
+        ><svg viewBox="0 0 24 24"><path d="M4 6h16v13H4zM7 10h10M7 14h6"></path></svg
+      ></span>
+      <div class="ds-metric-body">
+        <span class="ds-metric-label">Total Payments</span
+        ><strong class="ds-metric-value">{{ payments().length }}</strong
+        ><span class="ds-metric-helper">Current store</span>
+      </div>
+    </article>
+    <article class="ds-metric-card ds-tone-blue">
+      <span class="ds-metric-icon" aria-hidden="true"
+        ><svg viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+          <path d="M8 3v4M16 3v4M3 10h18"></path></svg
+      ></span>
+      <div class="ds-metric-body">
+        <span class="ds-metric-label">Payments This Month</span
+        ><strong class="ds-metric-value">{{ paymentsThisMonth() }}</strong
+        ><span class="ds-metric-helper">Current calendar month</span>
+      </div>
+    </article>
+    <article class="ds-metric-card ds-tone-green">
+      <span class="ds-metric-icon" aria-hidden="true"
+        ><svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M15 8.5h-4a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4H9M12 6v12"></path></svg
+      ></span>
+      <div class="ds-metric-body">
+        <span class="ds-metric-label">Total Amount Paid</span
+        ><strong class="ds-metric-value money">{{ totalAmountPaid() | currency: 'USD' }}</strong
+        ><span class="ds-metric-helper">All recorded payments</span>
+      </div>
+    </article>
+    <article class="ds-metric-card ds-tone-orange">
+      <span class="ds-metric-icon" aria-hidden="true"
+        ><svg viewBox="0 0 24 24">
+          <circle cx="9" cy="8" r="3"></circle>
+          <path d="M3 20c0-4 2-6 6-6s6 2 6 6M16 10h5M18.5 7.5v5"></path></svg
+      ></span>
+      <div class="ds-metric-body">
+        <span class="ds-metric-label">Suppliers Paid</span
+        ><strong class="ds-metric-value">{{ suppliersPaid() }}</strong
+        ><span class="ds-metric-helper">Distinct suppliers</span>
+      </div>
+    </article>
+  </section>
+  <section class="list-card">
+    <div class="toolbar">
+      <label class="search"
+        ><span>Search</span
+        ><input
+          type="search"
+          placeholder="Payment, invoice, supplier or reference..."
+          [value]="searchTerm()"
+          (input)="setSearch($event)" /></label
+      ><label
+        ><span>Payment Method</span
+        ><select [value]="methodFilter()" (change)="setMethod($event)">
+          <option value="all">All methods</option>
+          <option value="cash">Cash</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="cheque">Cheque</option>
+          <option value="other">Other</option>
+        </select></label
+      ><label
+        ><span>Supplier</span
+        ><select [value]="supplierFilter()" (change)="setSupplier($event)">
+          <option value="all">All suppliers</option>
+          @for (supplier of suppliers(); track supplier[0]) {
+            <option [value]="supplier[0]">{{ supplier[1] }}</option>
+          }
+        </select></label
+      >
+      @if (searchTerm() || methodFilter() !== 'all' || supplierFilter() !== 'all') {
+        <button class="clear-btn" type="button" (click)="clearFilters()">Clear</button>
+      }
+    </div>
+    @if (filteredPayments().length) {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Payment Number</th>
+              <th>Invoice Number</th>
+              <th>Supplier</th>
+              <th>Payment Date</th>
+              <th>Payment Method</th>
+              <th>Reference Number</th>
+              <th>Amount</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (payment of filteredPayments(); track payment.id) {
+              <tr>
+                <td data-label="Payment Number">
+                  <strong class="payment-number">{{ payment.paymentNumber }}</strong>
+                </td>
+                <td data-label="Invoice Number">{{ payment.invoiceNumber }}</td>
+                <td data-label="Supplier">{{ payment.supplierName }}</td>
+                <td data-label="Payment Date">{{ payment.paymentDate | date: 'dd MMM yyyy' }}</td>
+                <td data-label="Payment Method">
+                  <span class="method-badge">{{ methodLabel(payment.paymentMethod) }}</span>
+                </td>
+                <td data-label="Reference Number">{{ payment.referenceNumber || '—' }}</td>
+                <td data-label="Amount">
+                  <strong class="amount">{{ payment.amount | currency: 'USD' }}</strong>
+                </td>
+                <td data-label="Actions">
+                  <button class="view-btn" type="button" (click)="viewPayment(payment.id)">
+                    View
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (!payments().length) {
+      <div class="empty">
+        <h2>No supplier payments yet</h2>
+        <p>Payments will appear here after approved supplier invoices are paid.</p>
+        <button class="primary-btn" type="button" (click)="recordPayment()">Record Payment</button>
+      </div>
+    } @else {
+      <div class="empty">
+        <h2>No payments match your filters</h2>
+        <p>Try changing your search or filters.</p>
+        <button class="clear-btn" type="button" (click)="clearFilters()">Clear filters</button>
+      </div>
+    }
+  </section>
+</main>

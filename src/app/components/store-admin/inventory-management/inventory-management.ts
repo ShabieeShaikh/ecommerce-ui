@@ -703,6 +703,7 @@ export class InventoryManagement {
       release: 'Released',
       sale: 'Sale',
       return: 'Returned',
+      purchase_return: 'Purchase Return',
     }[type];
   }
   transactionRoute(transaction: InventoryTransaction): string {

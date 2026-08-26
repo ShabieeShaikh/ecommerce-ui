@@ -484,13 +484,10 @@ export class BranchForm {
       } else {
         this.branchService.create(data);
       }
-      await Swal.fire({
-        title: this.isEditMode ? 'Branch Updated' : 'Branch Created',
-        text: `Branch "${data.name}" ${this.isEditMode ? 'was updated' : 'was created'} successfully.`,
-        icon: 'success',
-        confirmButtonText: 'Continue',
-        confirmButtonColor: '#6437e8',
-      });
+      this.storeService.showToast(
+        `Branch "${data.name}" ${this.isEditMode ? 'was updated' : 'was created'} successfully.`,
+        'success',
+      );
       await this.router.navigate(['/store-admin/branches']);
     } catch {
       this.isSaving.set(false);

@@ -148,11 +148,86 @@ export class SupplierInvoiceService {
     const updated: SupplierInvoice = {
       ...existing,
       status: 'pending_review',
+      matchStatus: 'not_checked',
+      matchCheckedAt: undefined,
       updatedAt: new Date().toISOString(),
     };
     this.commit(
       this.invoicesState().map((invoice) => (invoice.id === existing.id ? updated : invoice)),
     );
+    return updated;
+  }
+
+  saveMatchOutcome(
+    id: string,
+    matchStatus: Exclude<SupplierInvoiceMatchStatus, 'not_checked'>,
+    checkedAt: string,
+  ): SupplierInvoice {
+    const existing = this.getSupplierInvoiceById(id);
+    if (!existing) throw new Error('Supplier invoice not found.');
+    this.assertSelectedStore(existing.storeId);
+    if (existing.status !== 'pending_review') {
+      throw new Error('Only supplier invoices pending review can be matched.');
+    }
+    const updated: SupplierInvoice = {
+      ...existing,
+      matchStatus,
+      matchCheckedAt: checkedAt,
+      updatedAt: checkedAt,
+    };
+    this.commit(this.invoicesState().map((invoice) => invoice.id === id ? updated : invoice));
+    return updated;
+  }
+
+  approveSupplierInvoice(id: string): SupplierInvoice {
+    const existing = this.getSupplierInvoiceById(id);
+    if (!existing) throw new Error('Supplier invoice not found.');
+    this.assertSelectedStore(existing.storeId);
+    if (existing.status !== 'pending_review') {
+      throw new Error('Only supplier invoices pending review can be approved.');
+    }
+    if (existing.matchStatus !== 'matched') {
+      throw new Error('Supplier invoice must pass three-way matching before approval.');
+    }
+    const updated: SupplierInvoice = {
+      ...existing,
+      status: 'approved',
+      updatedAt: new Date().toISOString(),
+    };
+    this.commit(this.invoicesState().map((invoice) => invoice.id === id ? updated : invoice));
+    return updated;
+  }
+
+  applySupplierPayment(id: string, requestedAmount: number): SupplierInvoice {
+    const existing = this.getSupplierInvoiceById(id);
+    if (!existing) throw new Error('Supplier invoice not found.');
+    const selectedStoreId = this.storeService.selectedStoreId();
+    if (selectedStoreId && selectedStoreId !== existing.storeId) {
+      throw new Error('Supplier invoice does not belong to the selected store.');
+    }
+    if (existing.status !== 'approved' && existing.status !== 'partially_paid') {
+      throw new Error('Payments can only be recorded for approved or partially paid invoices.');
+    }
+    if (existing.matchStatus !== 'matched') {
+      throw new Error('Supplier invoice must have a matched three-way check before payment.');
+    }
+    const amount = this.positiveMoney(requestedAmount, 'Payment amount must be greater than zero.');
+    if (this.moneyInCents(existing.balanceAmount) <= 0) {
+      throw new Error('Supplier invoice has no outstanding balance.');
+    }
+    if (this.moneyInCents(amount) > this.moneyInCents(existing.balanceAmount)) {
+      throw new Error('Payment amount cannot exceed the outstanding invoice balance.');
+    }
+    const paidAmount = this.roundMoney(existing.paidAmount + amount);
+    const balanceAmount = this.roundMoney(Math.max(0, existing.totalAmount - paidAmount));
+    const updated: SupplierInvoice = {
+      ...existing,
+      paidAmount,
+      balanceAmount,
+      status: this.moneyInCents(balanceAmount) === 0 ? 'paid' : 'partially_paid',
+      updatedAt: new Date().toISOString(),
+    };
+    this.commit(this.invoicesState().map((invoice) => invoice.id === id ? updated : invoice));
     return updated;
   }
 
@@ -290,6 +365,17 @@ export class SupplierInvoiceService {
     return this.roundMoney(value);
   }
 
+  private positiveMoney(value: number, message: string): number {
+    if (!Number.isFinite(value) || value <= 0) throw new Error(message);
+    const amount = this.roundMoney(value);
+    if (this.moneyInCents(amount) <= 0) throw new Error(message);
+    return amount;
+  }
+
+  private moneyInCents(value: number): number {
+    return Math.round((value + Number.EPSILON) * 100);
+  }
+
   private roundMoney(value: number): number {
     return Math.round((value + Number.EPSILON) * 100) / 100;
   }
@@ -372,6 +458,7 @@ export class SupplierInvoiceService {
       this.isNonNegativeFiniteNumber(value['balanceAmount']) &&
       this.isInvoiceStatus(value['status']) &&
       this.isMatchStatus(value['matchStatus']) &&
+      (value['matchCheckedAt'] === undefined || this.isDate(value['matchCheckedAt'])) &&
       (value['notes'] === undefined || typeof value['notes'] === 'string') &&
       typeof value['createdAt'] === 'string' &&
       (value['updatedAt'] === undefined || typeof value['updatedAt'] === 'string')

@@ -79,6 +79,83 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'purchasing/supplier-invoices',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/supplier-invoices/supplier-invoice-list/supplier-invoice-list').then(
+            (module) => module.SupplierInvoiceList,
+          ),
+      },
+      {
+        path: 'purchasing/supplier-invoices/add',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/supplier-invoices/create-supplier-invoice/create-supplier-invoice').then(
+            (module) => module.CreateSupplierInvoice,
+          ),
+      },
+      {
+        path: 'purchasing/supplier-invoices/:id/edit',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/supplier-invoices/edit-supplier-invoice/edit-supplier-invoice').then(
+            (module) => module.EditSupplierInvoice,
+          ),
+      },
+      {
+        path: 'purchasing/supplier-invoices/:id',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/supplier-invoices/view-supplier-invoice/view-supplier-invoice').then(
+            (module) => module.ViewSupplierInvoice,
+          ),
+      },
+      {
+        path: 'purchasing/supplier-payments',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/supplier-payments/supplier-payment-list/supplier-payment-list').then(
+            (module) => module.SupplierPaymentList,
+          ),
+      },
+      {
+        path: 'purchasing/supplier-payments/add',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/supplier-payments/record-supplier-payment/record-supplier-payment').then(
+            (module) => module.RecordSupplierPayment,
+          ),
+      },
+      {
+        path: 'purchasing/supplier-payments/:id',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/supplier-payments/view-supplier-payment/view-supplier-payment').then(
+            (module) => module.ViewSupplierPayment,
+          ),
+      },
+      {
+        path: 'purchasing/purchase-returns',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/purchase-returns/purchase-return-list/purchase-return-list').then(
+            (module) => module.PurchaseReturnList,
+          ),
+      },
+      {
+        path: 'purchasing/purchase-returns/add',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/purchase-returns/create-purchase-return/create-purchase-return').then(
+            (module) => module.CreatePurchaseReturn,
+          ),
+      },
+      {
+        path: 'purchasing/purchase-returns/:id',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/purchase-returns/view-purchase-return/view-purchase-return').then(
+            (module) => module.ViewPurchaseReturn,
+          ),
+      },
+      {
+        path: 'purchasing/reports',
+        loadComponent: () =>
+          import('./components/store-admin/purchasing/reports/purchasing-reports').then(
+            (module) => module.PurchasingReports,
+          ),
+      },
+      {
         path: 'purchasing/goods-receipts',
         loadComponent: () =>
           import('./components/store-admin/purchasing/goods-receipts/goods-receipt-list/goods-receipt-list').then(

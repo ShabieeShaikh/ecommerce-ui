@@ -5,6 +5,7 @@ export type InventoryTransactionType =
   | 'transfer'
   | 'adjustment'
   | 'receive'
+  | 'purchase_return'
   | 'return'
   | 'sale'
   | 'reserve'
@@ -58,8 +59,12 @@ export interface InventoryTransaction {
   destinationAfterQuantity: number | null;
   referenceNumber: string;
   goodsReceiptId?: string;
+  goodsReceiptNumber?: string;
   purchaseOrderId?: string;
   purchaseOrderNumber?: string;
+  purchaseReturnId?: string;
+  purchaseReturnNumber?: string;
+  supplierId?: number;
   supplierName?: string;
   reason: string;
   note: string;
@@ -110,6 +115,29 @@ export interface AddInventoryStockBatchInput {
   occurredAt: string;
   createdBy: string;
   lines: AddInventoryStockLine[];
+}
+
+export interface RemoveInventoryStockLine extends InventoryItemSelection {
+  quantity: number;
+}
+
+export interface RemoveInventoryStockBatchInput {
+  storeId: string;
+  sourceLocationKey: string;
+  supplierId: number;
+  supplierName: string;
+  referenceNumber: string;
+  purchaseReturnId: string;
+  purchaseReturnNumber: string;
+  goodsReceiptId: string;
+  goodsReceiptNumber: string;
+  purchaseOrderId: string;
+  purchaseOrderNumber: string;
+  reason: string;
+  note?: string;
+  occurredAt: string;
+  createdBy: string;
+  lines: RemoveInventoryStockLine[];
 }
 
 export interface AllocateInventoryStockInput extends InventoryItemSelection {

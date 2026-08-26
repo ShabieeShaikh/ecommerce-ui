@@ -1,9 +1,10 @@
-import { Component, HostListener, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 import { AuthService } from '../../../services/auth';
 import { StoreService } from '../../../services/store.service';
 import { ThemeService } from '../../../services/theme.service';
-import { Store } from '../../../models/admin.models';
+import { Store, ToastNotification } from '../../../models/admin.models';
 
 interface NavigationItem {
   label: string;
@@ -28,6 +29,8 @@ interface NavigationItem {
     | 'purchasing'
     | 'supplier'
     | 'purchase-order'
+    | 'payment'
+    | 'purchase-return'
     | 'analytics'
     | 'location'
     | 'settings'
@@ -84,9 +87,15 @@ export class StoreAdminLayout {
   readonly selectedStoreId = this.storeService.selectedStoreId;
   readonly selectedStore = this.storeService.selectedStore;
   readonly stores = this.storeService.stores;
+  readonly queuedAlerts = this.storeService.toasts;
   readonly notifications = this.storeService.notifications;
   readonly unreadCount = this.storeService.unreadNotificationsCount;
-  readonly toasts = this.storeService.toasts;
+  private alertOpen = false;
+  private readonly alertQueueEffect = effect(() => {
+    const nextAlert = this.queuedAlerts()[0];
+    if (!nextAlert || this.alertOpen) return;
+    void this.presentAlert(nextAlert);
+  });
 
   readonly navigationGroups: NavigationGroup[] = [
     {
@@ -253,6 +262,30 @@ export class StoreAdminLayout {
               icon: 'receive',
               exact: true,
             },
+            {
+              label: 'Supplier Invoices',
+              route: '/store-admin/purchasing/supplier-invoices',
+              icon: 'purchase-order',
+              exact: true,
+            },
+            {
+              label: 'Supplier Payments',
+              route: '/store-admin/purchasing/supplier-payments',
+              icon: 'payment',
+              exact: true,
+            },
+            {
+              label: 'Purchase Returns',
+              route: '/store-admin/purchasing/purchase-returns',
+              icon: 'purchase-return',
+              exact: true,
+            },
+            {
+              label: 'Reports',
+              route: '/store-admin/purchasing/reports',
+              icon: 'reports',
+              exact: true,
+            },
           ],
         },
         { label: 'Analytics', route: '/store-admin/analytics', icon: 'analytics' },
@@ -267,6 +300,7 @@ export class StoreAdminLayout {
       ],
     },
   ];
+
 
   readonly userInitials = computed(() =>
     this.getInitials(this.currentUser()?.name ?? 'Store Admin'),
@@ -401,10 +435,6 @@ export class StoreAdminLayout {
     this.router.navigate(['/login']);
   }
 
-  removeToast(id: string): void {
-    this.storeService.removeToast(id);
-  }
-
   onNavItemClick(): void {
     this.closeMobileDrawer();
   }
@@ -428,6 +458,35 @@ export class StoreAdminLayout {
     this.showNotifPanel.set(false);
   }
 
+  private async presentAlert(alert: ToastNotification): Promise<void> {
+    this.alertOpen = true;
+    const presentation: Record<
+      ToastNotification['type'],
+      { title: string; icon: SweetAlertIcon }
+    > = {
+      success: { title: 'Success', icon: 'success' },
+      danger: { title: 'Error', icon: 'error' },
+      warning: { title: 'Warning', icon: 'warning' },
+      info: { title: 'Information', icon: 'info' },
+    };
+    const style = presentation[alert.type];
+    try {
+      await Swal.fire({
+        toast: true,
+        position: 'top-end',
+        title: style.title,
+        text: alert.message,
+        icon: style.icon,
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+    } finally {
+      this.alertOpen = false;
+      this.storeService.removeToast(alert.id);
+    }
+  }
+
   private getInitials(name: string): string {
     return name
       .split(' ')
@@ -440,4 +499,5 @@ export class StoreAdminLayout {
   private formatRole(role: string): string {
     return role.replace(/([a-z])([A-Z])/g, '$1 $2');
   }
+
 }

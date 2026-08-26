@@ -13,6 +13,7 @@ import {
   InventoryOrderStatus,
   InventoryTransaction,
   InventoryTransactionType,
+  RemoveInventoryStockBatchInput,
   TransferInventoryStockInput,
 } from '../models/inventory.models';
 import { ProductVariant } from '../models/product-catalog.models';
@@ -631,6 +632,82 @@ export class InventoryService {
           input.reason?.trim() ||
           (destination.type === 'warehouse' ? 'Warehouse receipt' : 'Stock added'),
         note: input.note?.trim() || input.supplierName.trim(),
+        occurredAt: input.occurredAt,
+        createdBy: input.createdBy,
+        createdAt: timestamp,
+      });
+    });
+
+    this.commitStockReceipt(nextBalances, [...transactions, ...this.transactionsSignal()], () =>
+      afterCommit?.(transactions),
+    );
+    return transactions;
+  }
+
+  removeStockBatch(
+    input: RemoveInventoryStockBatchInput,
+    afterCommit?: (transactions: InventoryTransaction[]) => void,
+  ): InventoryTransaction[] {
+    const source = this.requireLocation(input.storeId, input.sourceLocationKey);
+    this.assertReference(input.storeId, input.referenceNumber);
+    if (!input.lines.length) throw new Error('Select at least one item to return.');
+
+    const itemKeys = new Set<string>();
+    const lines = input.lines.map((line) => {
+      const variantId = this.requireItem(input.storeId, line.productId, line.variantId);
+      const quantity = this.positiveInteger(
+        line.quantity,
+        'Return quantity must be a whole number greater than zero.',
+      );
+      const itemKey = `${line.productId}:${variantId ?? 'simple'}`;
+      if (itemKeys.has(itemKey)) {
+        throw new Error('Each inventory item can appear only once in a supplier return stock-out.');
+      }
+      itemKeys.add(itemKey);
+      const balance = this.getBalance(input.storeId, line.productId, source.key, variantId);
+      if (quantity > balance.availableQuantity) {
+        throw new Error(
+          `Return quantity exceeds available stock of ${balance.availableQuantity} at ${source.name}.`,
+        );
+      }
+      return { ...line, variantId, quantity, balance };
+    });
+
+    const timestamp = new Date().toISOString();
+    const referenceNumber = input.referenceNumber.trim().toUpperCase();
+    let nextBalances = this.balancesSignal().map((balance) => ({ ...balance }));
+    const transactions: InventoryTransaction[] = [];
+
+    lines.forEach(({ balance, ...line }) => {
+      const index = nextBalances.findIndex((candidate) => candidate.id === balance.id);
+      if (index < 0) throw new Error('No stock exists for this item at the return location.');
+      const nextQuantity = balance.quantity - line.quantity;
+      nextBalances[index] = { ...nextBalances[index], quantity: nextQuantity, updatedAt: timestamp };
+      transactions.push({
+        id: this.createId('inventory-transaction'),
+        storeId: input.storeId,
+        productId: line.productId,
+        variantId: line.variantId,
+        type: 'purchase_return',
+        quantity: -line.quantity,
+        unitCost: balance.averageUnitCost,
+        sourceLocationKey: source.key,
+        destinationLocationKey: null,
+        sourceBeforeQuantity: balance.quantity,
+        sourceAfterQuantity: nextQuantity,
+        destinationBeforeQuantity: null,
+        destinationAfterQuantity: null,
+        referenceNumber,
+        goodsReceiptId: input.goodsReceiptId,
+        goodsReceiptNumber: input.goodsReceiptNumber,
+        purchaseOrderId: input.purchaseOrderId,
+        purchaseOrderNumber: input.purchaseOrderNumber,
+        purchaseReturnId: input.purchaseReturnId,
+        purchaseReturnNumber: input.purchaseReturnNumber,
+        supplierId: input.supplierId,
+        supplierName: input.supplierName.trim(),
+        reason: input.reason.trim(),
+        note: input.note?.trim() || `Returned stock to ${input.supplierName.trim()}.`,
         occurredAt: input.occurredAt,
         createdBy: input.createdBy,
         createdAt: timestamp,
@@ -1511,8 +1588,12 @@ export class InventoryService {
       destinationAfterQuantity: transaction.destinationAfterQuantity ?? null,
       referenceNumber: transaction.referenceNumber,
       goodsReceiptId: transaction.goodsReceiptId,
+      goodsReceiptNumber: transaction.goodsReceiptNumber,
       purchaseOrderId: transaction.purchaseOrderId,
       purchaseOrderNumber: transaction.purchaseOrderNumber,
+      purchaseReturnId: transaction.purchaseReturnId,
+      purchaseReturnNumber: transaction.purchaseReturnNumber,
+      supplierId: transaction.supplierId,
       supplierName: transaction.supplierName,
       reason: transaction.reason ?? '',
       note: transaction.note ?? '',
